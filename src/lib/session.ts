@@ -1,4 +1,4 @@
-import type { SessionState } from "@/types";
+import type { SessionState, InterviewBranch } from "@/types";
 
 type FeedbackEntry = {
   message?: string;
@@ -22,7 +22,51 @@ export function createSession(taxYear: string): SessionState {
     current_screen_index: 0,
     tax_year: taxYear,
     completed: false,
+    answerHistory: [],
   };
+}
+
+function getActiveBranchesFor(
+  allBranches: InterviewBranch[],
+  flags: Record<string, boolean>
+): InterviewBranch[] {
+  return allBranches.filter((branch) => {
+    if (branch.always_runs) return true;
+    if (!branch.triggered_by) return false;
+    const triggers = Array.isArray(branch.triggered_by)
+      ? branch.triggered_by
+      : [branch.triggered_by];
+    return triggers.some((t) => flags[t] === true);
+  });
+}
+
+export function replaySession(
+  allBranches: InterviewBranch[],
+  history: NonNullable<SessionState["answerHistory"]>,
+  taxYear: string
+): SessionState {
+  let session = createSession(taxYear);
+  for (const entry of history) {
+    const active = getActiveBranchesFor(allBranches, session.flags);
+    const branch = active[entry.branch_index];
+    if (!branch) break;
+    const screen = branch.screens[entry.screen_index];
+    if (!screen) break;
+    session = {
+      ...session,
+      answers: { ...session.answers, [screen.question_id]: entry.value },
+    };
+    if (screen.screen_type === "multi_select" && Array.isArray(entry.value)) {
+      for (const v of entry.value) {
+        const fb = screen.feedback[String(v)];
+        if (fb) session = applyFeedback(session, fb);
+      }
+    } else {
+      const fb = screen.feedback[String(entry.value)];
+      if (fb) session = applyFeedback(session, fb);
+    }
+  }
+  return session;
 }
 
 export function applyFeedback(session: SessionState, feedback: object): SessionState {

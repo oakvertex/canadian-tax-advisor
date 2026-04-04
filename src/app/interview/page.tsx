@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import interviewFlowJson from "../../../taxonomy/2025/interview-flow.json";
 import taxonomyItemsJson from "../../../taxonomy/2025/items.json";
-import { createSession, applyFeedback } from "@/lib/session";
+import { createSession, applyFeedback, replaySession } from "@/lib/session";
 import InterviewScreenComponent from "@/components/InterviewScreen";
 import RunningChecklist from "@/components/RunningChecklist";
 import type { SessionState, InterviewBranch, InterviewScreen, TaxonomyNode } from "@/types";
@@ -91,11 +91,60 @@ export default function InterviewPage() {
 
   const currentScreen = currentBranch.screens[session.current_screen_index];
 
+  const canGoBack = showingIntro
+    ? session.current_branch_index > 0
+    : (session.answerHistory ?? []).length > 0;
+
+  const handlePrevious = () => {
+    const history = session.answerHistory ?? [];
+
+    if (showingIntro) {
+      // On branch intro: step back to last answered question of previous branch
+      if (history.length === 0) return;
+      const last = history[history.length - 1];
+      const newHistory = history.slice(0, -1);
+      const replayed = replaySession(branches, newHistory, session.tax_year);
+      const finalSession: SessionState = {
+        ...replayed,
+        answerHistory: newHistory,
+        current_branch_index: last.branch_index,
+        current_screen_index: last.screen_index,
+      };
+      saveSession(finalSession);
+      setSession(finalSession);
+      setShowingIntro(false);
+      return;
+    }
+
+    // On a question screen: pop last entry and replay clean state
+    if (history.length === 0) return;
+    const last = history[history.length - 1];
+    const newHistory = history.slice(0, -1);
+    const replayed = replaySession(branches, newHistory, session.tax_year);
+    const finalSession: SessionState = {
+      ...replayed,
+      answerHistory: newHistory,
+      current_branch_index: last.branch_index,
+      current_screen_index: last.screen_index,
+    };
+    saveSession(finalSession);
+    setSession(finalSession);
+  };
+
   const handleAnswer = (screen: InterviewScreen, value: any) => {
-    // 1. Record answer
+    // Record current position to history before advancing
+    const historyEntry = {
+      question_id: screen.question_id,
+      value,
+      branch_index: session.current_branch_index,
+      screen_index: session.current_screen_index,
+    };
+
+    // 1. Record answer and append to history
     let updated: SessionState = {
       ...session,
       answers: { ...session.answers, [screen.question_id]: value },
+      answerHistory: [...(session.answerHistory ?? []), historyEntry],
     };
 
     // 2. Apply feedback
@@ -185,20 +234,40 @@ export default function InterviewPage() {
               <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
                 {currentBranch.branch_label}
               </p>
-              <p className="text-gray-700 text-lg">{currentBranch.intro}</p>
-              <button
-                onClick={() => setShowingIntro(false)}
-                className="self-start px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                Start
-              </button>
+              <p className="text-lg font-semibold text-gray-900">{currentBranch.intro}</p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handlePrevious}
+                  disabled={!canGoBack}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setShowingIntro(false)}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Start
+                </button>
+              </div>
             </div>
           ) : currentScreen ? (
-            <InterviewScreenComponent
-              screen={currentScreen}
-              onAnswer={(value) => handleAnswer(currentScreen, value)}
-              currentAnswers={session.answers}
-            />
+            <div className="flex flex-col gap-6">
+              <InterviewScreenComponent
+                screen={currentScreen}
+                onAnswer={(value) => handleAnswer(currentScreen, value)}
+                currentAnswers={session.answers}
+              />
+              <div>
+                <button
+                  onClick={handlePrevious}
+                  disabled={!canGoBack}
+                  className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+              </div>
+            </div>
           ) : null}
         </div>
 

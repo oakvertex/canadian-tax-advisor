@@ -33,11 +33,13 @@ export default function RunningChecklist({ checklist, taxonomyNodes }: Props) {
             const config = tierConfig[item.confidence_tier];
             const node = taxonomyNodes.find((n) => n.id === item.node_id);
             const label = node ? node.label : item.node_id;
-            const section = node ? node.ita_reference.primary.section : null;
+            const itaRef = node
+              ? `${node.ita_reference.primary.act} s.${node.ita_reference.primary.section}`
+              : null;
             return (
               <li key={item.node_id} className="py-2.5 flex flex-col gap-1">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-medium text-gray-800 leading-snug">
+                <div className="flex items-start justify-between gap-2 max-w-full">
+                  <span className="text-sm font-medium text-gray-800 leading-snug break-all overflow-hidden">
                     {label}
                     {item.count != null && item.count > 1 && (
                       <span className="ml-1 text-gray-500 font-normal">x{item.count}</span>
@@ -49,7 +51,7 @@ export default function RunningChecklist({ checklist, taxonomyNodes }: Props) {
                     {config.label}
                   </span>
                 </div>
-                {section && <p className="text-xs text-gray-400">ITA s.{section}</p>}
+                {itaRef && <p className="text-xs text-gray-400">{itaRef}</p>}
                 {item.reason && <p className="text-xs text-gray-500">{item.reason}</p>}
               </li>
             );

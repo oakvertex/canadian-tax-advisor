@@ -5,9 +5,10 @@ export default function HomePage() {
     <div className="min-h-screen bg-white flex flex-col">
       <main className="flex-1 max-w-2xl mx-auto px-6 py-16 flex flex-col gap-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            Canadian Personal Tax Advisor
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">
+            Canadian Tax Prep Guide
           </h1>
+          <p className="text-sm text-gray-400 mb-6">A TaxReady Product</p>
           <div className="flex flex-col gap-4 text-gray-700 text-base leading-relaxed">
             <p>
               This tool guides Ontario residents through a brief interview to identify income
@@ -34,12 +35,14 @@ export default function HomePage() {
           </p>
         </div>
 
-        <Link
-          href="/interview"
-          className="self-start px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-base font-semibold"
-        >
-          Start Your 2025 Tax Review
-        </Link>
+        <div className="flex justify-center">
+          <Link
+            href="/interview"
+            className="w-full max-w-xs text-center px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-base font-semibold"
+          >
+            Start Your 2025 Tax Review
+          </Link>
+        </div>
       </main>
     </div>
   );

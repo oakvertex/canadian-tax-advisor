@@ -79,6 +79,7 @@ export default function CompletionPage() {
   const incomeItems = checklistWithNodes.filter((e) => e.node?.category === "income");
   const deductionItems = checklistWithNodes.filter((e) => e.node?.category === "deduction");
   const creditItems = checklistWithNodes.filter((e) => e.node?.category === "credit");
+  const generalItems = checklistWithNodes.filter((e) => e.node === null);
 
   // Deduplicated documents sorted by urgency
   const seenDocs = new Set<string>();
@@ -101,7 +102,9 @@ export default function CompletionPage() {
       <ul className="flex flex-col gap-3">
         {items.map(({ item, node }) => {
           const label = node ? node.label : item.node_id;
-          const section = node ? node.ita_reference.primary.section : null;
+          const itaRef = node
+            ? `${node.ita_reference.primary.act} s.${node.ita_reference.primary.section}`
+            : null;
           const config = tierConfig[item.confidence_tier];
           return (
             <li key={item.node_id} className="flex items-start gap-3">
@@ -113,11 +116,17 @@ export default function CompletionPage() {
                       <span className="ml-1 text-gray-500 font-normal">x{item.count}</span>
                     )}
                   </span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.classes}`}>
-                    {config.label}
-                  </span>
+                  {node ? (
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.classes}`}>
+                      {config.label}
+                    </span>
+                  ) : (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
+                      unknown
+                    </span>
+                  )}
                 </div>
-                {section && <p className="text-xs text-gray-400 mt-0.5">ITA s.{section}</p>}
+                {itaRef && <p className="text-xs text-gray-400 mt-0.5">{itaRef}</p>}
                 {item.reason && <p className="text-xs text-gray-500 mt-0.5">{item.reason}</p>}
                 {node?.plain_language && (
                   <p className="text-xs text-gray-500 mt-1 leading-relaxed">{node.plain_language}</p>
@@ -164,9 +173,17 @@ export default function CompletionPage() {
             {renderChecklistItems(creditItems)}
           </section>
 
-          {/* Section 4: Documents */}
+          {/* Section 4: General (unmatched items) */}
+          {generalItems.length > 0 && (
+            <section className="bg-white rounded-xl border border-gray-200 p-6">
+              <SectionHeader number={4} title="General" />
+              {renderChecklistItems(generalItems)}
+            </section>
+          )}
+
+          {/* Section 5: Documents */}
           <section className="bg-white rounded-xl border border-gray-200 p-6">
-            <SectionHeader number={4} title="Documents to Gather" />
+            <SectionHeader number={generalItems.length > 0 ? 5 : 4} title="Documents to Gather" />
             <p className="text-sm text-gray-600 mb-4">
               Prepare the following documents before meeting your tax preparer or filing your
               own return.
@@ -195,9 +212,9 @@ export default function CompletionPage() {
             )}
           </section>
 
-          {/* Section 5: Obligations */}
+          {/* Section 6: Obligations */}
           <section className="bg-white rounded-xl border border-gray-200 p-6">
-            <SectionHeader number={5} title="Obligations and Actions" />
+            <SectionHeader number={generalItems.length > 0 ? 6 : 5} title="Obligations and Actions" />
             {session.obligations.length === 0 ? (
               <EmptyState text="No additional obligations identified." />
             ) : (
@@ -221,8 +238,15 @@ export default function CompletionPage() {
           </section>
         </div>
 
+        {/* Disclaimer */}
+        <p className="mt-8 text-xs text-gray-400 leading-relaxed text-center">
+          This checklist is for preparation purposes only and does not constitute tax advice.
+          Consult a qualified tax professional before filing. —{" "}
+          <span className="font-medium">Canadian Tax Prep Guide by TaxReady</span>
+        </p>
+
         {/* Footer actions */}
-        <div className="mt-8 flex gap-4">
+        <div className="mt-4 flex gap-4">
           <Link
             href="/interview"
             className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"

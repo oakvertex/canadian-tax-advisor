@@ -15,7 +15,7 @@ export default function InterviewScreenComponent({ screen, onAnswer, currentAnsw
   if (screen_type === "single_select") {
     return (
       <div className="flex flex-col gap-4">
-        <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
+        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
         {instruction && <p className="text-gray-600">{instruction}</p>}
         <div className="flex flex-col gap-3 mt-2">
           {options.map((opt) => (
@@ -51,7 +51,7 @@ export default function InterviewScreenComponent({ screen, onAnswer, currentAnsw
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
+      <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
       {instruction && <p className="text-gray-600">{instruction}</p>}
       <p className="text-sm text-gray-500">Select all that apply.</p>
       <div className="flex flex-col gap-3 mt-2">

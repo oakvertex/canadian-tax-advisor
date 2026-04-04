@@ -133,6 +133,12 @@ export interface SessionState {
   current_screen_index: number;
   tax_year: string;
   completed: boolean;
+  answerHistory?: Array<{
+    question_id: string;
+    value: any;
+    branch_index: number;
+    screen_index: number;
+  }>;
 }
 
 export interface MatchedNode {
