@@ -1,1 +1,141 @@
-[]
+[
+  {
+    "id": "deduction_moving_expenses",
+    "tax_year": "2025",
+    "category": "deduction",
+    "subcategory": "other_deductions",
+    "label": "Moving Expenses",
+    "ita_reference": {
+      "primary": {
+        "section": "62(1)",
+        "act": "ITA",
+        "description": "Moving expense deduction for eligible relocations"
+      },
+      "supporting": [
+        {
+          "section": "62(2)",
+          "act": "ITA",
+          "description": "Eligible moving expenses defined"
+        },
+        {
+          "section": "248(1)",
+          "act": "ITA",
+          "description": "Eligible relocation definition — 40km rule"
+        }
+      ]
+    },
+    "legislation_status": {
+      "stable": true,
+      "note": null,
+      "last_verified": "2025-01"
+    },
+    "plain_language": "If you moved at least 40km closer to a new job, business, or school, you may deduct eligible moving costs against income earned at the new location.",
+    "life_event_tags": ["relocation", "new_employment", "started_business", "post_secondary"],
+    "eligibility_conditions": {
+      "logic": "ALL",
+      "conditions": [
+        {
+          "question_id": "move_reason",
+          "operator": "in",
+          "value": ["employment", "business", "post_secondary"]
+        },
+        {
+          "question_id": "move_distance_qualifies",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "flag_conditions": []
+    },
+    "confidence_tier": {
+      "confirmed": {
+        "label": "Likely applies to you",
+        "condition": "all_eligibility_conditions_met"
+      },
+      "possible": {
+        "label": "Moving Expenses",
+        "reasons": {
+          "condition_not_asked": "Distance could not be confirmed in this interview",
+          "fact_dependent": "Deduction ceiling depends on income earned at new location"
+        }
+      }
+    },
+    "limits": {
+      "type": "income_capped",
+      "description": "Deductible to the extent of income earned at the new location",
+      "amounts": [],
+      "phase_out": {
+        "starts_at": null,
+        "eliminated_at": null,
+        "note": null
+      },
+      "carryforward": true,
+      "carryforward_note": "Unused portion carries forward to following tax year under s.62(1)(c)",
+      "carryback": false,
+      "carryback_note": null
+    },
+    "eligible_expenses": [
+      "Travel costs to new location",
+      "Transportation and storage of belongings",
+      "Temporary lodging up to 15 days",
+      "Lease cancellation costs",
+      "Selling costs of old residence",
+      "Legal fees and land transfer taxes on new home",
+      "Cost of maintaining vacant former residence"
+    ],
+    "supporting_documents": [
+      {
+        "document": "Receipts for all moving costs",
+        "note": "Travel movers storage lodging",
+        "urgency": "priority"
+      },
+      {
+        "document": "Proof of new work location",
+        "note": "Offer letter T4 or business registration",
+        "urgency": "priority"
+      },
+      {
+        "document": "Old and new addresses",
+        "note": "CRA may verify 40km threshold",
+        "urgency": "standard"
+      },
+      {
+        "document": "Statement of Adjustments",
+        "note": "If home was sold or purchased as part of move",
+        "urgency": "standard"
+      },
+      {
+        "document": "2024 Notice of Assessment",
+        "note": "If carryforward from prior year suspected",
+        "urgency": "standard"
+      }
+    ],
+    "preparer_flags": [
+      {
+        "flag": "Distance measured by shortest public road route — confirm calculation method",
+        "urgency": "standard"
+      },
+      {
+        "flag": "Income at new location determines deduction ceiling",
+        "urgency": "priority"
+      },
+      {
+        "flag": "Check 2024 NOA for any moving expense carryforward",
+        "urgency": "standard"
+      }
+    ],
+    "legislation_interaction": [
+      {
+        "interacts_with_node": "income_employment_t4",
+        "interaction_type": "requires",
+        "note": "Deduction limited to employment or business income earned at new location"
+      }
+    ],
+    "planning_notes": "If income at new location is low in year of move carryforward maximizes the deduction in the following year.",
+    "newcomer_relevance": {
+      "high": true,
+      "note": "Newcomers relocating for first Canadian employment frequently miss this deduction"
+    },
+    "ontario_specific": false
+  }
+]
