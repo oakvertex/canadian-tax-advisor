@@ -110,6 +110,8 @@ export interface SessionState {
     confidence_tier: "confirmed" | "possible";
     reason?: string;
     planning_note?: string;
+    count?: number;
+    note?: string;
   }>;
   documents: Array<{
     document: string;
