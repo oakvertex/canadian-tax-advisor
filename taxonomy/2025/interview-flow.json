@@ -9027,7 +9027,7 @@
             },
             "preparer_flag": {
               "flag": "Newcomer foreign assets — confirm T1135 requirement if foreign property cost exceeds $100,000 CAD. Penalties for non-filing are significant.",
-              "urgey": "priority"
+              "urgency": "priority"
             }
           }
         }
