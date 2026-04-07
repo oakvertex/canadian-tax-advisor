@@ -7,7 +7,7 @@ import taxonomyItemsJson from "../../../taxonomy/2025/items.json";
 import { createSession, applyScreenFeedback, replaySession } from "@/lib/session";
 import InterviewScreenComponent from "@/components/InterviewScreen";
 import RunningChecklist from "@/components/RunningChecklist";
-import type { SessionState, InterviewBranch, InterviewScreen, TaxonomyNode } from "@/types";
+import type { SessionState, InterviewBranch, InterviewScreen, TaxonomyNode, AnswerValue } from "@/types";
 
 const branches = interviewFlowJson as unknown as InterviewBranch[];
 const taxonomyNodes = taxonomyItemsJson as TaxonomyNode[];
@@ -27,7 +27,7 @@ function getActiveBranches(flags: Record<string, boolean>): InterviewBranch[] {
     .sort((a, b) => a.branch_order - b.branch_order);
 }
 
-function shouldSkip(screen: InterviewScreen, answers: Record<string, any>): boolean {
+function shouldSkip(screen: InterviewScreen, answers: Record<string, AnswerValue>): boolean {
   if (!screen.skip_if) return false;
   const { question_id, operator, value } = screen.skip_if;
   const actual = answers[question_id];
@@ -37,9 +37,9 @@ function shouldSkip(screen: InterviewScreen, answers: Record<string, any>): bool
     case "not_equals":
       return actual !== value;
     case "in":
-      return Array.isArray(value) ? value.includes(actual) : false;
+      return Array.isArray(value) ? value.includes(actual as string) : false;
     case "not_in":
-      return Array.isArray(value) ? !value.includes(actual) : true;
+      return Array.isArray(value) ? !value.includes(actual as string) : true;
     default:
       return false;
   }
@@ -48,7 +48,7 @@ function shouldSkip(screen: InterviewScreen, answers: Record<string, any>): bool
 function findNextScreenIndex(
   branch: InterviewBranch,
   fromIndex: number,
-  answers: Record<string, any>
+  answers: Record<string, AnswerValue>
 ): number {
   let idx = fromIndex;
   while (idx < branch.screens.length && shouldSkip(branch.screens[idx], answers)) {
@@ -104,7 +104,6 @@ export default function InterviewPage() {
     const history = session.answerHistory ?? [];
 
     if (showingBranchSummary !== null) {
-      // On branch completion summary: go back to the last answered question
       if (history.length === 0) return;
       const last = history[history.length - 1];
       const newHistory = history.slice(0, -1);
@@ -123,7 +122,6 @@ export default function InterviewPage() {
     }
 
     if (showingIntro) {
-      // On branch intro: step back to last answered question of previous branch
       if (history.length === 0) return;
       const last = history[history.length - 1];
       const newHistory = history.slice(0, -1);
@@ -140,7 +138,6 @@ export default function InterviewPage() {
       return;
     }
 
-    // On a question screen: pop last entry and replay clean state
     if (history.length === 0) return;
     const last = history[history.length - 1];
     const newHistory = history.slice(0, -1);
@@ -155,26 +152,22 @@ export default function InterviewPage() {
     setSession(finalSession);
   };
 
-  const handleAnswer = (screen: InterviewScreen, value: any) => {
-    // Record current position to history before advancing
+  const handleAnswer = (screen: InterviewScreen, value: AnswerValue | AnswerValue[]) => {
     const historyEntry = {
       question_id: screen.question_id,
-      value,
+      value: value as AnswerValue,
       branch_index: session.current_branch_index,
       screen_index: session.current_screen_index,
     };
 
-    // 1. Record answer and append to history
     let updated: SessionState = {
       ...session,
-      answers: { ...session.answers, [screen.question_id]: value },
+      answers: { ...session.answers, [screen.question_id]: value as AnswerValue },
       answerHistory: [...(session.answerHistory ?? []), historyEntry],
     };
 
-    // 2. Apply feedback (handles both single_select and multi_select)
     updated = applyScreenFeedback(updated, screen, value);
 
-    // 3. Advance to next screen, skipping any skip_if matches
     const nextIdx = findNextScreenIndex(
       currentBranch,
       session.current_screen_index + 1,
@@ -186,7 +179,6 @@ export default function InterviewPage() {
     if (nextIdx < currentBranch.screens.length) {
       finalSession = { ...updated, current_screen_index: nextIdx };
     } else {
-      // Branch complete — advance to next active branch
       const newActiveBranches = getActiveBranches(updated.flags);
       const nextBranchIdx = session.current_branch_index + 1;
 

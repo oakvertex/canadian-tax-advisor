@@ -1,20 +1,20 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import type { SessionState, MatchedNode, TaxonomyNode } from "@/types";
+import type { SessionState, MatchedNode, TaxonomyNode, AnswerValue } from "@/types";
 
-function evaluateAnswerCondition(operator: string, actual: any, expected: any): boolean {
+function evaluateAnswerCondition(operator: string, actual: AnswerValue | undefined, expected: AnswerValue): boolean {
   switch (operator) {
     case "equals":
       return actual === expected;
     case "not_equals":
       return actual !== expected;
     case "in":
-      if (Array.isArray(expected)) return expected.includes(actual);
-      if (Array.isArray(actual)) return actual.includes(expected);
+      if (Array.isArray(expected)) return expected.includes(actual as string);
+      if (Array.isArray(actual)) return actual.includes(expected as string);
       return false;
     case "not_in":
-      if (Array.isArray(expected)) return !expected.includes(actual);
-      if (Array.isArray(actual)) return !actual.includes(expected);
+      if (Array.isArray(expected)) return !expected.includes(actual as string);
+      if (Array.isArray(actual)) return !actual.includes(expected as string);
       return true;
     case "greater_than":
       return typeof actual === "number" && actual > (expected as number);
@@ -25,7 +25,7 @@ function evaluateAnswerCondition(operator: string, actual: any, expected: any): 
   }
 }
 
-function evaluateFlagCondition(operator: string, flagValue: boolean | undefined, expected: any): boolean {
+function evaluateFlagCondition(operator: string, flagValue: boolean | undefined, expected: boolean): boolean {
   const actual = flagValue ?? false;
   switch (operator) {
     case "equals":
@@ -39,7 +39,7 @@ function evaluateFlagCondition(operator: string, flagValue: boolean | undefined,
 
 function evaluateEligibility(
   node: TaxonomyNode,
-  answers: Record<string, any>,
+  answers: Record<string, AnswerValue>,
   flags: Record<string, boolean>
 ): { matches: boolean; allMet: boolean } {
   const { logic, conditions, flag_conditions } = node.eligibility_conditions;

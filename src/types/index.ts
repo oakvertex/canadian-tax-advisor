@@ -1,3 +1,6 @@
+// Shared answer value type — used across interview engine, session, and components
+export type AnswerValue = string | number | boolean | string[];
+
 export interface TaxonomyNode {
   id: string;
   tax_year: string;
@@ -20,12 +23,12 @@ export interface TaxonomyNode {
     conditions: Array<{
       question_id: string;
       operator: "equals" | "not_equals" | "in" | "not_in" | "greater_than" | "less_than";
-      value: any;
+      value: AnswerValue;
     }>;
     flag_conditions: Array<{
       flag: string;
       operator: string;
-      value: any;
+      value: boolean;
     }>;
   };
   confidence_tier: {
@@ -69,12 +72,12 @@ export interface InterviewScreen {
   question_id: string;
   instruction?: string;
   options: Array<{
-    value: any;
+    value: AnswerValue;
     label: string;
     exclusive?: boolean;
   }>;
-  skip_if?: { question_id: string; operator: string; value: any };
-  show_if?: { question_id?: string; flag?: string; operator: string; value: any };
+  skip_if?: { question_id: string; operator: string; value: AnswerValue };
+  show_if?: { question_id?: string; flag?: string; operator: string; value: AnswerValue };
   feedback: Record<string, {
     message: string;
     checklist_update?: { node_id: string; confidence_tier: string; reason?: string } | null;
@@ -103,7 +106,7 @@ export interface InterviewBranch {
 }
 
 export interface SessionState {
-  answers: Record<string, any>;
+  answers: Record<string, AnswerValue>;
   flags: Record<string, boolean>;
   checklist: Array<{
     node_id: string;
@@ -135,7 +138,7 @@ export interface SessionState {
   completed: boolean;
   answerHistory?: Array<{
     question_id: string;
-    value: any;
+    value: AnswerValue;
     branch_index: number;
     screen_index: number;
   }>;

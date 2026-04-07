@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { InterviewScreen } from "@/types";
+import type { InterviewScreen, AnswerValue } from "@/types";
 
 interface Props {
   screen: InterviewScreen;
-  onAnswer: (value: any) => void;
-  currentAnswers: Record<string, any>;
+  onAnswer: (value: AnswerValue | AnswerValue[]) => void;
+  currentAnswers: Record<string, AnswerValue>;
 }
 
 export default function InterviewScreenComponent({ screen, onAnswer, currentAnswers }: Props) {
@@ -14,7 +14,7 @@ export default function InterviewScreenComponent({ screen, onAnswer, currentAnsw
   const currentValue = currentAnswers[question_id];
 
   // Local pending selection for multi_select — onAnswer is only called when Continue is clicked
-  const [pendingSelection, setPendingSelection] = useState<any[]>(() =>
+  const [pendingSelection, setPendingSelection] = useState<AnswerValue[]>(() =>
     Array.isArray(currentValue) ? currentValue : []
   );
 
@@ -41,7 +41,7 @@ export default function InterviewScreenComponent({ screen, onAnswer, currentAnsw
   // multi_select
   const exclusiveValues = options.filter((o) => o.exclusive).map((o) => o.value);
 
-  const toggleOption = (value: any, exclusive?: boolean) => {
+  const toggleOption = (value: AnswerValue, exclusive?: boolean) => {
     setPendingSelection((prev) => {
       if (exclusive) {
         // Exclusive option: select only this one, deselect everything else

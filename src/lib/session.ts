@@ -1,4 +1,4 @@
-import type { SessionState, InterviewBranch, InterviewScreen } from "@/types";
+import type { SessionState, InterviewBranch, InterviewScreen, AnswerValue } from "@/types";
 
 type FeedbackEntry = {
   message?: string;
@@ -64,7 +64,7 @@ export function replaySession(
 export function applyScreenFeedback(
   session: SessionState,
   screen: InterviewScreen,
-  value: any
+  value: AnswerValue | AnswerValue[]
 ): SessionState {
   if (screen.screen_type === "multi_select" && Array.isArray(value)) {
     let updated = session;
