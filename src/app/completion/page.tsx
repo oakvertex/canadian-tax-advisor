@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import taxonomyItemsJson from "../../../taxonomy/2025/items.json";
 import type { SessionState, TaxonomyNode } from "@/types";
+import { formatNodeId, inferCategory } from "@/lib/formatNodeId";
 
 const taxonomyNodes = taxonomyItemsJson as TaxonomyNode[];
 
@@ -21,10 +22,10 @@ const urgencyConfig: Record<string, { label: string; classes: string }> = {
   standard: { label: "Standard", classes: "bg-gray-100 text-gray-700" },
 };
 
-const tierConfig = {
+const tierConfig: Record<string, { label: string; classes: string }> = {
   confirmed: { label: "Confirmed", classes: "bg-green-100 text-green-800" },
   possible: { label: "Possible", classes: "bg-yellow-100 text-yellow-800" },
-} as const;
+};
 
 function SectionHeader({ number, title }: { number: number; title: string }) {
   return (
@@ -76,10 +77,18 @@ export default function CompletionPage() {
     node: nodeMap.get(item.node_id) ?? null,
   }));
 
-  const incomeItems = checklistWithNodes.filter((e) => e.node?.category === "income");
-  const deductionItems = checklistWithNodes.filter((e) => e.node?.category === "deduction");
-  const creditItems = checklistWithNodes.filter((e) => e.node?.category === "credit");
-  const generalItems = checklistWithNodes.filter((e) => e.node === null);
+  const incomeItems = checklistWithNodes.filter(
+    (e) => e.node?.category === "income" || (e.node === null && inferCategory(e.item.node_id) === "income")
+  );
+  const deductionItems = checklistWithNodes.filter(
+    (e) => e.node?.category === "deduction" || (e.node === null && inferCategory(e.item.node_id) === "deduction")
+  );
+  const creditItems = checklistWithNodes.filter(
+    (e) => e.node?.category === "credit" || (e.node === null && inferCategory(e.item.node_id) === "credit")
+  );
+  const generalItems = checklistWithNodes.filter(
+    (e) => e.node === null && inferCategory(e.item.node_id) === "general"
+  );
 
   // Deduplicated documents sorted by urgency
   const seenDocs = new Set<string>();
@@ -101,11 +110,11 @@ export default function CompletionPage() {
     return (
       <ul className="flex flex-col gap-3">
         {items.map(({ item, node }) => {
-          const label = node ? node.label : item.node_id;
+          const label = node ? node.label : formatNodeId(item.node_id);
           const itaRef = node
             ? `${node.ita_reference.primary.act} s.${node.ita_reference.primary.section}`
             : null;
-          const config = tierConfig[item.confidence_tier];
+          const config = tierConfig[item.confidence_tier] ?? tierConfig.possible;
           return (
             <li key={item.node_id} className="flex items-start gap-3">
               <div className="flex-1">
@@ -116,18 +125,11 @@ export default function CompletionPage() {
                       <span className="ml-1 text-gray-500 font-normal">x{item.count}</span>
                     )}
                   </span>
-                  {node ? (
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.classes}`}>
-                      {config.label}
-                    </span>
-                  ) : (
-                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
-                      unknown
-                    </span>
-                  )}
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.classes}`}>
+                    {config.label}
+                  </span>
                 </div>
                 {itaRef && <p className="text-xs text-gray-400 mt-0.5">{itaRef}</p>}
-                {item.reason && <p className="text-xs text-gray-500 mt-0.5">{item.reason}</p>}
                 {node?.plain_language && (
                   <p className="text-xs text-gray-500 mt-1 leading-relaxed">{node.plain_language}</p>
                 )}

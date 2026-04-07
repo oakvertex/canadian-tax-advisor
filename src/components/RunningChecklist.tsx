@@ -1,4 +1,5 @@
 import type { TaxonomyNode } from "@/types";
+import { formatNodeId } from "@/lib/formatNodeId";
 
 interface ChecklistItem {
   node_id: string;
@@ -14,10 +15,10 @@ interface Props {
   taxonomyNodes: TaxonomyNode[];
 }
 
-const tierConfig = {
+const tierConfig: Record<string, { label: string; classes: string }> = {
   confirmed: { label: "Confirmed", classes: "bg-green-100 text-green-800" },
   possible: { label: "Possible", classes: "bg-yellow-100 text-yellow-800" },
-} as const;
+};
 
 export default function RunningChecklist({ checklist, taxonomyNodes }: Props) {
   return (
@@ -30,9 +31,9 @@ export default function RunningChecklist({ checklist, taxonomyNodes }: Props) {
       ) : (
         <ul className="flex flex-col divide-y divide-gray-100">
           {checklist.map((item) => {
-            const config = tierConfig[item.confidence_tier];
+            const config = tierConfig[item.confidence_tier] ?? tierConfig.possible;
             const node = taxonomyNodes.find((n) => n.id === item.node_id);
-            const label = node ? node.label : item.node_id;
+            const label = node ? node.label : formatNodeId(item.node_id);
             const itaRef = node
               ? `${node.ita_reference.primary.act} s.${node.ita_reference.primary.section}`
               : null;
@@ -52,7 +53,6 @@ export default function RunningChecklist({ checklist, taxonomyNodes }: Props) {
                   </span>
                 </div>
                 {itaRef && <p className="text-xs text-gray-400">{itaRef}</p>}
-                {item.reason && <p className="text-xs text-gray-500">{item.reason}</p>}
               </li>
             );
           })}
