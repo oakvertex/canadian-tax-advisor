@@ -1,0 +1,393 @@
+{
+  "branch_id": "branch_self_employment",
+  "branch_label": "Self-Employment",
+  "branch_order": 7,
+  "always_runs": false,
+  "triggered_by": "life_event_started_business",
+  "intro": "Self-employment income is reported on Form T2125 — you report gross revenue and deduct eligible business expenses, paying tax only on net income. Let's make sure all legitimate expenses are captured and key obligations are flagged.",
+  "screens": [
+    {
+      "screen_id": "selfemploy_business_type",
+      "screen_type": "multi_select",
+      "title": "Which of the following describes your self-employment in 2025?",
+      "question_id": "business_type",
+      "instruction": "Select all that apply. Different business structures have different reporting requirements on your T1.",
+      "options": [
+        { "value": "sole_proprietor", "label": "Sole proprietor — operating under my own name or a business name" },
+        { "value": "partnership",     "label": "Partnership — sharing the business with one or more partners" },
+        { "value": "incorporated",    "label": "Incorporated — operating through a corporation" },
+        { "value": "freelance_gig",   "label": "Freelance or gig work — contracts, platforms, or occasional income" },
+        { "value": "professional",    "label": "Professional practice — legal, medical, accounting, or consulting" }
+      ],
+      "feedback": {
+        "sole_proprietor": {
+          "message": "Sole proprietorship income and expenses are reported on Form T2125 — Statement of Business or Professional Activities. Net income flows directly to Line 13500 of your T1.",
+          "activates_flag": "is_sole_proprietor",
+          "checklist_update": {
+            "node_id": "income_self_employment",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "partnership": {
+          "message": "Your share of partnership income and expenses is reported on Form T2125. A T5013 Partnership Information Return may also be issued. Bring both your T5013 slip and the partnership agreement showing your profit-sharing percentage.",
+          "checklist_update": {
+            "node_id": "income_self_employment",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T5013 Partnership slip (if issued) and partnership agreement showing your profit/loss sharing percentage",
+            "urgency": "priority"
+          }
+        },
+        "incorporated": {
+          "message": "Your corporation files its own T2 return separately. On your personal T1 you report: salary drawn from the corporation (T4 slip), dividends received (T5 slip), and any taxable shareholder benefits. This tool covers your personal T1 only — the T2 corporate return requires separate preparation.",
+          "activates_flag": "is_incorporated",
+          "preparer_flag": {
+            "flag": "Corporation requires separate T2 return — not covered by this tool. Confirm T4 salary and T5 dividend slips from corporation for personal T1.",
+            "urgency": "priority"
+          }
+        },
+        "freelance_gig": {
+          "message": "Freelance and gig income — including Uber, DoorDash, Airbnb hosting, Fiverr, or contract work — is fully taxable as business income under ITA s.9(1). All eligible expenses directly related to earning that income are deductible on Form T2125.",
+          "activates_flag": "is_freelance",
+          "checklist_update": {
+            "node_id": "income_self_employment",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "professional": {
+          "message": "Professional practice income is reported on Form T2125. Note: certain designated professionals (lawyers, accountants, engineers, physicians, chiropractors, dentists) may elect to exclude unbilled work-in-progress from income under ITA s.34. Your preparer will advise whether this election applies.",
+          "activates_flag": "is_professional",
+          "checklist_update": {
+            "node_id": "income_self_employment",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Professional practice — confirm ITA s.34 work-in-progress election status if applicable to this profession",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "selfemploy_revenue_range",
+      "screen_type": "single_select",
+      "title": "Approximately what was your gross business revenue in 2025?",
+      "question_id": "business_revenue_range",
+      "instruction": "Gross revenue before any expenses. This determines GST/HST registration requirements under the Excise Tax Act.",
+      "skip_if": {
+        "flag": "is_incorporated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "under_30k",       "label": "Under $30,000" },
+        { "value": "30k_to_100k",     "label": "$30,000 to $100,000" },
+        { "value": "100k_to_500k",    "label": "$100,000 to $500,000" },
+        { "value": "over_500k",       "label": "Over $500,000" },
+        { "value": "prefer_not_to_say","label": "I would prefer not to say" }
+      ],
+      "feedback": {
+        "under_30k": {
+          "message": "Under $30,000 cumulative gross revenue you qualify as a small supplier under the Excise Tax Act — GST/HST registration is not mandatory. However voluntary registration allows you to claim Input Tax Credits (ITCs) on your business purchases. Your preparer can advise whether voluntary registration benefits you.",
+          "activates_flag": "gst_voluntary_only",
+          "preparer_flag": {
+            "flag": "Revenue under $30,000 — advise on voluntary GST/HST registration and input tax credit opportunity",
+            "urgency": "standard"
+          }
+        },
+        "30k_to_100k": {
+          "message": "Once cumulative revenue exceeds $30,000 in any 12-month period, GST/HST registration is mandatory under the Excise Tax Act. If not already registered this must be done immediately — penalties apply for late registration and unremitted GST. The Quick Method of accounting is available and may simplify compliance.",
+          "activates_flag": "gst_mandatory",
+          "checklist_update": {
+            "node_id": "obligation_gst_hst_registration",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "GST/HST registration mandatory above $30,000 — confirm registration status. Penalties apply for late registration.",
+            "urgency": "urgent"
+          }
+        },
+        "100k_to_500k": {
+          "message": "GST/HST registration is mandatory. At this revenue level filing is likely quarterly. Input Tax Credits (ITCs) on business expenses are recoverable. Bring your GST/HST returns filed in 2025 and all remittance records.",
+          "activates_flag": "gst_mandatory",
+          "checklist_update": {
+            "node_id": "obligation_gst_hst_registration",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "GST/HST returns filed in 2025 and remittance payment confirmations",
+            "urgency": "priority"
+          }
+        },
+        "over_500k": {
+          "message": "At this revenue level monthly GST/HST filing is mandatory. Payroll source deductions also apply if you have employees or pay yourself a salary. Bring all GST/HST returns, remittance records, and T4 summaries.",
+          "activates_flag": "gst_mandatory",
+          "checklist_update": {
+            "node_id": "obligation_gst_hst_registration",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "GST/HST returns and remittances for all 2025 periods plus T4 Summary if employees",
+            "urgency": "priority"
+          }
+        },
+        "prefer_not_to_say": {
+          "message": "We will flag GST/HST registration as a priority item for your preparer to confirm based on your actual revenue.",
+          "checklist_update": {
+            "node_id": "obligation_gst_hst_registration",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "Confirm gross revenue and GST/HST registration status — mandatory above $30,000 cumulative in any 12-month period",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "selfemploy_books_records",
+      "screen_type": "single_select",
+      "title": "How did you track your business income and expenses in 2025?",
+      "question_id": "bookkeeping_method",
+      "instruction": "CRA requires you to maintain adequate books and records to support all revenue and expense claims on Form T2125.",
+      "skip_if": {
+        "flag": "is_incorporated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "accounting_software", "label": "Accounting software — QuickBooks, Wave, FreshBooks, or similar" },
+        { "value": "spreadsheet",         "label": "Spreadsheet — Excel or Google Sheets" },
+        { "value": "manual",              "label": "Manual records — paper receipts and notes" },
+        { "value": "none",                "label": "I did not keep formal records" }
+      ],
+      "feedback": {
+        "accounting_software": {
+          "message": "Good recordkeeping. Export a profit and loss summary for the full year 2025 and bring it to your preparer along with bank statements for reconciliation.",
+          "document_checklist_add": {
+            "document": "Profit and loss report from accounting software — full year 2025, plus business bank statements",
+            "urgency": "priority"
+          }
+        },
+        "spreadsheet": {
+          "message": "Spreadsheet records are acceptable. Bring a summary of all income and expenses by category along with supporting receipts. Your preparer will map these to the T2125 expense categories.",
+          "document_checklist_add": {
+            "document": "Business income and expense summary spreadsheet plus all supporting receipts organized by category",
+            "urgency": "priority"
+          }
+        },
+        "manual": {
+          "message": "Manual records are acceptable but carry higher audit risk. Organize all receipts by expense category before your preparer appointment. Your preparer will total each category and reconcile against your bank deposits.",
+          "document_checklist_add": {
+            "document": "All business receipts organized by expense category plus business bank statements showing all deposits",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Manual records only — organize receipts by category before appointment. Recommend accounting software for 2026 to reduce audit risk.",
+            "urgency": "standard"
+          }
+        },
+        "none": {
+          "message": "Without records CRA can disallow all expense claims on audit and estimate income from bank deposits. Before your appointment gather: all 2025 bank statements, credit card statements, and any receipts you can locate. Your preparer will reconstruct records from bank data. This is a critical risk item.",
+          "preparer_flag": {
+            "flag": "CRITICAL: No business records kept — gather all bank and credit card statements immediately. Preparer must reconstruct from bank data. High audit risk if reviewed.",
+            "urgency": "critical"
+          },
+          "document_checklist_add": {
+            "document": "All 2025 bank statements and credit card statements — complete year, all accounts used for business income and expenses",
+            "urgency": "critical"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "selfemploy_home_office",
+      "screen_type": "single_select",
+      "title": "Did you use part of your home as your principal place of business in 2025?",
+      "question_id": "selfemploy_home_office",
+      "instruction": "Self-employed individuals may deduct a proportionate share of home expenses under ITA s.18(12). The workspace must be either your principal place of business, or used exclusively for business and regularly for meeting clients.",
+      "skip_if": {
+        "flag": "is_incorporated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I work primarily from home" },
+        { "value": "partial", "label": "Yes — partially, I also have an outside office or client location" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Home office expenses are deductible under ITA s.18(12) based on the proportion of your home used exclusively for business — calculated as business-use square footage divided by total home square footage. Eligible expenses include rent or mortgage interest, property taxes, utilities, heat, and home insurance. The deduction cannot exceed your net business income for the year — excess amounts carry forward.",
+          "activates_flag": "selfemploy_home_office",
+          "checklist_update": {
+            "node_id": "deduction_selfemploy_home_office",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Home office receipts for 2025 — rent or mortgage statement, property tax bill, utility bills, insurance, and square footage measurements of business vs total home space",
+            "urgency": "standard"
+          }
+        },
+        "partial": {
+          "message": "A partial home office may still qualify under ITA s.18(12) if it is your principal place of business or is used exclusively for business and regularly for client meetings. Your preparer will determine eligibility based on the actual usage pattern.",
+          "activates_flag": "selfemploy_home_office",
+          "checklist_update": {
+            "node_id": "deduction_selfemploy_home_office",
+            "confidence_tier": "possible",
+            "reason": "professional_judgment_required"
+          },
+          "preparer_flag": {
+            "flag": "Partial home office — confirm whether workspace qualifies as principal place of business or exclusive business use under ITA s.18(12)",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No home office deduction applicable."
+        }
+      }
+    },
+    {
+      "screen_id": "selfemploy_vehicle",
+      "screen_type": "single_select",
+      "title": "Did you use your personal vehicle for business purposes in 2025?",
+      "question_id": "selfemploy_vehicle",
+      "instruction": "Business-use vehicle expenses are deductible under ITA s.18(1)(a) in proportion to business kilometres driven. Commuting from home to a fixed office location does not qualify.",
+      "skip_if": {
+        "flag": "is_incorporated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I drove to client locations, job sites, or for business errands" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Vehicle expenses are deductible under ITA s.18(1)(a) in proportion to business kilometres over total kilometres driven. Eligible expenses include fuel, insurance, repairs, licence fees, and a Capital Cost Allowance (CCA) claim for the vehicle itself. A detailed mileage log is essential — CRA routinely audits vehicle claims and will disallow the deduction without one.",
+          "activates_flag": "selfemploy_vehicle",
+          "checklist_update": {
+            "node_id": "deduction_selfemploy_vehicle",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Mileage log for 2025 — date, destination, business purpose, kilometres per trip, total annual km, and total business km",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Self-employment vehicle claim — confirm CCA class for vehicle, confirm ownership vs lease, and obtain all vehicle operating cost receipts",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No business vehicle use noted."
+        }
+      }
+    },
+    {
+      "screen_id": "selfemploy_employees",
+      "screen_type": "single_select",
+      "title": "Did you pay any employees or contractors in 2025?",
+      "question_id": "has_employees",
+      "instruction": "Employees require payroll source deductions (CPP, EI, income tax) remitted to CRA and T4 slips by February 28. Contractors are paid gross with no deductions — but the distinction is not always clear.",
+      "skip_if": {
+        "flag": "is_incorporated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "employees",   "label": "Yes — employees (I deducted CPP, EI, and income tax from their pay)" },
+        { "value": "contractors", "label": "Yes — contractors or subcontractors only (no source deductions)" },
+        { "value": "both",        "label": "Both employees and contractors" },
+        { "value": false,         "label": "No — I worked alone" }
+      ],
+      "feedback": {
+        "employees": {
+          "message": "Employer payroll obligations: remit CPP (employee and employer portions), EI (employee and 1.4x employer portion), and income tax source deductions to CRA. Issue T4 slips by February 28, 2026. File T4 Summary with CRA. Employer CPP contributions are deductible business expenses.",
+          "activates_flag": "has_employees",
+          "checklist_update": {
+            "node_id": "obligation_payroll_remittances",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Payroll records for all employees — T4 slips issued, remittance receipts, and PD7A payroll remittance statements",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Confirm T4 slips issued by Feb 28 and all 2025 payroll remittances to CRA are up to date",
+            "urgency": "urgent"
+          }
+        },
+        "contractors": {
+          "message": "Contractors are paid gross with no source deductions. However CRA may reclassify workers as employees based on control, ownership of tools, and financial risk — this is called worker misclassification and carries significant penalties. If any contractor was paid over $500 in the year, a T4A slip must be issued.",
+          "document_checklist_add": {
+            "document": "Contractor invoices and T4A slips issued for contractors paid over $500 in 2025",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Confirm worker classification — CRA may reclassify contractors as employees. T4A required for any contractor paid over $500.",
+            "urgency": "standard"
+          }
+        },
+        "both": {
+          "message": "Both employees and contractors noted. T4 slips required for employees (due Feb 28), T4A slips required for contractors paid over $500. Payroll remittances for employees must be current.",
+          "activates_flag": "has_employees",
+          "document_checklist_add": {
+            "document": "T4 slips for employees, T4A slips for contractors over $500, payroll remittance records",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No employees or contractors noted."
+        }
+      }
+    },
+    {
+      "screen_id": "selfemploy_cpp",
+      "screen_type": "single_select",
+      "title": "Are you aware that self-employed individuals pay both the employee and employer portions of CPP?",
+      "question_id": "selfemploy_cpp_awareness",
+      "instruction": "Self-employed individuals pay CPP contributions on net self-employment income under ITA s.4(1) of the CPP Act — both the employee and employer portions. For 2025 this is approximately 11.4% on net income between $3,500 and $73,200.",
+      "skip_if": {
+        "flag": "is_incorporated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I am aware and have set funds aside" },
+        { "value": false, "label": "No — I did not know about this" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Good. The employer portion of your CPP contributions (approximately half) is deductible as a business expense on Line 22200 of your T1. The employee portion is claimed as a credit on Schedule 8.",
+          "preparer_flag": {
+            "flag": "Confirm CPP contributions on Schedule 8 — deduct employer portion as business expense on Line 22200",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "Important: self-employed individuals pay CPP at approximately 11.4% on net self-employment income between $3,500 and $73,200 in 2025 — roughly $7,970 at maximum. This is separate from your income tax and is often a surprise at filing. Set funds aside if possible before your return is filed. The employer portion is deductible as a business expense.",
+          "preparer_flag": {
+            "flag": "Client unaware of self-employed CPP obligations — advise on amount owing and employer deduction. Manage cash flow expectations.",
+            "urgency": "priority"
+          }
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Self-employment section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "Complete income and expense records — accounting software report, spreadsheet, or organized receipts",
+      "Business bank statements for the full year",
+      "Mileage log if vehicle expenses claimed",
+      "Home office measurements and expense receipts if home office claimed",
+      "GST/HST returns and remittance records if registered",
+      "Payroll and T4/T4A records if workers were engaged"
+    ],
+    "transition": "Next: Retirement."
+  }
+}

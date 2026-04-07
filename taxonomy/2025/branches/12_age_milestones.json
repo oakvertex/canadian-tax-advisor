@@ -1,0 +1,199 @@
+{
+  "branch_id": "branch_age_milestone",
+  "branch_label": "Age Milestones",
+  "branch_order": 12,
+  "always_runs": false,
+  "triggered_by": ["life_event_age_milestone", "age_65_plus", "rrsp_conversion_required"],
+  "intro": "Turning 18, 65, or 71 triggers specific tax obligations and planning opportunities. Let's confirm what your milestone means for your 2025 return.",
+  "screens": [
+    {
+      "screen_id": "age_milestone_which",
+      "screen_type": "single_select",
+      "title": "Which age milestone did you reach in 2025?",
+      "question_id": "age_milestone_reached",
+      "options": [
+        { "value": "turned_18",  "label": "I turned 18 in 2025" },
+        { "value": "turned_65",  "label": "I turned 65 in 2025" },
+        { "value": "turned_71",  "label": "I turned 71 in 2025" },
+        { "value": "over_71",    "label": "I am already past 71 — I need to confirm RRIF obligations" }
+      ],
+      "feedback": {
+        "turned_18": {
+          "message": "At 18 you become eligible to open a TFSA — you can contribute $7,000 in 2025 plus $7,000 accumulated from 2024. If you worked in prior years your RRSP room (from the prior year's T1) is also available.",
+          "activates_flag": "milestone_18"
+        },
+        "turned_65": {
+          "message": "At 65 you become eligible for the Age Amount credit under ITA s.118(2), the Pension Income Credit under ITA s.118(3), pension income splitting under ITA s.60.03, and RRIF conversions. OAS eligibility also begins at 65. We will confirm each item.",
+          "activates_flag": "age_65_plus",
+          "activates_flag_note": "milestone_65 also set for planning purposes"
+        },
+        "turned_71": {
+          "message": "Turning 71 is the RRSP deadline year. Your RRSP must be converted to a RRIF or annuity by December 31, 2025 under ITA s.146(2)(b.4). You may still contribute to your RRSP in 2025 if you have contribution room — in fact making a final contribution before converting can be beneficial. We will confirm the conversion status.",
+          "activates_flag": "rrsp_conversion_required",
+          "activates_flag_note": "milestone_71 also set"
+        },
+        "over_71": {
+          "message": "Post-71 obligations are ongoing — minimum RRIF withdrawals are required each year. We will confirm your minimum withdrawal was taken.",
+          "activates_flag": "rrsp_conversion_required"
+        }
+      }
+    },
+    {
+      "screen_id": "age_milestone_tfsa_18",
+      "screen_type": "single_select",
+      "title": "Did you open a TFSA in 2025 now that you are 18?",
+      "question_id": "opened_tfsa_at_18",
+      "show_if": {
+        "flag": "milestone_18",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,       "label": "Yes — I opened and contributed to a TFSA" },
+        { "value": "opened",   "label": "I opened one but did not contribute yet" },
+        { "value": false,      "label": "Not yet" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "TFSA contributions are not deductible but all growth and withdrawals are completely tax-free. Your 2025 limit is $7,000 plus $7,000 accumulated room from 2024 (if you were 17 at any point in 2024). Over-contribution is subject to a 1% monthly penalty. Confirm your exact contribution room through CRA My Account.",
+          "document_checklist_add": {
+            "document": "TFSA contribution receipt from financial institution — confirm 2025 amount contributed",
+            "urgency": "standard"
+          }
+        },
+        "opened": {
+          "message": "Room is accumulating. You can contribute up to $7,000 per year once you are 18 regardless of income. Your total 2025 limit is $7,000 (2025) plus $7,000 (carried over from 2024 if you were a Canadian resident aged 17 in 2024)."
+        },
+        "false": {
+          "message": "Consider opening a TFSA — it is one of the best savings vehicles available and you can contribute up to $14,000 immediately ($7,000 for 2024 plus $7,000 for 2025)."
+        }
+      }
+    },
+    {
+      "screen_id": "age_milestone_oas_65",
+      "screen_type": "single_select",
+      "title": "Did you apply for Old Age Security (OAS) when you turned 65?",
+      "question_id": "oas_application_status",
+      "show_if": {
+        "flag": "age_65_plus",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,     "label": "Yes — I receive or have applied for OAS" },
+        { "value": "defer",  "label": "I am deferring OAS to increase my monthly payments" },
+        { "value": false,    "label": "I have not applied yet" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "OAS confirmed. Payments are taxable under ITA s.56(1)(a). If your net income exceeds $90,997 in 2025 the OAS clawback applies under ITA s.180.2. We covered this in the Retirement section.",
+          "activates_flag": "receives_oas"
+        },
+        "defer": {
+          "message": "Deferring OAS by up to 5 years (to age 70) increases your monthly payment by 0.6% per month of deferral — a maximum increase of 36% at age 70. This is often advantageous if you have other income and expect to live beyond the breakeven age of approximately 75. Your preparer can model the optimal start age.",
+          "preparer_flag": {
+            "flag": "OAS deferral elected — model optimal OAS start age based on current income, expected longevity, and tax bracket",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "OAS is not automatic — you must apply. If you are 65 or older and have not applied, contact Service Canada. You may also be entitled to retroactive payments up to 11 months.",
+          "preparer_flag": {
+            "flag": "OAS not yet applied for — client should contact Service Canada. Retroactive entitlement up to 11 months.",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "age_milestone_rrsp_final_contribution",
+      "screen_type": "single_select",
+      "title": "Did you make a final RRSP contribution in 2025 before the December 31 deadline?",
+      "question_id": "rrsp_final_contribution",
+      "instruction": "The year you turn 71 is your last year to contribute to your own RRSP. The deadline is December 31 of that year — not the usual 60-day window. A final contribution before conversion is often beneficial.",
+      "show_if": {
+        "flag": "rrsp_conversion_required",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,   "label": "Yes — I made a final RRSP contribution before December 31, 2025" },
+        { "value": false,  "label": "No" },
+        { "value": "unsure","label": "I am not sure" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Final RRSP contribution confirmed. This contribution is deductible on your 2025 T1. Bring your RRSP contribution receipt. Note: if you over-contributed you are subject to a 1% monthly penalty on the excess under ITA s.204.1.",
+          "document_checklist_add": {
+            "document": "RRSP contribution receipt for final 2025 contribution — confirm amount does not exceed available deduction room",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Final RRSP contribution made — confirm contribution room available to avoid over-contribution penalty under ITA s.204.1",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "If you had remaining RRSP room and did not contribute in 2025, that room is permanently lost after conversion. Your preparer can confirm whether any room remains for future spousal RRSP contributions if your spouse is under 71."
+        },
+        "unsure": {
+          "message": "Check CRA My Account for your 2025 RRSP deduction limit and any contributions recorded. Bring all RRSP receipts to your preparer.",
+          "document_checklist_add": {
+            "document": "All 2025 RRSP contribution receipts and Notice of Assessment showing available RRSP deduction limit",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "age_milestone_rrif_minimum",
+      "screen_type": "single_select",
+      "title": "Did you take at least the minimum required RRIF withdrawal in 2025?",
+      "question_id": "rrif_minimum_taken",
+      "instruction": "RRIF minimum withdrawals are mandatory each year under ITA s.146.3. The minimum percentage is based on your age on January 1, 2025. Failure to take the minimum results in penalty tax.",
+      "show_if": {
+        "flag": "receives_rrif",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,   "label": "Yes — I took at least the minimum" },
+        { "value": false,  "label": "No — I did not take a withdrawal" },
+        { "value": "unsure","label": "I am not sure if the amount was the minimum" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "RRIF minimum confirmed. RRIF withdrawals are taxable and reported on a T4RIF slip. Amounts above the minimum may also qualify for the Pension Income Credit under ITA s.118(3) if you are 65 or older.",
+          "document_checklist_add": {
+            "document": "T4RIF — Statement of Income from RRIF showing total withdrawal amount in 2025",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "Missing the RRIF minimum withdrawal results in a 1% monthly penalty tax under ITA s.146.3 on the shortfall. Contact your financial institution immediately to arrange a catch-up withdrawal and speak with your preparer about penalty mitigation.",
+          "preparer_flag": {
+            "flag": "RRIF minimum withdrawal not taken in 2025 — penalty tax may apply under ITA s.146.3. Contact financial institution and advise preparer for mitigation options.",
+            "urgency": "critical"
+          }
+        },
+        "unsure": {
+          "message": "Contact your financial institution to confirm the minimum amount required for 2025 and verify the actual withdrawal. Bring your T4RIF slip to your preparer.",
+          "document_checklist_add": {
+            "document": "T4RIF slip and RRIF statement confirming 2025 minimum withdrawal amount taken",
+            "urgency": "priority"
+          }
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Age milestones section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "RRSP contribution receipt for final 2025 contribution if applicable",
+      "T4RIF — RRIF withdrawal statement",
+      "TFSA contribution receipts if opened at 18"
+    ],
+    "transition": "Next: Savings and Registered Plans."
+  }
+}

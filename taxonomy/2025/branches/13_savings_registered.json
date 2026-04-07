@@ -1,0 +1,155 @@
+{
+  "branch_id": "branch_savings_registered",
+  "branch_label": "Savings and Registered Plans",
+  "branch_order": 13,
+  "always_runs": true,
+  "intro": "RRSP, TFSA, FHSA, and other registered plans affect nearly every Canadian's T1 return. Let's make sure your contributions, deductions, and any over-contributions are properly addressed.",
+  "screens": [
+    {
+      "screen_id": "savings_rrsp_contributed",
+      "screen_type": "single_select",
+      "title": "Did you contribute to an RRSP in 2025 or within 60 days of January 1, 2026?",
+      "question_id": "rrsp_contributed",
+      "instruction": "RRSP contributions are deductible under ITA s.146(1) up to your deduction limit shown on your Notice of Assessment. Contributions made from January 1, 2025 to March 1, 2026 can be claimed on your 2025 return.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "RRSP contributions reduce your taxable income dollar for dollar up to your deduction limit. Your limit is shown on your most recent Notice of Assessment. Contribution receipts are mailed by your financial institution — also available through CRA My Account. Note: you do not have to deduct the full contribution in 2025 — unused contributions can be carried forward to future years when your marginal rate may be higher.",
+          "checklist_update": {
+            "node_id": "deduction_rrsp_contribution",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "RRSP contribution receipts for all contributions from March 2, 2025 to March 1, 2026",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No RRSP contributions in 2025. Unused RRSP room accumulates indefinitely — check your most recent Notice of Assessment for your available room."
+        }
+      }
+    },
+    {
+      "screen_id": "savings_rrsp_deduction_timing",
+      "screen_type": "single_select",
+      "title": "Do you want to deduct the full RRSP contribution on your 2025 return?",
+      "question_id": "rrsp_deduct_full",
+      "instruction": "You can contribute to an RRSP now but carry the deduction forward to a future year when your income — and marginal tax rate — may be higher. This is a legitimate and often beneficial planning strategy.",
+      "show_if": {
+        "flag": "has_employment_income",
+        "operator": "equals",
+        "value": false
+      },
+      "options": [
+        { "value": true,    "label": "Yes — deduct the full contribution on my 2025 return" },
+        { "value": false,   "label": "No — I want to carry forward some or all of the deduction" },
+        { "value": "discuss","label": "I want my preparer to advise on the optimal timing" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Full deduction on 2025 return confirmed."
+        },
+        "false": {
+          "message": "Carrying forward the RRSP deduction is noted. This is beneficial if your income is expected to be higher in a future year — the deduction saves more tax at a higher marginal rate. Your preparer will note the carry-forward amount.",
+          "preparer_flag": {
+            "flag": "Client prefers to carry forward some or all RRSP deduction — model optimal deduction year based on income projections",
+            "urgency": "standard"
+          }
+        },
+        "discuss": {
+          "message": "Your preparer will model the deduction timing based on your current and projected future income to maximize tax savings.",
+          "preparer_flag": {
+            "flag": "Model RRSP deduction timing — compare current year vs future year tax saving based on marginal rates",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "savings_spousal_rrsp",
+      "screen_type": "single_select",
+      "title": "Did you contribute to a spousal RRSP in 2025?",
+      "question_id": "spousal_rrsp_contributed",
+      "instruction": "A spousal RRSP contribution uses your own deduction room but builds retirement savings in your spouse's name — useful for equalizing retirement income and reducing total tax through pension splitting.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Spousal RRSP contributions are deductible on your return using your own RRSP room. However if your spouse withdraws from the spousal RRSP within 3 calendar years of any spousal contribution, the withdrawal is attributed back to you as income under ITA s.146(8.3) — the attribution rule. Your preparer must track the last spousal contribution date.",
+          "document_checklist_add": {
+            "document": "Spousal RRSP contribution receipt and record of last spousal contribution date — required to assess 3-year attribution rule under ITA s.146(8.3)",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Spousal RRSP contribution — record date of last contribution for 3-year attribution rule under ITA s.146(8.3)",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No spousal RRSP contributions noted."
+        }
+      }
+    },
+    {
+      "screen_id": "savings_tfsa",
+      "screen_type": "single_select",
+      "title": "Did you contribute to a TFSA in 2025?",
+      "question_id": "tfsa_contributed",
+      "instruction": "TFSA contributions are not deductible but all growth and withdrawals are tax-free. Over-contributions are subject to a 1% monthly penalty tax on the excess amount under ITA s.207.02.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "TFSA contributions are not tax-deductible and do not appear on your T1. However the 2025 annual contribution limit is $7,000. If you have withdrawn funds from a TFSA in prior years those amounts are added back to your room on January 1 of the following year. Confirm your exact room through CRA My Account to avoid over-contribution penalties.",
+          "preparer_flag": {
+            "flag": "Confirm TFSA contribution room through CRA My Account — over-contribution penalty is 1% per month on excess under ITA s.207.02",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No TFSA contributions noted."
+        }
+      }
+    },
+    {
+      "screen_id": "savings_rrsp_over_contribution",
+      "screen_type": "single_select",
+      "title": "Are you concerned you may have over-contributed to your RRSP?",
+      "question_id": "rrsp_over_contribution_concern",
+      "instruction": "RRSP over-contributions above the $2,000 lifetime buffer are subject to a 1% monthly penalty tax under ITA s.204.1. Your deduction limit is on your most recent Notice of Assessment.",
+      "options": [
+        { "value": true,  "label": "Yes — I may have exceeded my deduction limit" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "RRSP over-contributions above a $2,000 lifetime buffer are penalized at 1% per month under ITA s.204.1. If you have over-contributed you must file Form T1-OVP by March 31, 2026 to self-assess the penalty. Remedies include withdrawing the excess (a Form T3012A can reduce withholding tax on the withdrawal) or using deduction room from 2025 earned income if contribution room increases in 2026.",
+          "preparer_flag": {
+            "flag": "RRSP over-contribution concern — verify contribution room immediately via CRA My Account. File T1-OVP by March 31, 2026 if excess exists. Advise on T3012A withdrawal option.",
+            "urgency": "urgent"
+          }
+        },
+        "false": {
+          "message": "No over-contribution concern noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Savings and registered plans section complete.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "RRSP contribution receipts for March 2025 to March 2026 period",
+      "Notice of Assessment — confirms RRSP deduction limit and TFSA room",
+      "Spousal RRSP receipt and last contribution date record"
+    ],
+    "transition": "Next: Deductions Review."
+  }
+}

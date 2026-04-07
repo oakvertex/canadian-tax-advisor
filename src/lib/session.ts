@@ -1,4 +1,4 @@
-import type { SessionState, InterviewBranch } from "@/types";
+import type { SessionState, InterviewBranch, InterviewScreen } from "@/types";
 
 type FeedbackEntry = {
   message?: string;
@@ -56,17 +56,26 @@ export function replaySession(
       ...session,
       answers: { ...session.answers, [screen.question_id]: entry.value },
     };
-    if (screen.screen_type === "multi_select" && Array.isArray(entry.value)) {
-      for (const v of entry.value) {
-        const fb = screen.feedback[String(v)];
-        if (fb) session = applyFeedback(session, fb);
-      }
-    } else {
-      const fb = screen.feedback[String(entry.value)];
-      if (fb) session = applyFeedback(session, fb);
-    }
+    session = applyScreenFeedback(session, screen, entry.value);
   }
   return session;
+}
+
+export function applyScreenFeedback(
+  session: SessionState,
+  screen: InterviewScreen,
+  value: any
+): SessionState {
+  if (screen.screen_type === "multi_select" && Array.isArray(value)) {
+    let updated = session;
+    for (const v of value) {
+      const fb = screen.feedback[String(v)];
+      if (fb) updated = applyFeedback(updated, fb);
+    }
+    return updated;
+  }
+  const fb = screen.feedback[String(value)];
+  return fb ? applyFeedback(session, fb) : session;
 }
 
 export function applyFeedback(session: SessionState, feedback: object): SessionState {

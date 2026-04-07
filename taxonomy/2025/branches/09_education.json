@@ -1,0 +1,282 @@
+{
+  "branch_id": "branch_education",
+  "branch_label": "Education",
+  "branch_order": 9,
+  "always_runs": false,
+  "triggered_by": "life_event_education",
+  "intro": "Post-secondary education creates several tax opportunities — the Tuition Tax Credit, Canada Training Credit, student loan interest, and registered plan interactions. Let's make sure all education-related items are captured.",
+  "screens": [
+    {
+      "screen_id": "education_who_is_student",
+      "screen_type": "multi_select",
+      "title": "Who attended post-secondary education in 2025?",
+      "question_id": "student_profile",
+      "instruction": "Select all that apply. Tuition credits can be used by the student, transferred to a supporting parent or grandparent, or carried forward.",
+      "options": [
+        { "value": "self",        "label": "I attended a qualifying post-secondary program" },
+        { "value": "spouse",      "label": "My spouse or common-law partner attended" },
+        { "value": "child",       "label": "My child or grandchild attended" },
+        { "value": "none",        "label": "None of the above", "exclusive": true }
+      ],
+      "feedback": {
+        "self": {
+          "message": "As a student you may claim the Tuition Tax Credit under ITA s.118.5, the Canada Training Credit under ITA s.122.91, and student loan interest under ITA s.118.62. Unused tuition amounts carry forward indefinitely or may be transferred up to $5,000 to a supporting parent or grandparent under ITA s.118.9.",
+          "activates_flag": "taxpayer_is_student",
+          "checklist_update": {
+            "node_id": "credit_tuition",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "spouse": {
+          "message": "Your spouse's tuition credit can be transferred to you if your spouse does not need the full amount to reduce their own tax to zero. The maximum transfer is $5,000 under ITA s.118.8. Your spouse must designate the transfer on their return.",
+          "checklist_update": {
+            "node_id": "credit_tuition_transfer_spouse",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          }
+        },
+        "child": {
+          "message": "Your child or grandchild may transfer up to $5,000 of unused tuition credit to you under ITA s.118.9, after using enough to reduce their own tax to zero. They must designate you on their return (Form T2202). The child can alternatively carry the unused amount forward to their own future returns.",
+          "activates_flag": "dependent_is_student",
+          "checklist_update": {
+            "node_id": "credit_tuition_transfer_parent",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "activates_flag_note": "tuition_transfer_decision flag also relevant — preparer to model transfer vs carryforward"
+        },
+        "none": {
+          "message": "No post-secondary education noted."
+        }
+      }
+    },
+    {
+      "screen_id": "education_tuition_receipts",
+      "screen_type": "single_select",
+      "title": "Has your educational institution issued a T2202 — Tuition and Enrolment Certificate?",
+      "question_id": "has_t2202",
+      "instruction": "Form T2202 is issued by qualifying Canadian post-secondary institutions for tuition fees paid. It is now filed directly with CRA by the institution — you can access it through CRA My Account.",
+      "show_if": {
+        "flag": "taxpayer_is_student",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,    "label": "Yes — I have or can access my T2202" },
+        { "value": false,   "label": "No — I have not received it yet" },
+        { "value": "unsure","label": "I am not sure — this was my first year at this institution" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "T2202 confirmed. This form shows eligible tuition fees and months of full-time and part-time enrolment. Both figures are used to calculate your Tuition Tax Credit under ITA s.118.5 and your Canada Training Credit accumulation under ITA s.122.91.",
+          "document_checklist_add": {
+            "document": "T2202 — Tuition and Enrolment Certificate from post-secondary institution (available in CRA My Account)",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "T2202 forms are typically available through CRA My Account by late February. Contact your institution's registrar if it is not available by then.",
+          "document_checklist_add": {
+            "document": "T2202 — Tuition and Enrolment Certificate — access through CRA My Account or request from institution registrar",
+            "urgency": "priority"
+          }
+        },
+        "unsure": {
+          "message": "Check CRA My Account — institutions are now required to file T2202 directly with CRA. If not available there, contact your institution's registrar.",
+          "document_checklist_add": {
+            "document": "T2202 — Tuition and Enrolment Certificate — check CRA My Account",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "education_carryforward",
+      "screen_type": "single_select",
+      "title": "Do you have unused tuition credits carried forward from previous years?",
+      "question_id": "tuition_carryforward",
+      "instruction": "Unused tuition amounts from prior years accumulate indefinitely and appear on your most recent Notice of Assessment. They cannot be transferred to a supporting parent — only the current year amount can be transferred.",
+      "show_if": {
+        "flag": "taxpayer_is_student",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,    "label": "Yes — I have a carryforward balance" },
+        { "value": false,   "label": "No" },
+        { "value": "unsure","label": "I am not sure" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Prior year tuition carryforward is used in the current year before the current year's tuition credit under ITA s.118.61. Bring your most recent Notice of Assessment which shows the exact carryforward balance.",
+          "document_checklist_add": {
+            "document": "Most recent Notice of Assessment — shows unused tuition credit carryforward balance",
+            "urgency": "priority"
+          }
+        },
+        "unsure": {
+          "message": "Check your most recent CRA Notice of Assessment or CRA My Account — unused tuition credits appear there. Bring it to your preparer.",
+          "document_checklist_add": {
+            "document": "Most recent Notice of Assessment — verify unused tuition credit carryforward balance",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No prior year tuition carryforward."
+        }
+      }
+    },
+    {
+      "screen_id": "education_transfer_decision",
+      "screen_type": "single_select",
+      "title": "Do you want to transfer your unused 2025 tuition credit to a supporting parent or grandparent?",
+      "question_id": "tuition_transfer_election",
+      "instruction": "You can transfer up to $5,000 of your current year tuition credit to a parent or grandparent under ITA s.118.9 — but only after applying enough to reduce your own tax to zero. Once transferred it cannot be reclaimed as a carryforward.",
+      "show_if": {
+        "flag": "taxpayer_is_student",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,      "label": "Yes — I want to transfer the unused amount to a supporting parent or grandparent" },
+        { "value": false,     "label": "No — I prefer to carry it forward to my own future returns" },
+        { "value": "discuss", "label": "I want my preparer to model which option is better" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Tuition transfer confirmed. The parent or grandparent will claim the transferred amount. You must designate the specific person on your return by completing the tuition section of Form T2202. The maximum transferable is $5,000 of current year tuition — carryforward amounts from prior years cannot be transferred.",
+          "activates_flag": "tuition_transfer_decision",
+          "checklist_update": {
+            "node_id": "credit_tuition_transfer_parent",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Tuition transfer elected — confirm receiving person and complete T2202 designation. Transferred amount cannot be reclaimed as carryforward.",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "Carryforward confirmed. Unused tuition amounts carry forward indefinitely to your own future returns under ITA s.118.61 and are applied before current year tuition.",
+          "checklist_update": {
+            "node_id": "credit_tuition",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "discuss": {
+          "message": "Your preparer will model both options based on the parent's and your own projected income to determine which produces the greater total tax saving.",
+          "activates_flag": "tuition_transfer_decision",
+          "preparer_flag": {
+            "flag": "Model tuition transfer vs carryforward — compare tax saving for student vs supporting parent based on respective marginal rates",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "education_canada_training_credit",
+      "screen_type": "single_select",
+      "title": "Are you between 26 and 65 years old and did you pay tuition to an eligible institution in 2025?",
+      "question_id": "qualifies_ctc",
+      "instruction": "The Canada Training Credit under ITA s.122.91 is a refundable credit of up to $250 per year for eligible Canadians aged 26–65. You accumulate $10 per year in a notional account, visible on your Notice of Assessment. You can claim up to the lesser of the account balance and 50% of tuition paid.",
+      "show_if": {
+        "flag": "taxpayer_is_student",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I am between 26 and 65 and paid eligible tuition" },
+        { "value": false, "label": "No — I am under 26 or over 65, or this was an ineligible program" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "The Canada Training Credit under ITA s.122.91 is refundable — you receive the credit even if you owe no tax. The maximum is $250 per year (50% of up to $500 in eligible tuition). Check your Notice of Assessment for your Canada Training Credit limit. Any amount claimed reduces your Tuition Tax Credit for the year.",
+          "checklist_update": {
+            "node_id": "credit_canada_training",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Notice of Assessment — confirms your Canada Training Credit limit balance for 2025",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "Canada Training Credit does not apply."
+        }
+      }
+    },
+    {
+      "screen_id": "education_student_loan_interest",
+      "screen_type": "single_select",
+      "title": "Did you pay interest on a student loan in 2025?",
+      "question_id": "paid_student_loan_interest",
+      "instruction": "Interest paid on government student loans (Canada Student Loans, provincial student loans) is eligible for a non-refundable credit under ITA s.118.62. Private bank loans and lines of credit do not qualify.",
+      "show_if": {
+        "flag": "taxpayer_is_student",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — on a government student loan" },
+        { "value": "private","label": "Yes — but on a private bank loan or line of credit" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Interest paid on government student loans is eligible for a non-refundable credit under ITA s.118.62 at the lowest federal tax rate (15%). Unused interest amounts can be carried forward up to 5 years — use it in the year that produces the greatest tax benefit.",
+          "checklist_update": {
+            "node_id": "credit_student_loan_interest",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Student loan interest statement from National Student Loans Service Centre or provincial student loan authority confirming interest paid in 2025",
+            "urgency": "standard"
+          }
+        },
+        "private": {
+          "message": "Interest on private bank loans and lines of credit — even if used to fund education — does not qualify for the student loan interest credit under ITA s.118.62. Only government-issued student loans qualify."
+        },
+        "false": {
+          "message": "No student loan interest noted."
+        }
+      }
+    },
+    {
+      "screen_id": "education_resp_withdrawal",
+      "screen_type": "single_select",
+      "title": "Did you or your child withdraw funds from an RESP in 2025?",
+      "question_id": "resp_withdrawal",
+      "instruction": "Educational Assistance Payments (EAPs) from an RESP — which include accumulated income and government grants — are taxable in the student's hands under ITA s.146.1. The return of contributions is tax-free.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Educational Assistance Payments (EAPs) from an RESP are taxable in the student's hands under ITA s.146.1(7) — not the subscriber's. The student will receive a T4A showing the EAP amount. Since most students have low income the tax on EAPs is often nil or minimal. The return of original contributions is always tax-free.",
+          "checklist_update": {
+            "node_id": "income_resp_eap",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A slip for RESP Educational Assistance Payment — issued to the student beneficiary",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No RESP withdrawals in 2025 noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Education section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "T2202 — Tuition and Enrolment Certificate (access via CRA My Account)",
+      "Notice of Assessment — confirms tuition carryforward and Canada Training Credit limit",
+      "Student loan interest statement from NSLSC or provincial authority",
+      "T4A — RESP Educational Assistance Payment slip (issued to student)"
+    ],
+    "transition": "Next: First Home Purchase."
+  }
+}

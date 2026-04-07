@@ -1,0 +1,264 @@
+{
+  "branch_id": "branch_retirement",
+  "branch_label": "Retirement",
+  "branch_order": 8,
+  "always_runs": false,
+  "triggered_by": ["life_event_retired", "age_65_plus", "receives_eligible_pension", "rrsp_conversion_required"],
+  "intro": "Retirement income has special rules — pension splitting, RRIF minimum withdrawals, the Age Amount, and OAS repayment thresholds. Let's make sure your retirement picture is fully captured.",
+  "screens": [
+    {
+      "screen_id": "retirement_income_sources",
+      "screen_type": "multi_select",
+      "title": "Which retirement income sources did you receive in 2025?",
+      "question_id": "retirement_income_types",
+      "instruction": "Select all that apply. Each source has specific reporting requirements and potential planning opportunities.",
+      "options": [
+        { "value": "cpp",              "label": "Canada Pension Plan (CPP) or CPP2 benefits" },
+        { "value": "oas",              "label": "Old Age Security (OAS)" },
+        { "value": "employer_pension", "label": "Employer registered pension plan (DB or DC)" },
+        { "value": "rrif_withdrawal",  "label": "RRIF or LRIF withdrawals" },
+        { "value": "annuity",          "label": "Annuity payments" },
+        { "value": "retiring_allowance","label": "Retiring allowance from an employer" },
+        { "value": "none",             "label": "None of the above", "exclusive": true }
+      ],
+      "feedback": {
+        "cpp": {
+          "message": "CPP benefits are taxable under ITA s.56(1)(a). A T4A(P) slip is issued by Service Canada. Up to 50% of CPP income may be assigned to a spouse under the CPP Act's pension sharing provisions — different from the ITA s.60.03 pension income splitting election. Your preparer can model both options.",
+          "activates_flag": "receives_cpp",
+          "checklist_update": {
+            "node_id": "income_cpp_oas",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A(P) — Statement of CPP Benefits from Service Canada",
+            "urgency": "priority"
+          }
+        },
+        "oas": {
+          "message": "OAS is taxable under ITA s.56(1)(a). A T4A(OAS) slip is issued. If your net income exceeds $90,997 in 2025 you are required to repay a portion of OAS under ITA s.180.2 — the OAS clawback. The clawback rate is 15% of net income above the threshold up to the full OAS amount.",
+          "activates_flag": "receives_oas",
+          "checklist_update": {
+            "node_id": "income_cpp_oas",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A(OAS) — Statement of OAS Benefits from Service Canada",
+            "urgency": "priority"
+          }
+        },
+        "employer_pension": {
+          "message": "Registered pension plan income is taxable under ITA s.56(1)(a) and reported on a T4A. It qualifies as eligible pension income for the Pension Income Credit under ITA s.118(3) and for pension income splitting under ITA s.60.03.",
+          "activates_flag": "receives_eligible_pension",
+          "checklist_update": {
+            "node_id": "income_employer_pension",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A slip — Statement of Pension Retirement Annuity and Other Income from pension plan",
+            "urgency": "priority"
+          }
+        },
+        "rrif_withdrawal": {
+          "message": "RRIF withdrawals are fully taxable under ITA s.56(1)(a.1). A T4RIF slip is issued. Minimum withdrawals are required each year based on your age — withdrawals above the minimum also qualify as eligible pension income for the Pension Income Credit if you are 65 or older.",
+          "activates_flag": "receives_rrif",
+          "checklist_update": {
+            "node_id": "income_rrif_withdrawal",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4RIF — Statement of Income from a Registered Retirement Income Fund",
+            "urgency": "priority"
+          }
+        },
+        "annuity": {
+          "message": "Annuity payments purchased from an RRSP or RRIF are fully taxable under ITA s.56(1)(a.1) and reported on a T4A. Annuity payments from life insurance or non-registered sources may have a partial tax-free component — your preparer will determine the prescribed portion.",
+          "checklist_update": {
+            "node_id": "income_annuity",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A slip for annuity income — confirm whether annuity is from registered or non-registered source",
+            "urgency": "priority"
+          }
+        },
+        "retiring_allowance": {
+          "message": "A retiring allowance is taxable under ITA s.56(1)(a.ii) and reported on a T4A. You may be able to transfer a portion to your RRSP tax-free — $2,000 per year of pre-1996 service under ITA s.60(j.1). This is an important planning opportunity if any pre-1996 service exists.",
+          "activates_flag": "received_retiring_allowance",
+          "checklist_update": {
+            "node_id": "income_retiring_allowance",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Confirm years of pre-1996 service for retiring allowance RRSP transfer under ITA s.60(j.1) — $2,000 per eligible year",
+            "urgency": "priority"
+          }
+        },
+        "none": {
+          "message": "No retirement income sources noted."
+        }
+      }
+    },
+    {
+      "screen_id": "retirement_pension_splitting",
+      "screen_type": "single_select",
+      "title": "Do you have a spouse or common-law partner, and are you considering splitting your pension income?",
+      "question_id": "pension_splitting_interest",
+      "instruction": "Pension income splitting under ITA s.60.03 allows you to allocate up to 50% of eligible pension income to a lower-income spouse. This can significantly reduce combined family tax by moving income from a higher bracket to a lower one.",
+      "show_if": {
+        "flag": "receives_eligible_pension",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I have a spouse and want to explore pension splitting" },
+        { "value": false, "label": "No spouse, or already addressed" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Pension income splitting under ITA s.60.03 is made jointly on Form T1032. Eligible pension income includes registered pension plan payments, RRIF withdrawals (if 65 or older), and annuity payments from a registered plan. CPP income is assigned separately through Service Canada, not ITA s.60.03. Your preparer will model the optimal split percentage based on both spouses' income.",
+          "activates_flag": "pension_splitting_eligible",
+          "checklist_update": {
+            "node_id": "special_pension_splitting",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Model optimal pension income split percentage — requires both spouses' income projections. File Form T1032 jointly.",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "Pension splitting not applicable."
+        }
+      }
+    },
+    {
+      "screen_id": "retirement_age_amount",
+      "screen_type": "single_select",
+      "title": "Did you turn 65 or older in 2025?",
+      "question_id": "qualifies_age_amount",
+      "instruction": "The Age Amount credit under ITA s.118(2) is available to Canadians 65 or older. For 2025 the maximum federal credit is $8,790, reduced by 15% of net income above $42,335 and fully eliminated above $101,135.",
+      "show_if": {
+        "flag": "age_65_plus",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I was 65 or older on December 31, 2025" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "The Age Amount credit under ITA s.118(2) will be calculated on your return. If your net income exceeds $42,335 the credit phases out at 15 cents per dollar of excess income. At income above $101,135 the credit is fully eliminated. Your preparer will calculate the exact credit based on your final net income.",
+          "checklist_update": {
+            "node_id": "credit_age_amount",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "false": {
+          "message": "Age Amount not yet applicable."
+        }
+      }
+    },
+    {
+      "screen_id": "retirement_oas_clawback",
+      "screen_type": "single_select",
+      "title": "Was your net income in 2025 above approximately $90,000?",
+      "question_id": "oas_clawback_risk",
+      "instruction": "The OAS Recovery Tax under ITA s.180.2 requires repayment of 15% of OAS for every dollar of net income above $90,997 in 2025. At approximately $148,450 the full OAS amount is recovered.",
+      "show_if": {
+        "flag": "receives_oas",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — my income was likely above $90,000" },
+        { "value": false, "label": "No — my income was below $90,000" },
+        { "value": "unsure", "label": "I am not sure" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "OAS Recovery Tax may apply. The clawback rate is 15% of net income above $90,997 under ITA s.180.2. This appears on Schedule 1 and reduces your net OAS. CRA may also request that your monthly OAS payments be reduced prospectively through voluntary tax deductions at source. Your preparer will calculate the exact amount.",
+          "checklist_update": {
+            "node_id": "obligation_oas_clawback",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "OAS clawback may apply — calculate OAS Recovery Tax under ITA s.180.2. Consider voluntary withholding at source to avoid large year-end balance owing.",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "OAS clawback threshold not reached. No recovery tax expected."
+        },
+        "unsure": {
+          "message": "We have flagged the OAS clawback as possible — your preparer will confirm based on your actual net income.",
+          "checklist_update": {
+            "node_id": "obligation_oas_clawback",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "retirement_rrif_conversion",
+      "screen_type": "single_select",
+      "title": "Did you turn 71 in 2025 and convert your RRSP to a RRIF or annuity?",
+      "question_id": "rrif_conversion_done",
+      "instruction": "Under ITA s.146(2)(b.4), an RRSP must be converted by December 31 of the year you turn 71. Failure to convert results in the full RRSP balance being included in income in the following year.",
+      "show_if": {
+        "flag": "rrsp_conversion_required",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,    "label": "Yes — I converted my RRSP to a RRIF or annuity before December 31, 2025" },
+        { "value": false,   "label": "No — I did not convert" },
+        { "value": "unsure","label": "I am not sure if this has been done" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "RRIF conversion confirmed. Minimum annual withdrawals are now required based on your age each January 1. Your financial institution calculates the minimum. Withdrawals in excess of the minimum are also taxable but may qualify for the Pension Income Credit if you are 65 or older.",
+          "checklist_update": {
+            "node_id": "income_rrif_withdrawal",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Confirm RRIF minimum withdrawal was taken in 2025 — failure to take minimum results in penalty tax under ITA s.146.3(1)",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "CRITICAL: If your RRSP was not converted by December 31 of the year you turned 71, the full remaining RRSP balance is included in your income in the following year under ITA s.146(2)(b.4). Contact your financial institution immediately to initiate conversion and speak with your preparer about remediation options.",
+          "checklist_update": {
+            "node_id": "obligation_rrsp_conversion",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "CRITICAL: RRSP not converted by age 71 deadline — full balance potentially includable in income. Contact financial institution immediately and advise preparer of remediation options.",
+            "urgency": "critical"
+          }
+        },
+        "unsure": {
+          "message": "Confirm urgently with your financial institution whether your RRSP has been converted. The conversion deadline is December 31 of the year you turn 71 under ITA s.146(2)(b.4). This is a critical and irreversible item.",
+          "preparer_flag": {
+            "flag": "RRSP conversion status unknown — client must confirm with financial institution immediately. Deadline is Dec 31 of age-71 year.",
+            "urgency": "critical"
+          }
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Retirement section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "T4A(P) — CPP Statement of Benefits",
+      "T4A(OAS) — OAS Statement of Benefits",
+      "T4A slip — registered pension plan payments",
+      "T4RIF — RRIF withdrawal statement",
+      "Form T1032 — joint election for pension income splitting (if applicable)"
+    ],
+    "transition": "Next: Education."
+  }
+}

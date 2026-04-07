@@ -1,0 +1,211 @@
+{
+  "branch_id": "branch_disability",
+  "branch_label": "Disability",
+  "branch_order": 11,
+  "always_runs": false,
+  "triggered_by": ["life_event_disability", "has_child_with_disability"],
+  "intro": "Disability-related tax supports require specific CRA certifications and can be claimed retroactively. Let's make sure the Disability Tax Credit, RDSP, and related medical supports are fully addressed.",
+  "screens": [
+    {
+      "screen_id": "disability_who_affected",
+      "screen_type": "multi_select",
+      "title": "Who has the disability?",
+      "question_id": "disability_who",
+      "instruction": "Select all that apply. Different rules apply depending on whether it is you, your spouse, or a dependent.",
+      "options": [
+        { "value": "self",             "label": "I have a disability" },
+        { "value": "spouse",           "label": "My spouse or common-law partner has a disability" },
+        { "value": "child_dependent",  "label": "A child or dependent of mine has a disability" },
+        { "value": "none",             "label": "None of the above", "exclusive": true }
+      ],
+      "feedback": {
+        "self": {
+          "message": "We will cover the Disability Tax Credit, RDSP, and attendant care deduction for you.",
+          "activates_flag": "self_has_disability"
+        },
+        "spouse": {
+          "message": "Your spouse's disability credit may transfer to you if they cannot use the full amount. We will cover the transfer provisions.",
+          "activates_flag": "spouse_has_disability"
+        },
+        "child_dependent": {
+          "message": "A dependent's disability credit may transfer to you as the supporting person under ITA s.118.3(2). We will confirm the details.",
+          "activates_flag": "child_has_disability"
+        },
+        "none": {
+          "message": "No disability noted."
+        }
+      }
+    },
+    {
+      "screen_id": "disability_dtc_status",
+      "screen_type": "single_select",
+      "title": "Is there a Disability Tax Credit certificate (Form T2201) approved by CRA for the person with the disability?",
+      "question_id": "dtc_status",
+      "instruction": "The DTC requires a medical practitioner to certify Form T2201, which CRA must then approve. Without approval the credit cannot be claimed, but approval can be retroactive up to 10 years.",
+      "options": [
+        { "value": "approved", "label": "Yes — CRA has approved Form T2201" },
+        { "value": "applied",  "label": "Application submitted — awaiting CRA approval" },
+        { "value": "not_applied","label": "Not yet applied — the condition may qualify" },
+        { "value": "ineligible","label": "The condition does not qualify for the DTC" }
+      ],
+      "feedback": {
+        "approved": {
+          "message": "DTC approved. The 2025 federal disability amount is $9,872 — worth up to $1,481 in federal tax. An enhanced amount of $5,758 applies for children under 18. If the eligible person cannot use the full amount against their own tax, the unused portion transfers to a supporting person under ITA s.118.3(2).",
+          "activates_flag": "dtc_approved",
+          "checklist_update": {
+            "node_id": "credit_disability_tax_credit",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "CRA DTC approval letter — confirms certificate period and approved impairment",
+            "urgency": "priority"
+          }
+        },
+        "applied": {
+          "message": "Application pending. If approved before filing, the credit applies from the certificate start date. File your return on time. If approval comes after filing, amend the return — CRA allows retroactive DTC claims up to 10 years.",
+          "activates_flag": "dtc_pending",
+          "checklist_update": {
+            "node_id": "credit_disability_tax_credit",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "DTC application pending — monitor CRA approval. File return on time and amend if approved after filing. Retroactive up to 10 years.",
+            "urgency": "priority"
+          }
+        },
+        "not_applied": {
+          "message": "If the person has a prolonged physical or mental impairment that markedly restricts basic activities of daily living, they may qualify for the DTC. Have a medical practitioner complete Form T2201 and submit to CRA. If approved, claims are retroactive up to 10 years — this is a significant opportunity.",
+          "activates_flag": "dtc_not_applied",
+          "checklist_update": {
+            "node_id": "credit_disability_tax_credit",
+            "confidence_tier": "possible",
+            "reason": "professional_judgment_required"
+          },
+          "preparer_flag": {
+            "flag": "DTC not yet applied for — assess eligibility. If approved, retroactive claim possible up to 10 years. Significant credit opportunity.",
+            "urgency": "priority"
+          }
+        },
+        "ineligible": {
+          "message": "DTC does not apply. We will still check whether attendant care or medical expense claims are available."
+        }
+      }
+    },
+    {
+      "screen_id": "disability_attendant_care",
+      "screen_type": "single_select",
+      "title": "Did you pay for attendant care, nursing home, or disability support services in 2025?",
+      "question_id": "has_attendant_care",
+      "instruction": "Attendant care costs may be deductible under ITA s.64 (as a deduction for earned income) and also claimable as medical expenses under ITA s.118.2(2)(b). You cannot claim the same amount under both provisions.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Attendant care expenses may be deductible under ITA s.64 as an attendant care deduction — which can exceed the medical expense credit value — or claimed as medical expenses under ITA s.118.2(2)(b). The s.64 deduction requires a DTC certificate and is limited to two-thirds of earned income. Your preparer will determine which claim produces the greater benefit.",
+          "activates_flag": "has_attendant_care",
+          "checklist_update": {
+            "node_id": "deduction_attendant_care",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Receipts for attendant care, personal support workers, or nursing home fees paid in 2025 — provider name, address, and amounts paid",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Attendant care — model s.64 deduction vs medical expense claim to determine optimal treatment",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No attendant care expenses noted."
+        }
+      }
+    },
+    {
+      "screen_id": "disability_rdsp",
+      "screen_type": "single_select",
+      "title": "Does the person with the disability have a Registered Disability Savings Plan (RDSP)?",
+      "question_id": "has_rdsp",
+      "instruction": "An RDSP under ITA s.146.4 is a long-term savings plan that attracts the Canada Disability Savings Grant (up to $3,500/year) and Canada Disability Savings Bond (up to $1,000/year) from the federal government. A DTC approval is required to open an RDSP.",
+      "show_if": {
+        "flag": "dtc_approved",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,       "label": "Yes — an RDSP is open and active" },
+        { "value": "considering","label": "No — but we are interested in opening one" },
+        { "value": false,      "label": "No RDSP" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "RDSP contributions attract the Canada Disability Savings Grant (CDSG) of up to $3,500 per year based on family income, and the Canada Disability Savings Bond (CDSB) of up to $1,000 per year for lower-income beneficiaries — both are government contributions requiring no repayment if held for at least 10 years. RDSP contributions are not tax-deductible but grow tax-sheltered.",
+          "checklist_update": {
+            "node_id": "savings_rdsp",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "RDSP annual statement — shows contributions made and CDSG/CDSB received in 2025",
+            "urgency": "standard"
+          }
+        },
+        "considering": {
+          "message": "An RDSP is one of the most valuable savings tools available for people with disabilities. The federal government contributes grants and bonds worth potentially $90,000 over a lifetime. A DTC approval is the only requirement to open one. Your preparer can provide guidance on the application and optimal contribution strategy.",
+          "checklist_update": {
+            "node_id": "savings_rdsp",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "RDSP not yet opened — advise on opening process and CDSG/CDSB entitlements. Significant long-term benefit opportunity.",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No RDSP noted."
+        }
+      }
+    },
+    {
+      "screen_id": "disability_medical_expenses",
+      "screen_type": "single_select",
+      "title": "Did you pay any medical expenses related to the disability in 2025?",
+      "question_id": "has_disability_medical",
+      "instruction": "Disability-specific medical expenses — such as specialized devices, therapies, modifications, and prescriptions — are claimable under ITA s.118.2(2). These are in addition to general medical expenses.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Disability-related medical expenses are claimable under ITA s.118.2(2) — which covers a broad range of costs including prescribed devices, renovations to accommodate the disability, guide animal care, and specialized therapy. These will be captured in the Deductions Review section. Gather all receipts now.",
+          "checklist_update": {
+            "node_id": "credit_medical_expenses",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Disability-related medical expenses — review ITA s.118.2(2) eligible expense list carefully. Many disability-specific items qualify beyond standard medical costs.",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No disability-related medical expenses noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Disability section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "CRA DTC approval letter — Form T2201 certification",
+      "Attendant care receipts — provider name, address, and amounts paid",
+      "RDSP annual statement if an RDSP is open",
+      "Medical expense receipts for disability-related costs"
+    ],
+    "transition": "Next: Age Milestones."
+  }
+}

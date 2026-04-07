@@ -1,0 +1,266 @@
+{
+  "branch_id": "branch_credits_review",
+  "branch_label": "Credits Review",
+  "branch_order": 15,
+  "always_runs": true,
+  "intro": "Let's check the federal and Ontario credits that apply to your situation. Many of these are easy to miss — especially the Ontario-specific credits that are often overlooked.",
+  "screens": [
+    {
+      "screen_id": "credits_gst_hst",
+      "screen_type": "single_select",
+      "title": "Are you aware that you may be entitled to the GST/HST Credit?",
+      "question_id": "gst_credit_awareness",
+      "instruction": "The GST/HST Credit under ITA s.122.5 is a quarterly tax-free payment for low and moderate income Canadians. It is applied for automatically when you file your T1 return. No separate application is required.",
+      "options": [
+        { "value": true,  "label": "Yes — I already receive it" },
+        { "value": false, "label": "No — tell me about it" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "GST/HST Credit confirmed. It is recalculated each July based on your prior year net income. Filing on time is essential — late filing can delay or interrupt payments."
+        },
+        "false": {
+          "message": "The GST/HST Credit under ITA s.122.5 is a quarterly payment for individuals with low to moderate income. For 2025 single individuals receive up to $519 annually plus $272 per spouse and each child under 19. It is applied for automatically on your T1 — just file your return and CRA will determine eligibility and payment amounts.",
+          "checklist_update": {
+            "node_id": "credit_gst_hst_credit",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "credits_cwb",
+      "screen_type": "single_select",
+      "title": "Was your employment or self-employment income under approximately $43,000 in 2025?",
+      "question_id": "cwb_income_check",
+      "instruction": "The Canada Workers Benefit under ITA s.122.7 is a refundable credit for low-income workers. The basic amount phases in above $3,000 of earned income and phases out above approximately $23,000 for singles or $36,000 for families.",
+      "show_if": {
+        "flag": "lift_likely",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I had modest employment or self-employment income" },
+        { "value": false, "label": "No — my income was above that range" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "You may qualify for the Canada Workers Benefit under ITA s.122.7. The maximum basic amount is $1,590 for single individuals and $2,739 for families in 2025. It is refundable — you receive the credit even if you owe no tax. Advance payments of up to half the annual amount are available through CRA if you apply.",
+          "checklist_update": {
+            "node_id": "credit_canada_workers_benefit",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "preparer_flag": {
+            "flag": "Assess Canada Workers Benefit eligibility under ITA s.122.7 — confirm earned income and family net income thresholds",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "Canada Workers Benefit phase-out threshold exceeded."
+        }
+      }
+    },
+    {
+      "screen_id": "credits_ontario_trillium",
+      "screen_type": "single_select",
+      "title": "Did you pay rent or property tax in Ontario in 2025?",
+      "question_id": "otb_eligible_expenses",
+      "instruction": "The Ontario Trillium Benefit (OTB) under OTA s.103.1 combines three Ontario credits — the Ontario Energy and Property Tax Credit, Northern Ontario Energy Credit (if in northern Ontario), and Ontario Sales Tax Credit. Rent and property tax are key inputs.",
+      "show_if": {
+        "flag": "ontario_credits_eligible",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "rent",          "label": "I paid rent in 2025" },
+        { "value": "property_tax",  "label": "I paid property tax directly in 2025" },
+        { "value": "both",          "label": "Both — I paid rent for part of the year and property tax for part" },
+        { "value": "neither",       "label": "Neither — I lived with parents or paid neither" }
+      ],
+      "feedback": {
+        "rent": {
+          "message": "Ontario renters may claim the Ontario Energy and Property Tax Credit component of the OTB under OTA s.103.1. Eligible rent is the amount paid for a principal residence in Ontario. Subsidized housing rent may be reduced. Bring your landlord's name and address and the total rent paid in 2025.",
+          "activates_flag": "otb_rental",
+          "checklist_update": {
+            "node_id": "credit_ontario_trillium_benefit",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Rent receipts or lease showing total rent paid in 2025 and landlord name and address",
+            "urgency": "standard"
+          }
+        },
+        "property_tax": {
+          "message": "Ontario homeowners who paid property tax directly may claim the Ontario Energy and Property Tax Credit under OTA s.103.1. Bring your 2025 property tax assessment and payment records.",
+          "checklist_update": {
+            "node_id": "credit_ontario_trillium_benefit",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "2025 Ontario property tax assessment notice showing annual property tax amount",
+            "urgency": "standard"
+          }
+        },
+        "both": {
+          "message": "For the portion of the year you rented use your rent amount, and for the ownership portion use your property tax amount. The ON-BEN form accommodates split-year claims.",
+          "checklist_update": {
+            "node_id": "credit_ontario_trillium_benefit",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Rent receipts or lease for rental period and property tax assessment for ownership period",
+            "urgency": "standard"
+          }
+        },
+        "neither": {
+          "message": "You may still qualify for the Ontario Sales Tax Credit component of the OTB based on income alone, even without rent or property tax. Your preparer will include this on the ON-BEN form."
+        }
+      }
+    },
+    {
+      "screen_id": "credits_lift",
+      "screen_type": "single_select",
+      "title": "Was your individual Ontario employment income under approximately $50,000 in 2025?",
+      "question_id": "lift_income_check",
+      "instruction": "The Low-income Individuals and Families Tax (LIFT) Credit under OTA s.103.4 provides a non-refundable Ontario credit to reduce or eliminate provincial income tax for lower-income workers.",
+      "show_if": {
+        "flag": "ontario_credits_eligible",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — my individual income was under approximately $50,000" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "The LIFT Credit under OTA s.103.4 reduces Ontario income tax for working individuals with employment income. For 2025 the credit fully eliminates provincial tax up to approximately $30,000 of individual income and phases out as income rises. The credit is based on individual (not family) employment income. Your preparer will calculate the exact amount.",
+          "checklist_update": {
+            "node_id": "credit_lift",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "preparer_flag": {
+            "flag": "Assess LIFT Credit under OTA s.103.4 — based on individual employment income, not family income",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "LIFT Credit phase-out likely exceeded."
+        }
+      }
+    },
+    {
+      "screen_id": "credits_senior_homeowners",
+      "screen_type": "single_select",
+      "title": "Are you 64 or older and do you own your principal residence in Ontario?",
+      "question_id": "senior_homeowners_eligible",
+      "instruction": "The Ontario Senior Homeowners Property Tax Grant under OTA s.104.1 provides up to $500 per year for Ontario homeowners 64 or older. It is claimed on the ON-BEN form with your T1 return.",
+      "show_if": {
+        "flag": "ontario_credits_eligible",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I am 64 or older and own my Ontario principal residence" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "You may qualify for the Ontario Senior Homeowners Property Tax Grant under OTA s.104.1 — up to $500 annually. Eligibility requires age 64 or older on December 31, 2025, ownership of your principal residence in Ontario, and net income below $50,000 (for singles) or $60,000 (for couples). It is claimed on the ON-BEN form attached to your T1.",
+          "checklist_update": {
+            "node_id": "credit_ontario_senior_grant",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "preparer_flag": {
+            "flag": "Assess Ontario Senior Homeowners Property Tax Grant eligibility under OTA s.104.1 — confirm age, ownership, and net income threshold",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "Senior Homeowners Grant not applicable."
+        }
+      }
+    },
+    {
+      "screen_id": "credits_foreign_income_verification",
+      "screen_type": "single_select",
+      "title": "At any point in 2025, did the total cost of all foreign property you owned exceed $100,000 Canadian?",
+      "question_id": "t1135_required",
+      "instruction": "If the total adjusted cost base of all specified foreign property exceeded $100,000 CAD at any point in 2025, you must file Form T1135 — Foreign Income Verification Statement. Failure to file carries significant penalties.",
+      "options": [
+        { "value": true,    "label": "Yes — I owned foreign property worth over $100,000 CAD" },
+        { "value": "unsure","label": "I am not sure — I have foreign accounts or investments" },
+        { "value": false,   "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Form T1135 — Foreign Income Verification Statement must be filed with your T1 return under ITA s.233.3. Specified foreign property includes foreign bank accounts, foreign stocks, foreign real estate (other than personal-use property), and interests in foreign entities. The penalty for failure to file is $25 per day up to $2,500, plus 5% of the cost of the unreported property for repeated failures. Do not miss this filing.",
+          "checklist_update": {
+            "node_id": "obligation_t1135_foreign_income",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "T1135 Foreign Income Verification Statement required — specified foreign property exceeded $100,000 CAD. Penalties are severe for failure to file.",
+            "urgency": "urgent"
+          }
+        },
+        "unsure": {
+          "message": "If you have foreign bank accounts, investments, or real estate (outside Canada), tally the cost (not current value) of all holdings. If that total exceeded $100,000 Canadian at any point in 2025, T1135 is required. Your preparer will help you determine whether you must file.",
+          "checklist_update": {
+            "node_id": "obligation_t1135_foreign_income",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "Possible T1135 filing requirement — assess cost of all specified foreign property. Threshold is $100,000 CAD at any point in the year.",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "T1135 filing not required."
+        }
+      }
+    },
+    {
+      "screen_id": "credits_volunteer_firefighter",
+      "screen_type": "single_select",
+      "title": "Did you perform at least 200 hours of volunteer work as a firefighter, search and rescue volunteer, or emergency services volunteer in 2025?",
+      "question_id": "volunteer_credit_eligible",
+      "instruction": "The Volunteer Firefighters Tax Credit and Search and Rescue Volunteers Tax Credit under ITA s.118.06 and s.118.07 each provide a $3,000 non-refundable credit — worth $450 federally.",
+      "options": [
+        { "value": true,  "label": "Yes — I completed at least 200 hours of eligible volunteer service" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "You may claim the Volunteer Firefighters Tax Credit or Search and Rescue Volunteers Tax Credit under ITA s.118.06 or s.118.07 — a $3,000 amount generating a $450 federal credit. You must have completed a minimum of 200 hours of eligible service in 2025. The certification from your organization is required.",
+          "checklist_update": {
+            "node_id": "credit_volunteer_firefighter",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Certification of volunteer service hours from fire department or search and rescue organization — confirms 200+ eligible hours in 2025",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "Volunteer credits not applicable."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Credits review complete. Your interview is now finished.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "ON-BEN form information — rent or property tax amounts, senior homeowner eligibility",
+      "T1135 if specified foreign property exceeded $100,000 CAD",
+      "Volunteer service certification if applicable"
+    ],
+    "transition": null
+  }
+}

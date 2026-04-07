@@ -1,0 +1,47 @@
+{
+  "branch_id": "branch_life_events_gate",
+  "branch_label": "Your 2025 Tax Year",
+  "branch_order": 0,
+  "always_runs": true,
+  "intro": "Let's start by understanding what happened in your 2025 tax year. This helps us focus only on the sections that matter for your situation.",
+  "screens": [
+    {
+      "screen_id": "life_events_gate",
+      "screen_type": "multi_select",
+      "title": "Which of the following happened in 2025?",
+      "question_id": "life_events",
+      "instruction": "Select all that apply. Don't worry if you are unsure — we'll ask follow-up questions for each. We'll cover standard items like RRSP, TFSA, and common credits regardless of your selections.",
+      "options": [
+        { "value": "life_event_moved",            "label": "I moved to a new city or province",             "exclusive": false },
+        { "value": "life_event_changed_job",       "label": "I changed jobs or started a new job",          "exclusive": false },
+        { "value": "life_event_marriage_change",   "label": "I got married, separated, or divorced",        "exclusive": false },
+        { "value": "life_event_had_child",         "label": "I had a child or adopted",                     "exclusive": false },
+        { "value": "life_event_started_business",  "label": "I started a business or became self-employed", "exclusive": false },
+        { "value": "life_event_retired",           "label": "I retired or stopped working",                 "exclusive": false },
+        { "value": "life_event_age_milestone",     "label": "I turned 18, 65, or 71 in 2025",               "exclusive": false },
+        { "value": "life_event_disability",        "label": "I or a family member has a disability",        "exclusive": false },
+        { "value": "life_event_education",         "label": "I attended school or a post-secondary program","exclusive": false },
+        { "value": "life_event_first_home",        "label": "I bought my first home",                       "exclusive": false },
+        { "value": "life_event_none",              "label": "None of the above",                            "exclusive": true  }
+      ],
+      "feedback": {
+        "life_event_moved":           { "message": "", "activates_flag": "life_event_moved" },
+        "life_event_changed_job":     { "message": "", "activates_flag": "life_event_changed_job" },
+        "life_event_marriage_change": { "message": "", "activates_flag": "life_event_marriage_change" },
+        "life_event_had_child":       { "message": "", "activates_flag": "life_event_had_child" },
+        "life_event_started_business":{ "message": "", "activates_flag": "life_event_started_business" },
+        "life_event_retired":         { "message": "", "activates_flag": "life_event_retired" },
+        "life_event_age_milestone":   { "message": "", "activates_flag": "life_event_age_milestone" },
+        "life_event_disability":      { "message": "", "activates_flag": "life_event_disability" },
+        "life_event_education":       { "message": "", "activates_flag": "life_event_education" },
+        "life_event_first_home":      { "message": "", "activates_flag": "life_event_first_home" },
+        "life_event_none":            { "message": "" }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Here's what we'll cover based on your 2025 situation.",
+    "shows": "active_branches_preview",
+    "transition": null
+  }
+}

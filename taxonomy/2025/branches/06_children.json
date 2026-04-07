@@ -1,0 +1,446 @@
+{
+  "branch_id": "branch_children",
+  "branch_label": "Children and Dependents",
+  "branch_order": 6,
+  "always_runs": false,
+  "triggered_by": ["life_event_had_child", "has_dependents"],
+  "intro": "Children and other dependents unlock several deductions and credits. Let's make sure you claim everything you're entitled to — these are among the most commonly missed items, especially for newcomers and first-time parents.",
+  "screens": [
+    {
+      "screen_id": "children_count_ages",
+      "screen_type": "multi_select",
+      "title": "Which of the following describes your children or dependents in 2025?",
+      "question_id": "dependent_profile",
+      "instruction": "Select all that apply. This determines which deductions and credits are available to you.",
+      "options": [
+        { "value": "child_under_7",    "label": "Child under 7 years old at December 31, 2025" },
+        { "value": "child_7_to_16",    "label": "Child aged 7 to 16 at December 31, 2025" },
+        { "value": "child_with_disability", "label": "Child of any age with a physical or mental disability" },
+        { "value": "adult_dependent",  "label": "Adult dependent — parent, grandparent, or other relative I support financially" },
+        { "value": "none",             "label": "No children or dependents in 2025", "exclusive": true }
+      ],
+      "feedback": {
+        "child_under_7": {
+          "message": "Children under 7 attract the highest child care deduction limit — $8,000 per child under ITA s.63(1). We will confirm eligibility in the next questions.",
+          "activates_flag": "has_child_under_7"
+        },
+        "child_7_to_16": {
+          "message": "Children aged 7 to 16 attract a child care deduction limit of $5,000 per child under ITA s.63(1). We will confirm eligibility in the next questions.",
+          "activates_flag": "has_child_7_to_16"
+        },
+        "child_with_disability": {
+          "message": "A child with a disability qualifies for an $11,000 child care limit under ITA s.63(1) and may also be eligible for the Disability Tax Credit transfer to you as the supporting parent under ITA s.118.3(2). We will cover both.",
+          "activates_flag": "has_child_with_disability"
+        },
+        "adult_dependent": {
+          "message": "Supporting an adult dependent may qualify you for the Canada Caregiver Amount under ITA s.118(1)(c.1) or the Infirm Dependent credit under ITA s.118(1)(d). We will confirm the details.",
+          "activates_flag": "has_adult_dependent"
+        },
+        "none": {
+          "message": "No children or dependents noted."
+        }
+      }
+    },
+    {
+      "screen_id": "children_single_parent",
+      "screen_type": "single_select",
+      "title": "Are you a single parent — supporting a child without a cohabiting spouse or common-law partner?",
+      "question_id": "is_single_parent",
+      "instruction": "Single parents may claim the Eligible Dependant Amount for one qualifying child — worth up to $2,421 federally in 2025 under ITA s.118(1)(b).",
+      "show_if": {
+        "question_id": "marital_status",
+        "operator": "in",
+        "value": ["single", "separated", "divorced", "widowed"]
+      },
+      "skip_if": {
+        "question_id": "dependent_profile",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I am the primary supporting parent without a cohabiting partner" },
+        { "value": false, "label": "No — the other parent or a partner is also in the household" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "You may claim the Eligible Dependant Amount under ITA s.118(1)(b) for one child — this gives a federal credit equivalent to the spousal amount. Important: if you paid child support for this child in 2025 you cannot claim this credit for the same child in the same year.",
+          "checklist_update": {
+            "node_id": "credit_eligible_dependant",
+            "confidence_tier": "confirmed"
+          },
+          "activates_flag": "single_parent",
+          "preparer_flag": {
+            "flag": "Confirm no child support was paid for the same child claimed as eligible dependant — ITA s.118(1)(b) and s.118(5) prohibit claiming both",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "Eligible Dependant Amount does not apply when a cohabiting partner is present."
+        }
+      }
+    },
+    {
+      "screen_id": "children_care_expenses",
+      "screen_type": "single_select",
+      "title": "Did you pay for child care in 2025?",
+      "question_id": "paid_child_care",
+      "instruction": "Eligible child care includes daycare, licensed home care, babysitting, nanny, boarding school, and overnight camps. The child must be 16 or under at any time in the year, or have a disability.",
+      "skip_if": {
+        "question_id": "dependent_profile",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Child care expenses are deductible under ITA s.63(1) by the lower-income spouse. Annual limits: $8,000 per child under 7, $5,000 per child aged 7–16, and $11,000 for a child with a disability. The deduction cannot exceed 2/3 of the claimant's earned income for the year.",
+          "checklist_update": {
+            "node_id": "deduction_child_care",
+            "confidence_tier": "confirmed"
+          },
+          "activates_flag": "has_child_care_expenses"
+        },
+        "false": {
+          "message": "No child care expenses noted."
+        }
+      }
+    },
+    {
+      "screen_id": "children_care_provider",
+      "screen_type": "single_select",
+      "title": "Do you have receipts from your child care provider showing their name, address, and SIN or business number?",
+      "question_id": "child_care_receipts",
+      "instruction": "CRA requires provider identification to support the child care deduction under ITA s.63(1). Without it the claim can be denied on audit.",
+      "show_if": {
+        "flag": "has_child_care_expenses",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,     "label": "Yes — I have proper receipts with all required information" },
+        { "value": "partial","label": "Some receipts — missing SIN or business number" },
+        { "value": false,    "label": "No formal receipts" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Receipts confirmed. Child care deduction is well supported.",
+          "document_checklist_add": {
+            "document": "Child care receipts — provider name, address, SIN or business number, and amounts paid per child",
+            "urgency": "priority"
+          }
+        },
+        "partial": {
+          "message": "Request the missing SIN or business number from your provider before filing. CRA frequently audits child care claims and will disallow unsupported amounts.",
+          "checklist_update": {
+            "node_id": "deduction_child_care",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "Child care receipts incomplete — obtain provider SIN or business number before filing",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "Without receipts the child care deduction cannot be supported on audit. Contact your provider immediately. We have flagged this as urgent.",
+          "checklist_update": {
+            "node_id": "deduction_child_care",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "No child care receipts — obtain from provider urgently. Deduction unsupportable without receipts showing provider SIN or business number.",
+            "urgency": "urgent"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "children_lower_income_spouse",
+      "screen_type": "single_select",
+      "title": "Between you and your spouse or partner, who had the lower net income in 2025?",
+      "question_id": "lower_income_spouse",
+      "instruction": "Child care expenses must be claimed by the lower-income spouse under ITA s.63(1). There are limited exceptions when the higher-income spouse may claim — for example, when the lower-income spouse was a student or in prison.",
+      "show_if": {
+        "flag": "has_child_care_expenses",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "self",    "label": "I did — I am the lower-income spouse" },
+        { "value": "spouse",  "label": "My spouse or partner had lower income" },
+        { "value": "similar", "label": "Our incomes were similar — not sure who was lower" }
+      ],
+      "feedback": {
+        "self": {
+          "message": "You claim the child care deduction on your own return."
+        },
+        "spouse": {
+          "message": "Your spouse claims the child care deduction on their return. Share the receipts with their preparer as well.",
+          "preparer_flag": {
+            "flag": "Child care deduction claimed by spouse — confirm lower-income status and provide receipts to spouse's preparer",
+            "urgency": "standard"
+          }
+        },
+        "similar": {
+          "message": "When incomes are close your preparer will confirm which spouse had lower net income based on final figures and allocate the deduction accordingly.",
+          "preparer_flag": {
+            "flag": "Incomes similar — preparer to confirm lower-income spouse and optimize child care deduction allocation",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "children_resp",
+      "screen_type": "single_select",
+      "title": "Do you have or are you considering a Registered Education Savings Plan (RESP) for your child?",
+      "question_id": "has_resp",
+      "instruction": "An RESP grows tax-free and attracts the Canada Education Savings Grant (CESG) of 20% on contributions up to $2,500 annually — a free $500 per year per child from the federal government.",
+      "skip_if": {
+        "question_id": "dependent_profile",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": "existing",    "label": "Yes — I contributed to an existing RESP in 2025" },
+        { "value": "new",         "label": "I opened a new RESP in 2025" },
+        { "value": "considering", "label": "I do not have one yet but I am interested" },
+        { "value": false,         "label": "No" }
+      ],
+      "feedback": {
+        "existing": {
+          "message": "RESP contributions attract the CESG of 20% on contributions up to $2,500 per year under ITA s.146.1 — maximum $500 grant annually per beneficiary, $7,200 lifetime. Contributions are not tax deductible but investment growth is tax-sheltered. Withdrawals are taxed in the child's hands.",
+          "checklist_update": {
+            "node_id": "savings_resp",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "RESP annual statement from financial institution showing contributions and CESG received",
+            "urgency": "standard"
+          }
+        },
+        "new": {
+          "message": "New RESP noted. Ensure the CESG application is submitted through your financial institution — it does not happen automatically. The child must be a Canadian resident under 18 to receive the grant. Contributions made in the year of opening are eligible for the grant.",
+          "checklist_update": {
+            "node_id": "savings_resp",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "New RESP opened — confirm CESG application submitted and child meets residency requirement",
+            "urgency": "standard"
+          }
+        },
+        "considering": {
+          "message": "An RESP is worth opening even with a small contribution — you only need $2,500 to maximize the $500 annual CESG. Unused grant room from prior years accumulates and can be caught up at up to $1,000 in grants per year. For newcomers: CESG eligibility begins from the date your child becomes a Canadian resident.",
+          "preparer_flag": {
+            "flag": "RESP not yet opened — advise on CESG catch-up opportunity and optimal timing for contributions",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No RESP noted."
+        }
+      }
+    },
+    {
+      "screen_id": "children_disability_dtc",
+      "screen_type": "single_select",
+      "title": "Does your child have a Disability Tax Credit (DTC) certificate approved by CRA?",
+      "question_id": "dependent_dtc_certified",
+      "instruction": "The DTC requires a certified Form T2201 on file with CRA. If your child cannot use the full disability amount, the unused portion transfers to you as the supporting parent under ITA s.118.3(2).",
+      "show_if": {
+        "flag": "has_child_with_disability",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,     "label": "Yes — Form T2201 has been approved by CRA" },
+        { "value": "applied","label": "Application is in progress" },
+        { "value": false,    "label": "No — not yet applied" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "DTC certificate confirmed. If your child cannot use the full disability amount against their own income, the unused portion transfers to you under ITA s.118.3(2). Your preparer will calculate the transferable amount. The $11,000 child care limit also applies.",
+          "checklist_update": {
+            "node_id": "credit_disability_transfer",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "CRA DTC approval letter for dependent — confirms Form T2201 approval date and period covered",
+            "urgency": "priority"
+          }
+        },
+        "applied": {
+          "message": "DTC application pending. If approved before you file, the credit applies from the certificate start date. File your return on time — if approval comes after filing, amend the return for the applicable years (up to 10 years retroactively).",
+          "checklist_update": {
+            "node_id": "credit_disability_transfer",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "DTC application pending for dependent — monitor CRA approval. File return on time and amend if approved after filing. Retroactive up to 10 years.",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "If your child has a prolonged physical or mental impairment that markedly restricts basic activities of daily living, they may qualify for the DTC. A medical practitioner must certify Form T2201. CRA approval is retroactive up to 10 years — this is worth pursuing if there is a qualifying condition.",
+          "checklist_update": {
+            "node_id": "credit_disability_transfer",
+            "confidence_tier": "possible",
+            "reason": "professional_judgment_required"
+          },
+          "preparer_flag": {
+            "flag": "DTC not applied for — assess child's eligibility with medical practitioner. Retroactive claim possible up to 10 years if approved.",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "children_canada_child_benefit",
+      "screen_type": "single_select",
+      "title": "Are you currently receiving the Canada Child Benefit (CCB) for your child?",
+      "question_id": "receives_ccb",
+      "instruction": "The CCB is a tax-free monthly benefit for families with children under 18. It is not reported as income but must be applied for and is recalculated annually based on your prior year net income.",
+      "skip_if": {
+        "question_id": "dependent_profile",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": true,             "label": "Yes — I receive CCB" },
+        { "value": "newly_eligible", "label": "I had a new child or arrived in Canada in 2025 and have not yet applied" },
+        { "value": false,            "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "CCB is not taxable income. However, it is recalculated each July based on prior year net income — filing your T1 return on time is essential. Late or non-filing can interrupt CCB payments.",
+          "preparer_flag": {
+            "flag": "File return on time — CCB recalculated July based on prior year net income. Late filing interrupts payments.",
+            "urgency": "priority"
+          }
+        },
+        "newly_eligible": {
+          "message": "Apply for the CCB immediately through CRA My Account or by filing Form RC66. Newcomers must also file Form RC66SCH to confirm residency status. CCB payments are not retroactive beyond 11 months — apply now to preserve your entitlement.",
+          "checklist_update": {
+            "node_id": "benefit_canada_child_benefit",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "CCB not yet applied for — complete RC66 (and RC66SCH for newcomers) immediately. Payments not retroactive beyond 11 months.",
+            "urgency": "urgent"
+          }
+        },
+        "false": {
+          "message": "If you have children under 18 and are not receiving CCB, apply immediately — there may be retroactive entitlement up to 11 months. Your preparer can assist.",
+          "checklist_update": {
+            "node_id": "benefit_canada_child_benefit",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "CCB not being received — confirm eligibility and apply. Retroactive entitlement up to 11 months.",
+            "urgency": "urgent"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "children_caregiver_adult",
+      "screen_type": "single_select",
+      "title": "Did you provide a home for an elderly parent, grandparent, or infirm adult relative in 2025?",
+      "question_id": "provides_caregiver_support",
+      "show_if": {
+        "flag": "has_adult_dependent",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "lived_with_me",       "label": "Yes — they lived in my home" },
+        { "value": "financial_support",   "label": "Yes — I supported them financially but they lived elsewhere" },
+        { "value": false,                 "label": "No" }
+      ],
+      "feedback": {
+        "lived_with_me": {
+          "message": "You may be eligible for the Canada Caregiver Amount under ITA s.118(1)(c.1) for an infirm dependent living with you. The federal credit is up to $7,999 for 2025, reduced by the dependent's net income above $17,670. Medical documentation of infirmity may be required by CRA.",
+          "checklist_update": {
+            "node_id": "credit_caregiver_amount",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "document_checklist_add": {
+            "document": "Dependent's net income information — required to calculate Canada Caregiver Amount phase-out under ITA s.118(1)(c.1)",
+            "urgency": "standard"
+          },
+          "preparer_flag": {
+            "flag": "Caregiver amount — confirm dependent's net income and infirmity status. Medical documentation may be required by CRA.",
+            "urgency": "standard"
+          }
+        },
+        "financial_support": {
+          "message": "Financial support of an infirm dependent living elsewhere may qualify for the Infirm Dependent credit under ITA s.118(1)(d). The dependent must have a physical or mental infirmity and be dependent on you due to that infirmity. Your preparer will confirm eligibility.",
+          "checklist_update": {
+            "node_id": "credit_infirm_dependent",
+            "confidence_tier": "possible",
+            "reason": "professional_judgment_required"
+          },
+          "preparer_flag": {
+            "flag": "Infirm dependent living elsewhere — confirm infirmity status and degree of financial dependence for ITA s.118(1)(d) credit",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No caregiver support noted."
+        }
+      }
+    },
+    {
+      "screen_id": "children_attribution_rules",
+      "screen_type": "single_select",
+      "title": "Did you transfer money or property to a child under 18 to invest in their name in 2025?",
+      "question_id": "transferred_to_minor",
+      "instruction": "Attribution rules under ITA s.74.1(2) apply income earned on transferred property back to you until the year the child turns 18. Capital gains are exempt from attribution — only income such as interest and dividends is attributed.",
+      "skip_if": {
+        "question_id": "dependent_profile",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Attribution rules under ITA s.74.1(2) require you to report income (interest, dividends) earned on funds transferred to a minor child on your own return until the year they turn 18. Capital gains earned in the child's hands are not attributed back. Your preparer needs the amount transferred and any income earned on it.",
+          "checklist_update": {
+            "node_id": "special_attribution_minor",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Income attribution applies — report income earned on funds transferred to minor on your return under ITA s.74.1(2). Capital gains not attributed.",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No transfers to minors noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Children and dependents section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "Child care receipts — provider name, SIN or business number, amounts paid per child",
+      "CRA DTC approval letter if disability credit applies to a dependent",
+      "RESP annual contribution statement",
+      "Dependent's net income information if caregiver credit is claimed",
+      "Form RC66 and RC66SCH if CCB not yet applied for"
+    ],
+    "transition": "Next: Self-Employment."
+  }
+}

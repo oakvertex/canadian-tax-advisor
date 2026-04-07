@@ -1,0 +1,135 @@
+{
+  "branch_id": "branch_personal_profile",
+  "branch_label": "Personal Profile",
+  "branch_order": 1,
+  "always_runs": true,
+  "intro": "First, a few basics about your situation. These help us personalize everything that follows.",
+  "screens": [
+    {
+      "screen_id": "profile_residency",
+      "screen_type": "single_select",
+      "title": "Where did you live on December 31, 2025?",
+      "question_id": "province_of_residence",
+      "instruction": "Your province of residence on December 31 determines your provincial tax rates and which provincial credits apply for the full year — even if you moved mid-year.",
+      "options": [
+        { "value": "ON",             "label": "Ontario" },
+        { "value": "BC",             "label": "British Columbia" },
+        { "value": "AB",             "label": "Alberta" },
+        { "value": "QC",             "label": "Quebec" },
+        { "value": "other_province", "label": "Other province or territory" },
+        { "value": "newcomer",       "label": "I became a Canadian resident in 2025" }
+      ],
+      "feedback": {
+        "ON": {
+          "message": "Ontario residents qualify for the Ontario Trillium Benefit (OTB) under OTA s.103.1, the Low-income Individuals and Families Tax (LIFT) Credit under OTA s.103.4, and the Senior Homeowners Property Tax Grant under OTA s.104.1. We will cover all three at the end of your interview.",
+          "activates_flag": "ontario_credits_eligible"
+        },
+        "BC": {
+          "message": "British Columbia provincial credits will be noted where applicable. All federal T1 items covered in this interview apply regardless of province."
+        },
+        "AB": {
+          "message": "Alberta provincial credits will be noted where applicable. All federal T1 items covered in this interview apply regardless of province."
+        },
+        "QC": {
+          "message": "Quebec residents file a separate provincial return with Revenu Québec in addition to the federal T1. This interview covers federal items only. Quebec-specific items should be reviewed with a Quebec-licensed preparer."
+        },
+        "other_province": {
+          "message": "Provincial credits for your territory or province will be noted where applicable. All federal T1 items covered in this interview apply regardless of province."
+        },
+        "newcomer": {
+          "message": "Welcome to Canada. As a new resident, your Canadian tax obligation begins on your date of arrival. Your return covers only that partial year. We will factor your arrival date into credit eligibility and pro-ration calculations throughout the interview.",
+          "activates_flag": "newcomer_proration"
+        }
+      }
+    },
+    {
+      "screen_id": "profile_marital_status",
+      "screen_type": "single_select",
+      "title": "What was your marital status on December 31, 2025?",
+      "question_id": "marital_status",
+      "instruction": "CRA determines most credits and benefit entitlements based on your status on December 31. If your status changed during 2025, select your status at year-end — we will ask about the change separately if relevant.",
+      "options": [
+        { "value": "single",     "label": "Single" },
+        { "value": "married",    "label": "Married" },
+        { "value": "common_law", "label": "Common-law partner" },
+        { "value": "separated",  "label": "Separated" },
+        { "value": "divorced",   "label": "Divorced" },
+        { "value": "widowed",    "label": "Widowed" }
+      ],
+      "feedback": {
+        "single": {
+          "message": "Single status noted."
+        },
+        "married": {
+          "message": "Your spouse's net income affects the spousal amount credit under ITA s.118(1)(a), the GST/HST Credit, Canada Child Benefit, and several other income-tested credits. We will ask for their income range when relevant."
+        },
+        "common_law": {
+          "message": "Common-law partners are treated identically to married spouses under the ITA after 12 continuous months of cohabitation, or immediately if you have a child together. Your partner's net income affects the same credits as a married spouse."
+        },
+        "separated": {
+          "message": "If you separated in 2025, your December 31 status determines credit eligibility. Support payment deductibility under ITA s.60(b), the eligible dependant amount under ITA s.118(1)(b), and several credits are affected. We will cover these if the Marital Status Change branch applies."
+        },
+        "divorced": {
+          "message": "Divorce affects support payment deductibility under ITA s.60(b), credit eligibility, and property transfer rules under ITA s.73(1). We will cover the relevant items."
+        },
+        "widowed": {
+          "message": "The death of a spouse triggers specific rules — RRSP spousal rollover under ITA s.146(16), deemed disposition of capital property under ITA s.70(5), and survivor benefit reporting. We will flag the key items throughout."
+        }
+      }
+    },
+    {
+      "screen_id": "profile_age",
+      "screen_type": "single_select",
+      "title": "What is your age as of December 31, 2025?",
+      "question_id": "taxpayer_age",
+      "instruction": "Age determines registered plan obligations, credit eligibility, and pension income splitting availability.",
+      "options": [
+        { "value": "under_18", "label": "Under 18" },
+        { "value": "18_to_64", "label": "18 to 64" },
+        { "value": "65_to_71", "label": "65 to 71" },
+        { "value": "over_71",  "label": "72 or older" }
+      ],
+      "feedback": {
+        "under_18": {
+          "message": "Under 18 noted. If you have employment, self-employment, or other income you are still required to file a T1 return. Filing also establishes RRSP contribution room for future years."
+        },
+        "18_to_64": {
+          "message": "Standard working-age profile confirmed."
+        },
+        "65_to_71": {
+          "message": "At age 65 or older you may qualify for the Age Amount credit under ITA s.118(2) — worth up to $8,790 federally in 2025, subject to a net income phase-out starting at $42,335. You also become eligible for the Pension Income Credit under ITA s.118(3) and pension income splitting under ITA s.60.03. We will cover all of these.",
+          "activates_flag": "age_65_plus"
+        },
+        "over_71": {
+          "message": "At age 72 or older your RRSP must have been converted to a RRIF or annuity by December 31 of the year you turned 71 under ITA s.146(2)(b.4). If conversion did not occur the full RRSP balance is included in income. You also qualify for all age 65+ credits. We will address RRSP conversion in the Retirement and Age Milestones sections.",
+          "activates_flag": "rrsp_conversion_required"
+        }
+      }
+    },
+    {
+      "screen_id": "profile_dependents",
+      "screen_type": "single_select",
+      "title": "Do you support any dependents?",
+      "question_id": "has_dependents",
+      "instruction": "Dependents include children under 18, full-time students, elderly parents, or other family members you financially support. This may unlock additional interview sections even if you did not flag a life event.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Dependents noted. Potential items include child care expenses under ITA s.63(1), the eligible dependant amount under ITA s.118(1)(b), the caregiver amount under ITA s.118(1)(c.1), and the Canada Child Benefit. We will ask for details in the relevant sections.",
+          "activates_flag": "has_dependents"
+        },
+        "false": {
+          "message": "No dependents noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Personal profile complete.",
+    "shows": "running_checklist_snapshot",
+    "transition": "Next: Employment Income."
+  }
+}

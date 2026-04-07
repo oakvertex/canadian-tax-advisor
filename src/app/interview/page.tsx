@@ -4,25 +4,27 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import interviewFlowJson from "../../../taxonomy/2025/interview-flow.json";
 import taxonomyItemsJson from "../../../taxonomy/2025/items.json";
-import { createSession, applyFeedback, replaySession } from "@/lib/session";
+import { createSession, applyScreenFeedback, replaySession } from "@/lib/session";
 import InterviewScreenComponent from "@/components/InterviewScreen";
 import RunningChecklist from "@/components/RunningChecklist";
 import type { SessionState, InterviewBranch, InterviewScreen, TaxonomyNode } from "@/types";
 
-const branches = interviewFlowJson as InterviewBranch[];
+const branches = interviewFlowJson as unknown as InterviewBranch[];
 const taxonomyNodes = taxonomyItemsJson as TaxonomyNode[];
 
 const SESSION_KEY = "tax-advisor-session";
 
 function getActiveBranches(flags: Record<string, boolean>): InterviewBranch[] {
-  return branches.filter((branch) => {
-    if (branch.always_runs) return true;
-    if (!branch.triggered_by) return false;
-    const triggers = Array.isArray(branch.triggered_by)
-      ? branch.triggered_by
-      : [branch.triggered_by];
-    return triggers.some((t) => flags[t] === true);
-  });
+  return branches
+    .filter((branch) => {
+      if (branch.always_runs) return true;
+      if (!branch.triggered_by) return false;
+      const triggers = Array.isArray(branch.triggered_by)
+        ? branch.triggered_by
+        : [branch.triggered_by];
+      return triggers.some((t) => flags[t] === true);
+    })
+    .sort((a, b) => a.branch_order - b.branch_order);
 }
 
 function shouldSkip(screen: InterviewScreen, answers: Record<string, any>): boolean {
@@ -65,6 +67,7 @@ export default function InterviewPage() {
   const router = useRouter();
   const [session, setSession] = useState<SessionState>(() => createSession("2025"));
   const [showingIntro, setShowingIntro] = useState(true);
+  const [showingBranchSummary, setShowingBranchSummary] = useState<InterviewBranch | null>(null);
 
   const activeBranches = getActiveBranches(session.flags);
   const currentBranch = activeBranches[session.current_branch_index];
@@ -91,12 +94,33 @@ export default function InterviewPage() {
 
   const currentScreen = currentBranch.screens[session.current_screen_index];
 
-  const canGoBack = showingIntro
+  const canGoBack = showingBranchSummary !== null
+    ? (session.answerHistory ?? []).length > 0
+    : showingIntro
     ? session.current_branch_index > 0
     : (session.answerHistory ?? []).length > 0;
 
   const handlePrevious = () => {
     const history = session.answerHistory ?? [];
+
+    if (showingBranchSummary !== null) {
+      // On branch completion summary: go back to the last answered question
+      if (history.length === 0) return;
+      const last = history[history.length - 1];
+      const newHistory = history.slice(0, -1);
+      const replayed = replaySession(branches, newHistory, session.tax_year);
+      const finalSession: SessionState = {
+        ...replayed,
+        answerHistory: newHistory,
+        current_branch_index: last.branch_index,
+        current_screen_index: last.screen_index,
+      };
+      saveSession(finalSession);
+      setSession(finalSession);
+      setShowingBranchSummary(null);
+      setShowingIntro(false);
+      return;
+    }
 
     if (showingIntro) {
       // On branch intro: step back to last answered question of previous branch
@@ -147,16 +171,8 @@ export default function InterviewPage() {
       answerHistory: [...(session.answerHistory ?? []), historyEntry],
     };
 
-    // 2. Apply feedback
-    if (screen.screen_type === "multi_select" && Array.isArray(value)) {
-      for (const v of value) {
-        const fb = screen.feedback[String(v)];
-        if (fb) updated = applyFeedback(updated, fb);
-      }
-    } else {
-      const fb = screen.feedback[String(value)];
-      if (fb) updated = applyFeedback(updated, fb);
-    }
+    // 2. Apply feedback (handles both single_select and multi_select)
+    updated = applyScreenFeedback(updated, screen, value);
 
     // 3. Advance to next screen, skipping any skip_if matches
     const nextIdx = findNextScreenIndex(
@@ -187,7 +203,11 @@ export default function InterviewPage() {
           current_branch_index: nextBranchIdx,
           current_screen_index: 0,
         };
-        setShowingIntro(true);
+        if (currentBranch.branch_completion_summary.shows === "active_branches_preview") {
+          setShowingBranchSummary(currentBranch);
+        } else {
+          setShowingIntro(true);
+        }
       }
     }
 
@@ -229,7 +249,39 @@ export default function InterviewPage() {
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 flex gap-8">
         {/* Interview area */}
         <div className="flex-1 min-w-0">
-          {showingIntro ? (
+          {showingBranchSummary !== null ? (
+            <div className="flex flex-col gap-5">
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
+                Your 2025 Tax Review
+              </p>
+              <p className="text-lg font-semibold text-gray-900">
+                {showingBranchSummary.branch_completion_summary.message}
+              </p>
+              <ul className="flex flex-col gap-2">
+                {activeBranches.map((b) => (
+                  <li key={b.branch_id} className="flex items-center gap-2 text-gray-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+                    {b.branch_label}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex items-center gap-3 mt-2">
+                <button
+                  onClick={handlePrevious}
+                  disabled={!canGoBack}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => { setShowingBranchSummary(null); setShowingIntro(true); }}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          ) : showingIntro ? (
             <div className="flex flex-col gap-5">
               <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
                 {currentBranch.branch_label}
@@ -254,6 +306,7 @@ export default function InterviewPage() {
           ) : currentScreen ? (
             <div className="flex flex-col gap-6">
               <InterviewScreenComponent
+                key={currentScreen.question_id}
                 screen={currentScreen}
                 onAnswer={(value) => handleAnswer(currentScreen, value)}
                 currentAnswers={session.answers}

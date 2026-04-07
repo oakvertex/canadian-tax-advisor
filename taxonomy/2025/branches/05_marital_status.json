@@ -1,0 +1,394 @@
+{
+  "branch_id": "branch_marital_status",
+  "branch_label": "Marital Status Change",
+  "branch_order": 5,
+  "always_runs": false,
+  "triggered_by": "life_event_marriage_change",
+  "intro": "A change in marital status during 2025 affects several areas of your T1 — credits, deductions, registered plan rules, and how certain income is reported. Let's work through the details.",
+  "screens": [
+    {
+      "screen_id": "marital_change_type",
+      "screen_type": "single_select",
+      "title": "What changed in your marital status in 2025?",
+      "question_id": "marital_change_type",
+      "options": [
+        { "value": "married_or_commonlaw", "label": "I got married or entered a common-law relationship" },
+        { "value": "separated",            "label": "I separated from my spouse or common-law partner" },
+        { "value": "divorced",             "label": "My divorce was finalized" },
+        { "value": "widowed",              "label": "My spouse or common-law partner passed away" }
+      ],
+      "feedback": {
+        "married_or_commonlaw": {
+          "message": "From the date of marriage or common-law status, your spouse's net income affects the spousal amount credit under ITA s.118(1)(a), GST/HST Credit, Canada Child Benefit, and pension income splitting eligibility. We will cover the key items.",
+          "activates_flag": "newly_coupled"
+        },
+        "separated": {
+          "message": "Separation has several tax implications — support payment deductibility under ITA s.60(b), adjustment of credits based on December 31 status, the eligible dependant amount under ITA s.118(1)(b) if you have children, and property transfer rules under ITA s.73(1). We will work through each.",
+          "activates_flag": "newly_separated"
+        },
+        "divorced": {
+          "message": "Divorce finalization affects support payment deductibility under ITA s.60(b), credit eligibility based on December 31 status, and property dispositions. We will cover each area.",
+          "activates_flag": "newly_divorced"
+        },
+        "widowed": {
+          "message": "We are sorry for your loss. The death of a spouse triggers specific rules — RRSP/RRIF spousal rollover under ITA s.146(8.1), deemed disposition of capital property under ITA s.70(5), and changes to your own credits. Several of these items have time-sensitive deadlines. We will flag each one.",
+          "activates_flag": "newly_widowed"
+        }
+      }
+    },
+    {
+      "screen_id": "marital_new_spouse_income",
+      "screen_type": "single_select",
+      "title": "Does your new spouse or common-law partner have net income of their own?",
+      "question_id": "new_spouse_has_income",
+      "instruction": "Your spouse's net income determines your eligibility for the Spousal Amount credit under ITA s.118(1)(a) and affects several income-tested credits and benefits.",
+      "show_if": {
+        "flag": "newly_coupled",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "none",             "label": "No income or minimal income" },
+        { "value": "low",              "label": "Some income — under $15,705" },
+        { "value": "moderate_or_above","label": "Income above $15,705" },
+        { "value": "prefer_not_to_say","label": "I would prefer not to say" }
+      ],
+      "feedback": {
+        "none": {
+          "message": "You may claim the full Spousal Amount credit under ITA s.118(1)(a) — worth up to $2,421 federally in 2025. The credit is reduced dollar-for-dollar by your spouse's net income and fully eliminated once their net income equals the basic personal amount.",
+          "checklist_update": {
+            "node_id": "credit_spousal_amount",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "low": {
+          "message": "The Spousal Amount credit is reduced dollar-for-dollar by your spouse's net income. A partial credit under ITA s.118(1)(a) likely applies — your preparer will calculate the exact amount.",
+          "checklist_update": {
+            "node_id": "credit_spousal_amount",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          }
+        },
+        "moderate_or_above": {
+          "message": "At this income level the Spousal Amount credit is fully eliminated. Your spouse's income is still relevant for GST/HST Credit and Canada Child Benefit family income calculations."
+        },
+        "prefer_not_to_say": {
+          "message": "We will flag the Spousal Amount credit as possible — your preparer will determine eligibility from your spouse's return.",
+          "checklist_update": {
+            "node_id": "credit_spousal_amount",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "marital_separation_date",
+      "screen_type": "single_select",
+      "title": "When did your separation occur in 2025?",
+      "question_id": "separation_timing",
+      "instruction": "The timing of separation affects which credits you can claim and how support payment deductibility is calculated for the year.",
+      "show_if": {
+        "flag": "newly_separated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "early_2025", "label": "Early 2025 — before July 1" },
+        { "value": "late_2025",  "label": "Late 2025 — July 1 or after" }
+      ],
+      "feedback": {
+        "early_2025": {
+          "message": "For most of 2025 you were separated. Your December 31 marital status determines credit eligibility — the Spousal Amount does not apply. The Eligible Dependant Amount under ITA s.118(1)(b) may be available if you have a child.",
+          "preparer_flag": {
+            "flag": "Confirm exact separation date — affects credit eligibility and support payment deductibility calculations for 2025",
+            "urgency": "priority"
+          }
+        },
+        "late_2025": {
+          "message": "You were coupled for most of 2025. The Spousal Amount is based on your December 31 status, so it does not apply for 2025 if separated at year-end. Your preparer will review which credits apply for the full year versus the period together.",
+          "preparer_flag": {
+            "flag": "Partial year marital status — confirm exact separation date for credit eligibility and proration",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "marital_support_paid",
+      "screen_type": "single_select",
+      "title": "Did you make spousal or child support payments in 2025?",
+      "question_id": "support_paid",
+      "instruction": "Spousal support paid periodically under a court order or written agreement is deductible under ITA s.60(b). Child support paid under agreements made after May 1, 1997 is not deductible.",
+      "show_if": {
+        "flag": "newly_separated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "spousal_only", "label": "Yes — spousal support only" },
+        { "value": "child_only",   "label": "Yes — child support only" },
+        { "value": "both",         "label": "Yes — both spousal and child support" },
+        { "value": false,          "label": "No" }
+      ],
+      "feedback": {
+        "spousal_only": {
+          "message": "Spousal support paid periodically pursuant to a court order or written agreement is deductible under ITA s.60(b). Lump sum payments are generally not deductible. Bring your agreement and proof of payments made.",
+          "checklist_update": {
+            "node_id": "deduction_spousal_support_paid",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Separation agreement or court order specifying support terms and records of all spousal support payments made in 2025",
+            "urgency": "priority"
+          }
+        },
+        "child_only": {
+          "message": "Child support paid under agreements made after May 1, 1997 is not deductible under the current rules — no deduction to claim. Bring your agreement to confirm the commencement date.",
+          "preparer_flag": {
+            "flag": "Confirm child support agreement commencement date — pre-May 1997 agreements follow the old inclusion-deduction regime",
+            "urgency": "standard"
+          }
+        },
+        "both": {
+          "message": "Spousal support is deductible, child support is not. Your agreement must clearly separate the two amounts. Bring the full agreement — your preparer will identify the deductible portion under ITA s.60(b).",
+          "checklist_update": {
+            "node_id": "deduction_spousal_support_paid",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "document_checklist_add": {
+            "document": "Separation agreement or court order clearly showing spousal vs child support breakdown and proof of all payments made in 2025",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Confirm breakdown of spousal vs child support in agreement to determine deductible amount",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No support payments made noted."
+        }
+      }
+    },
+    {
+      "screen_id": "marital_legal_fees",
+      "screen_type": "single_select",
+      "title": "Did you incur legal fees related to your separation or divorce in 2025?",
+      "question_id": "separation_legal_fees",
+      "instruction": "Legal fees paid to establish or enforce a right to support payments are deductible under ITA s.60(o.1). Legal fees for property settlement or the divorce itself are not deductible.",
+      "show_if": {
+        "flag": "newly_separated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Legal fees to establish or enforce the right to support payments are deductible under ITA s.60(o.1). Fees for property division, custody arrangements, or the divorce proceedings themselves are not deductible. Bring itemized legal invoices — your preparer will identify the deductible portion.",
+          "checklist_update": {
+            "node_id": "deduction_legal_fees_support",
+            "confidence_tier": "possible",
+            "reason": "professional_judgment_required"
+          },
+          "document_checklist_add": {
+            "document": "Legal invoices — itemized billing showing fees for support enforcement vs property or divorce matters",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No legal fees noted."
+        }
+      }
+    },
+    {
+      "screen_id": "marital_property_transfer",
+      "screen_type": "single_select",
+      "title": "Did you transfer property to or receive property from your spouse as part of the separation?",
+      "question_id": "separation_property_transfer",
+      "instruction": "Property transfers between spouses on marriage breakdown follow specific rollover rules under ITA s.73(1) — different from arm's length transfers.",
+      "show_if": {
+        "flag": "newly_separated",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "transferred_to_spouse", "label": "I transferred property to my spouse" },
+        { "value": "received_from_spouse",  "label": "I received property from my spouse" },
+        { "value": "both",                  "label": "Both directions" },
+        { "value": false,                   "label": "No property transfers" }
+      ],
+      "feedback": {
+        "transferred_to_spouse": {
+          "message": "Property transferred to a spouse on marriage breakdown is deemed disposed at its adjusted cost base under ITA s.73(1) — no immediate capital gain is triggered. The receiving spouse inherits your cost base. Your preparer must document the transfer carefully to establish the ACB that carries over.",
+          "checklist_update": {
+            "node_id": "special_spousal_property_rollover",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Original purchase documents for all transferred property — establishes the ACB that rolls over to your spouse under ITA s.73(1)",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Document ACB of all transferred property — s.73(1) rollover defers gain but ACB must be recorded for the receiving spouse",
+            "urgency": "priority"
+          }
+        },
+        "received_from_spouse": {
+          "message": "Property received from a spouse on marriage breakdown carries over at the transferor's adjusted cost base under ITA s.73(1). Your future capital gain is calculated from their original cost — not the fair market value at the time of transfer. Obtain original purchase documentation from your spouse.",
+          "checklist_update": {
+            "node_id": "special_spousal_property_rollover",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Original purchase documents from transferring spouse — confirms inherited ACB for future capital gains calculation",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Obtain ACB documentation from transferring spouse — determines your future capital gain when property is eventually sold",
+            "urgency": "priority"
+          }
+        },
+        "both": {
+          "message": "Multiple property transfers noted in both directions. Each transfer must be documented individually with the original cost base. Professional review is strongly recommended before these transactions are reported.",
+          "checklist_update": {
+            "node_id": "special_spousal_property_rollover",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Multiple property transfers on marriage breakdown — document ACB for each separately. Professional review required.",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No property transfers noted."
+        }
+      }
+    },
+    {
+      "screen_id": "marital_widowed_rrsp",
+      "screen_type": "single_select",
+      "title": "Did your spouse have an RRSP or RRIF at the time of their passing?",
+      "question_id": "deceased_spouse_rrsp",
+      "show_if": {
+        "flag": "newly_widowed",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "rrsp",  "label": "Yes — an RRSP" },
+        { "value": "rrif",  "label": "Yes — a RRIF" },
+        { "value": "both",  "label": "Yes — both an RRSP and a RRIF" },
+        { "value": false,   "label": "No" },
+        { "value": "unsure","label": "I am not sure" }
+      ],
+      "feedback": {
+        "rrsp": {
+          "message": "If you are the named beneficiary of your spouse's RRSP you may transfer the proceeds directly to your own RRSP or RRIF on a tax-deferred basis under ITA s.146(8.1) — no income inclusion in either return. Without this rollover election, the full RRSP value is included in your spouse's terminal return. This election must be made before the estate is settled. Act urgently.",
+          "checklist_update": {
+            "node_id": "special_deceased_spouse_rrsp_rollover",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "RRSP account statement at date of death, beneficiary designation form, and death certificate — required to initiate spousal rollover under ITA s.146(8.1)",
+            "urgency": "critical"
+          },
+          "preparer_flag": {
+            "flag": "CRITICAL: Spousal RRSP rollover election must be made before estate is settled — confirm beneficiary designation immediately and file election with financial institution",
+            "urgency": "critical"
+          }
+        },
+        "rrif": {
+          "message": "RRIF proceeds paid to a surviving spouse who is a named beneficiary may be transferred to your own RRSP or RRIF tax-deferred under ITA s.146.3. Minimum withdrawal rules apply going forward from your own plan. Bring the RRIF statements and beneficiary designation documents.",
+          "checklist_update": {
+            "node_id": "special_deceased_spouse_rrif_rollover",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "RRIF account statement at date of death, beneficiary designation form, and death certificate",
+            "urgency": "critical"
+          },
+          "preparer_flag": {
+            "flag": "Spousal RRIF rollover — confirm beneficiary designation, initiate transfer, and calculate minimum withdrawal obligations from the new plan",
+            "urgency": "critical"
+          }
+        },
+        "both": {
+          "message": "Both RRSP and RRIF noted. Each requires a separate rollover election at the financial institution holding the plan. Both elections must be completed before the estate is settled. Act immediately.",
+          "checklist_update": {
+            "node_id": "special_deceased_spouse_rrsp_rollover",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Statements for both RRSP and RRIF at date of death, beneficiary designations for each plan, and death certificate",
+            "urgency": "critical"
+          },
+          "preparer_flag": {
+            "flag": "CRITICAL: Both RRSP and RRIF rollover elections required — each must be completed at the holding institution before estate settlement",
+            "urgency": "critical"
+          }
+        },
+        "false": {
+          "message": "No RRSP or RRIF noted for deceased spouse."
+        },
+        "unsure": {
+          "message": "Contact the financial institutions your spouse dealt with urgently to confirm whether any RRSP or RRIF existed. The rollover window closes when the estate is settled — missing it means the full plan value is taxed in the terminal return.",
+          "preparer_flag": {
+            "flag": "URGENT: Confirm whether deceased spouse held an RRSP or RRIF — rollover opportunity is time-limited and irreversible if missed",
+            "urgency": "urgent"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "marital_widowed_capital_property",
+      "screen_type": "single_select",
+      "title": "Did you inherit capital property from your spouse — such as a home, investments, or rental property?",
+      "question_id": "inherited_capital_property",
+      "show_if": {
+        "flag": "newly_widowed",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Capital property transferred to a surviving spouse on death is deemed disposed at its adjusted cost base under the spousal rollover in ITA s.70(6) — deferring any capital gain until you eventually sell. You inherit the deceased's original cost base, not the fair market value at death. Obtain original purchase documents for all inherited property. This documentation will be essential when you sell.",
+          "checklist_update": {
+            "node_id": "special_deceased_spouse_capital_property",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Original purchase documents for all capital property inherited from spouse — establishes the ACB that carries over to you under ITA s.70(6)",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Document ACB of all inherited capital property — spousal rollover under ITA s.70(6) defers the gain but the ACB must be on file for the future sale",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No inherited capital property noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Marital status section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "Separation agreement or court order — if separated or divorced",
+      "Proof of support payments made or received in 2025",
+      "Itemized legal invoices — if deducting legal fees under ITA s.60(o.1)",
+      "Original purchase documents for any transferred or inherited capital property",
+      "RRSP/RRIF statements and beneficiary designation forms — if spouse passed away"
+    ],
+    "transition": "Next: Children and Dependents."
+  }
+}

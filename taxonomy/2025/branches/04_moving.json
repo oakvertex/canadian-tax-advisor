@@ -1,0 +1,272 @@
+{
+  "branch_id": "branch_moving",
+  "branch_label": "Relocation",
+  "branch_order": 4,
+  "always_runs": false,
+  "triggered_by": "life_event_moved",
+  "intro": "You indicated you moved in 2025. Depending on the reason for the move and the distance, your moving costs may be deductible under ITA s.62(1). Let's confirm the details.",
+  "screens": [
+    {
+      "screen_id": "moving_reason",
+      "screen_type": "single_select",
+      "title": "Why did you move?",
+      "question_id": "move_reason",
+      "instruction": "Moving expenses are only deductible for an eligible relocation — defined in ITA s.248(1) as a move to enable you to be employed, carry on business, or attend a post-secondary institution at your new location.",
+      "options": [
+        { "value": "employment",     "label": "I started a new job or transferred with my employer" },
+        { "value": "business",       "label": "I relocated to run or start my own business" },
+        { "value": "post_secondary", "label": "I moved to attend a college or university" },
+        { "value": "other",          "label": "Another reason (family, lifestyle, retirement)" }
+      ],
+      "feedback": {
+        "employment": {
+          "message": "Employment relocation qualifies under ITA s.62(1). One more question to confirm the distance threshold.",
+          "checklist_update": {
+            "node_id": "deduction_moving_expenses",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          }
+        },
+        "business": {
+          "message": "Relocation to carry on business qualifies under ITA s.62(1). One more question to confirm the distance threshold.",
+          "checklist_update": {
+            "node_id": "deduction_moving_expenses",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          }
+        },
+        "post_secondary": {
+          "message": "Students who relocate for full-time post-secondary education may deduct moving expenses under ITA s.62(1) — but only against scholarships, bursaries, or income earned at the new location. One more question to confirm the distance threshold.",
+          "checklist_update": {
+            "node_id": "deduction_moving_expenses",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          }
+        },
+        "other": {
+          "message": "Moving expenses are deductible only for employment, business, or education relocations under ITA s.62(1). A personal relocation — for family, lifestyle, or retirement — does not qualify regardless of distance.",
+          "suppresses_branch_screens": [
+            "moving_distance",
+            "moving_province_change",
+            "moving_expenses_types",
+            "moving_income_at_new_location",
+            "moving_prior_year_carryforward"
+          ]
+        }
+      }
+    },
+    {
+      "screen_id": "moving_distance",
+      "screen_type": "single_select",
+      "title": "Was your new home at least 40 kilometres closer to your new work or school?",
+      "question_id": "move_distance_qualifies",
+      "instruction": "The distance is measured in a straight line from each home to the new work or school location — not driving distance. Under ITA s.248(1), your new home must be at least 40km closer to your new principal place of employment or education than your old home was.",
+      "skip_if": {
+        "question_id": "move_reason",
+        "operator": "equals",
+        "value": "other"
+      },
+      "options": [
+        { "value": true,    "label": "Yes — definitely more than 40km closer" },
+        { "value": "unsure","label": "I am not sure — it might be close" },
+        { "value": false,   "label": "No — less than 40km closer" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "40km threshold confirmed. Moving expenses are added to your checklist under ITA s.62(1).",
+          "activates_flag": "moving_expenses_confirmed",
+          "checklist_update": {
+            "node_id": "deduction_moving_expenses",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "unsure": {
+          "message": "Your preparer can verify the 40km measurement using your old and new addresses. We have kept moving expenses on your checklist as possible — gather your receipts in the meantime.",
+          "activates_flag": "moving_expenses_possible",
+          "checklist_update": {
+            "node_id": "deduction_moving_expenses",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          }
+        },
+        "false": {
+          "message": "The 40km threshold under ITA s.248(1) is not met. Moving expenses are not deductible in this case.",
+          "suppresses_branch_screens": [
+            "moving_province_change",
+            "moving_expenses_types",
+            "moving_income_at_new_location",
+            "moving_prior_year_carryforward"
+          ]
+        }
+      }
+    },
+    {
+      "screen_id": "moving_province_change",
+      "screen_type": "single_select",
+      "title": "Did you move to a different province or territory?",
+      "question_id": "move_changed_province",
+      "instruction": "Your province of residence on December 31, 2025 determines which provincial tax rates and credits apply for the full year — even if you moved mid-year.",
+      "options": [
+        { "value": true,  "label": "Yes — I moved to a different province or territory" },
+        { "value": false, "label": "No — I moved within the same province" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Provincial change noted. Your province of residence on December 31 determines provincial tax rates and credits for the entire year. If you moved to or from Ontario, Ontario-specific credits such as the OTB and LIFT Credit are affected.",
+          "activates_flag": "changed_province",
+          "preparer_flag": {
+            "flag": "Confirm exact date of provincial move — determines Ontario credit eligibility and provincial tax rates for the year",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "Same-province move noted. Provincial credits are unaffected."
+        }
+      }
+    },
+    {
+      "screen_id": "moving_expenses_types",
+      "screen_type": "multi_select",
+      "title": "Which moving expenses did you incur in 2025?",
+      "question_id": "moving_expense_types",
+      "instruction": "Select all that apply. This builds your document checklist — we are not asking for amounts yet. All eligible moving expense categories are defined in ITA s.62(3).",
+      "options": [
+        { "value": "travel",            "label": "Travel costs to the new location — gas, meals, flights, accommodation en route" },
+        { "value": "movers_storage",    "label": "Moving company or storage costs" },
+        { "value": "temp_lodging",      "label": "Temporary accommodation during the transition" },
+        { "value": "lease_cancellation","label": "Lease cancellation costs at old residence" },
+        { "value": "sold_old_home",     "label": "I sold my old home — realtor fees, legal fees, mortgage prepayment penalty" },
+        { "value": "bought_new_home",   "label": "I purchased a new home — legal fees, land transfer taxes" },
+        { "value": "maintain_vacant",   "label": "Costs to maintain old home while it sat vacant after I moved" }
+      ],
+      "feedback": {
+        "travel": {
+          "message": "Travel costs en route to the new location are eligible under ITA s.62(3)(b). Keep receipts for gas, meals (subject to the 50% meals limitation), and accommodation. Reasonable travel by the most direct route qualifies.",
+          "document_checklist_add": {
+            "document": "Travel receipts — gas, meals, and accommodation en route to new location",
+            "urgency": "standard"
+          }
+        },
+        "movers_storage": {
+          "message": "Moving company invoices and storage costs during the relocation are eligible under ITA s.62(3)(a).",
+          "document_checklist_add": {
+            "document": "Moving company invoice and storage facility receipts",
+            "urgency": "standard"
+          }
+        },
+        "temp_lodging": {
+          "message": "Temporary lodging while you are settling in at the new location is eligible under ITA s.62(3)(c) for up to 15 days. Meals during this period are also eligible, subject to the 50% limitation.",
+          "document_checklist_add": {
+            "document": "Temporary lodging receipts near new location — up to 15 days eligible under ITA s.62(3)(c)",
+            "urgency": "standard"
+          }
+        },
+        "lease_cancellation": {
+          "message": "Lease cancellation fees paid to break your old lease are eligible under ITA s.62(3)(f).",
+          "document_checklist_add": {
+            "document": "Lease cancellation agreement and proof of penalty payment",
+            "urgency": "standard"
+          }
+        },
+        "sold_old_home": {
+          "message": "Costs of selling your old home are eligible under ITA s.62(3)(e) — realtor commissions, legal fees, and mortgage prepayment penalties. These are often the largest moving expense amounts.",
+          "document_checklist_add": {
+            "document": "Statement of Adjustments from sale of old home — showing realtor commissions, legal fees, and any mortgage penalty",
+            "urgency": "priority"
+          }
+        },
+        "bought_new_home": {
+          "message": "Legal fees and land transfer taxes on your new home are eligible under ITA s.62(3)(d) — but only if you sold your old home or if this is a move for a new job or business.",
+          "document_checklist_add": {
+            "document": "Statement of Adjustments from purchase of new home — showing legal fees and land transfer taxes paid",
+            "urgency": "standard"
+          }
+        },
+        "maintain_vacant": {
+          "message": "Costs to maintain a vacant former residence while it is listed for sale are eligible under ITA s.62(3)(f) — including utilities, insurance, and property tax. There is no fixed time limit but costs must be reasonable and the home must have been actively listed.",
+          "document_checklist_add": {
+            "document": "Receipts for vacant home maintenance costs — utilities, insurance, property tax while actively listed for sale",
+            "urgency": "standard"
+          },
+          "preparer_flag": {
+            "flag": "Confirm duration old home was vacant and whether it was actively listed — required to support maintenance cost eligibility under ITA s.62(3)(f)",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "moving_income_at_new_location",
+      "screen_type": "single_select",
+      "title": "Did you earn employment or business income at your new location in 2025?",
+      "question_id": "income_at_new_location",
+      "instruction": "Moving expenses are only deductible against income earned at the new location in the same year under ITA s.62(1). If your income at the new location was insufficient, unused expenses carry forward to the following year under ITA s.62(1)(c).",
+      "options": [
+        { "value": "full_year", "label": "Yes — I worked at the new location for most of the year" },
+        { "value": "partial",   "label": "Yes — but only for a portion of the year after the move" },
+        { "value": "none_yet",  "label": "Not yet — I moved late in the year or am still seeking work" }
+      ],
+      "feedback": {
+        "full_year": {
+          "message": "Good. Your moving expenses are deductible against your new location income, subject to the total eligible amounts."
+        },
+        "partial": {
+          "message": "Your deduction is capped at income earned at the new location in 2025. Any excess moving expenses carry forward automatically to 2026 under ITA s.62(1)(c) and are deductible when you earn sufficient income there.",
+          "preparer_flag": {
+            "flag": "Calculate income earned at new location in 2025 to determine deduction ceiling — carry forward remainder to 2026",
+            "urgency": "standard"
+          }
+        },
+        "none_yet": {
+          "message": "If no income was earned at the new location in 2025, the full amount of eligible moving expenses carries forward to 2026 under ITA s.62(1)(c). No deduction is available in 2025.",
+          "preparer_flag": {
+            "flag": "No new location income in 2025 — carry forward full moving expense amount to 2026 return",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "moving_prior_year_carryforward",
+      "screen_type": "single_select",
+      "title": "Did you have unclaimed moving expenses carried forward from 2024?",
+      "question_id": "moving_prior_carryforward",
+      "instruction": "If you moved in late 2024 and earned insufficient income at the new location that year, unused expenses carry forward to 2025 under ITA s.62(1)(c). Your 2024 Notice of Assessment will show the carryforward amount.",
+      "options": [
+        { "value": true,    "label": "Yes" },
+        { "value": "unsure","label": "I am not sure" },
+        { "value": false,   "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Prior year moving expense carryforward is deductible in 2025 against income earned at the new location. Your 2024 Notice of Assessment shows the exact amount available.",
+          "document_checklist_add": {
+            "document": "2024 Notice of Assessment — confirms moving expense carryforward balance available for 2025",
+            "urgency": "priority"
+          }
+        },
+        "unsure": {
+          "message": "Check your 2024 Notice of Assessment — CRA lists all carryforward amounts there. Bring it to your preparer.",
+          "document_checklist_add": {
+            "document": "2024 Notice of Assessment — verify whether moving expense carryforward balance exists",
+            "urgency": "standard"
+          }
+        },
+        "false": {
+          "message": "No prior year moving expense carryforward noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Relocation section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "All moving receipts — travel, movers, storage, and temporary lodging",
+      "Statement of Adjustments if home was sold or purchased",
+      "2024 Notice of Assessment if a carryforward balance is suspected",
+      "Proof of new work location — offer letter, T4, or first pay stub"
+    ],
+    "transition": "Next: Marital Status Change."
+  }
+}

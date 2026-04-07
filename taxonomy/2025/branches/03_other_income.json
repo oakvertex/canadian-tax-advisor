@@ -1,0 +1,337 @@
+{
+  "branch_id": "branch_other_income",
+  "branch_label": "Other Income Sources",
+  "branch_order": 3,
+  "always_runs": true,
+  "intro": "Beyond T4 employment income, many other amounts must be reported on your T1. Some arrive as slips, others you must track yourself. Let's make sure nothing is missed.",
+  "screens": [
+    {
+      "screen_id": "other_income_cpp_oas",
+      "screen_type": "single_select",
+      "title": "Did you receive CPP or OAS payments in 2025?",
+      "question_id": "receives_cpp_oas",
+      "instruction": "CPP and OAS are taxable income under ITA s.56(1)(a). You will receive a T4A(P) for CPP and a T4A(OAS) for OAS. These screens appear for taxpayers 65 and older — if you received CPP disability benefits at any age those are covered here too.",
+      "show_if": {
+        "flag": "age_65_plus",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "CPP and OAS are taxable under ITA s.56(1)(a). T4A(P) and T4A(OAS) slips are issued by Service Canada by late February. Up to 50% of CPP income may be assigned to a spouse for tax purposes under ITA s.60.03 — your preparer can model whether splitting is beneficial.",
+          "activates_flag": "receives_cpp",
+          "checklist_update": {
+            "node_id": "income_cpp_oas",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A(P) — CPP Statement of Benefits and T4A(OAS) — OAS Statement of Benefits from Service Canada",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No CPP or OAS income noted."
+        }
+      }
+    },
+    {
+      "screen_id": "other_income_employer_pension",
+      "screen_type": "single_select",
+      "title": "Did you receive pension payments from a former employer's registered pension plan in 2025?",
+      "question_id": "receives_employer_pension",
+      "instruction": "This includes defined benefit (DB) and defined contribution (DC) pension payments. You will receive a T4A slip. This is considered eligible pension income under ITA s.118(3).",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Employer registered pension income is taxable under ITA s.56(1)(a) and reported on a T4A slip. It qualifies as eligible pension income for the Pension Income Credit under ITA s.118(3) — worth up to $2,000 federally. Up to 50% may be allocated to a spouse under ITA s.60.03 if both are 65 or older, or if you are receiving pension payments from a registered pension plan at any age.",
+          "activates_flag": "receives_eligible_pension",
+          "checklist_update": {
+            "node_id": "income_employer_pension",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A slip — Statement of Pension Retirement Annuity and Other Income from former employer's pension plan",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No employer pension income noted."
+        }
+      }
+    },
+    {
+      "screen_id": "other_income_foreign_pension",
+      "screen_type": "single_select",
+      "title": "Did you receive pension income from another country in 2025?",
+      "question_id": "receives_foreign_pension",
+      "instruction": "Includes pensions from a former employer abroad, government pensions from another country, or US Social Security. All foreign pension income is taxable in Canada under ITA s.56(1)(a) and must be converted to Canadian dollars.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Foreign pension income is taxable in Canada under ITA s.56(1)(a) at the Bank of Canada annual average exchange rate. Tax treaties with the source country may reduce foreign withholding tax, and a Foreign Tax Credit under ITA s.126(1) offsets taxes paid abroad to avoid double taxation. US Social Security is taxable at 85% of benefits received under the Canada-US Tax Treaty.",
+          "activates_flag": "receives_foreign_pension",
+          "checklist_update": {
+            "node_id": "income_foreign_pension",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Obtain foreign pension statement, confirm currency conversion rate used, and gather proof of foreign tax withheld — applicable tax treaty must be identified",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No foreign pension income noted."
+        }
+      }
+    },
+    {
+      "screen_id": "other_income_ei",
+      "screen_type": "single_select",
+      "title": "Did you receive Employment Insurance (EI) benefits in 2025?",
+      "question_id": "receives_ei",
+      "instruction": "Includes regular EI, maternity, parental, sickness, compassionate care, and fishing benefits. All EI is taxable under ITA s.56(1)(a)(iv). You will receive a T4E slip.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "EI benefits are taxable under ITA s.56(1)(a)(iv) and reported on a T4E slip. If your net income exceeds $79,000 in 2025 you may be required to repay a portion under ITA s.145 — this is called the EI social benefits repayment and appears on Schedule 1. If you collected EI in any of the prior 10 years your preparer should verify whether the repayment rule applies.",
+          "activates_flag": "received_ei",
+          "checklist_update": {
+            "node_id": "income_ei_benefits",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4E — Statement of Employment Insurance and Other Benefits from Service Canada",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No EI benefits noted."
+        }
+      }
+    },
+    {
+      "screen_id": "other_income_rrsp_withdrawal",
+      "screen_type": "single_select",
+      "title": "Did you withdraw any funds from an RRSP in 2025?",
+      "question_id": "rrsp_withdrawal",
+      "instruction": "Any RRSP withdrawal — other than under the Home Buyers Plan or Lifelong Learning Plan — is fully taxable as income in the year received under ITA s.56(1)(h). Withholding tax is deducted at source but may not cover your full liability.",
+      "options": [
+        { "value": "yes_regular", "label": "Yes — a regular withdrawal" },
+        { "value": "yes_hbp",     "label": "Yes — under the Home Buyers Plan (HBP)" },
+        { "value": "yes_llp",     "label": "Yes — under the Lifelong Learning Plan (LLP)" },
+        { "value": false,         "label": "No withdrawals in 2025" }
+      ],
+      "feedback": {
+        "yes_regular": {
+          "message": "Regular RRSP withdrawals are fully taxable under ITA s.56(1)(h). You will receive a T4RSP slip showing the withdrawal and withholding tax. Note that once withdrawn, RRSP contribution room for that amount is permanently lost — there is no re-contribution room created.",
+          "checklist_update": {
+            "node_id": "income_rrsp_withdrawal",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4RSP — Statement of RRSP Income showing withdrawal amount and withholding tax deducted",
+            "urgency": "priority"
+          }
+        },
+        "yes_hbp": {
+          "message": "HBP withdrawals up to $35,000 are not taxable when used to purchase a qualifying first home under ITA s.146.01. However, annual repayments to your RRSP are required starting the second calendar year after the first withdrawal year. Missed repayments are added to your income for that year. We will cover this in the First Home Purchase section.",
+          "activates_flag": "hbp_active",
+          "checklist_update": {
+            "node_id": "income_hbp_repayment",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          }
+        },
+        "yes_llp": {
+          "message": "LLP withdrawals are not taxable while you are enrolled in qualifying full-time education under ITA s.146.02. Maximum lifetime withdrawal is $20,000 ($10,000 per year). Repayments must begin no later than 10 years after the first withdrawal, or the year after you stop being a full-time student. Missed repayments are added to your income.",
+          "activates_flag": "llp_active",
+          "checklist_update": {
+            "node_id": "income_llp_repayment",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          }
+        },
+        "false": {
+          "message": "No RRSP withdrawals noted."
+        }
+      }
+    },
+    {
+      "screen_id": "other_income_support_received",
+      "screen_type": "single_select",
+      "title": "Did you receive spousal or child support payments in 2025?",
+      "question_id": "support_received",
+      "instruction": "Spousal support received is taxable under ITA s.56(1)(b) if paid periodically under a court order or written agreement. Child support received under agreements after May 1, 1997 is not taxable.",
+      "show_if": {
+        "question_id": "marital_status",
+        "operator": "in",
+        "value": ["separated", "divorced"]
+      },
+      "options": [
+        { "value": "spousal_only", "label": "Yes — spousal support only" },
+        { "value": "child_only",   "label": "Yes — child support only" },
+        { "value": "both",         "label": "Yes — both spousal and child support" },
+        { "value": false,          "label": "No" }
+      ],
+      "feedback": {
+        "spousal_only": {
+          "message": "Spousal support received is taxable under ITA s.56(1)(b) when paid periodically pursuant to a court order or written agreement. Lump sum payments are generally not taxable. Bring your separation agreement or court order.",
+          "checklist_update": {
+            "node_id": "income_spousal_support_received",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Separation agreement or court order and records of spousal support payments received in 2025",
+            "urgency": "priority"
+          }
+        },
+        "child_only": {
+          "message": "Child support received under agreements made after May 1, 1997 is not taxable — no income to report. Bring your agreement to confirm the commencement date. Pre-1997 agreements follow different rules.",
+          "preparer_flag": {
+            "flag": "Confirm child support agreement date — pre-May 1997 agreements are taxable under old inclusion-deduction rules",
+            "urgency": "standard"
+          }
+        },
+        "both": {
+          "message": "Spousal support is taxable, child support is not. Your agreement must specify the breakdown between the two. Bring the full agreement — your preparer will identify the taxable portion.",
+          "checklist_update": {
+            "node_id": "income_spousal_support_received",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "document_checklist_add": {
+            "document": "Separation agreement or court order clearly showing spousal vs child support breakdown and proof of all payments received",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No support payments received noted."
+        }
+      }
+    },
+    {
+      "screen_id": "other_income_investments",
+      "screen_type": "multi_select",
+      "title": "Did you receive any investment income outside a registered account in 2025?",
+      "question_id": "investment_income_types",
+      "instruction": "Select all that apply. Exclude amounts earned inside a TFSA, RRSP, or RRIF — those are sheltered from current tax. Outside registered accounts, all investment income is reportable.",
+      "options": [
+        { "value": "interest",          "label": "Interest income from bank accounts, GICs, or bonds" },
+        { "value": "canadian_dividends", "label": "Dividends from Canadian corporations" },
+        { "value": "foreign_dividends",  "label": "Dividends from foreign corporations" },
+        { "value": "capital_gains",      "label": "Sold investments, property, or cryptocurrency at a gain or loss" },
+        { "value": "none",               "label": "None of the above", "exclusive": true }
+      ],
+      "feedback": {
+        "interest": {
+          "message": "Interest income is fully taxable in the year earned under ITA s.12(1)(c) — regardless of whether it is received or accrued. T5 slips are issued for interest over $50 per institution. Interest under $50 must still be reported without a slip.",
+          "checklist_update": {
+            "node_id": "income_interest",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T5 slips — Statement of Investment Income showing interest earned from each financial institution",
+            "urgency": "priority"
+          }
+        },
+        "canadian_dividends": {
+          "message": "Canadian dividends are taxable but eligible for the Dividend Tax Credit under ITA s.121, which partially offsets the corporate tax already paid. Eligible dividends (from large public corporations) are grossed up 38% — your T5 shows both the actual and grossed-up amounts. Ineligible dividends (from CCPCs) are grossed up 15%.",
+          "checklist_update": {
+            "node_id": "income_canadian_dividends",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T5 slips — Statement of Investment Income showing actual and grossed-up dividend amounts and Dividend Tax Credit",
+            "urgency": "priority"
+          }
+        },
+        "foreign_dividends": {
+          "message": "Foreign dividends are fully taxable as foreign income — there is no gross-up or Dividend Tax Credit available. Foreign withholding tax deducted at source may generate a Foreign Tax Credit under ITA s.126(1). If total foreign property cost exceeded $100,000 at any point in 2025 a T1135 Foreign Income Verification must be filed.",
+          "checklist_update": {
+            "node_id": "income_foreign_dividends",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T5 or NR4 slips for foreign dividends and proof of foreign withholding tax paid",
+            "urgency": "priority"
+          }
+        },
+        "capital_gains": {
+          "message": "Capital gains and losses are reported under ITA s.39(1). For 2025, the inclusion rate is 1/2 for individuals on the first $250,000 of net capital gains, and 2/3 above that threshold. Cryptocurrency dispositions are taxable events — every trade, conversion, or spend is a disposition. Bring trade confirmations or brokerage statements showing Adjusted Cost Base (ACB) and proceeds for each transaction.",
+          "activates_flag": "has_capital_gains",
+          "checklist_update": {
+            "node_id": "income_capital_gains",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Trade confirmations or brokerage statements showing ACB and proceeds for all dispositions in 2025 — including cryptocurrency transactions",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Confirm ACB for every disposition — particularly cryptocurrency where per-coin tracking is complex and often incomplete",
+            "urgency": "priority"
+          }
+        },
+        "none": {
+          "message": "No investment income outside registered accounts noted."
+        }
+      }
+    },
+    {
+      "screen_id": "other_income_rental",
+      "screen_type": "single_select",
+      "title": "Did you earn rental income in 2025?",
+      "question_id": "has_rental_income",
+      "instruction": "Includes renting a room, basement suite, or entire property. Short-term rentals such as Airbnb also qualify. Rental income is property income under ITA s.9(1), not employment income.",
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Rental income is taxable as property income under ITA s.9(1). Eligible rental expenses deductible under ITA s.18(1)(a) include: mortgage interest (not principal), property tax, insurance, repairs and maintenance, utilities paid by you, and a portion of your own home expenses if renting a portion of your principal residence. Note: if you rent part of your principal residence, the change-in-use rules under ITA s.45(1) may affect your future principal residence exemption — discuss with your preparer before filing.",
+          "activates_flag": "has_rental_income",
+          "checklist_update": {
+            "node_id": "income_rental",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Rental income and expense records for 2025 — mortgage statement, property tax bill, insurance, receipts for all repairs and eligible expenses",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Confirm if rental property is part of principal residence — partial rental may affect principal residence exemption under ITA s.45(1) on future sale",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No rental income noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Other income section complete. Here is what we have identified so far.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "All T4A, T4A(P), T4A(OAS), T4E slips",
+      "T5 slips and brokerage statements for investment income",
+      "Trade confirmations showing ACB and proceeds for capital gains",
+      "Rental income and expense records"
+    ],
+    "transition": "Next: Life event sections relevant to your 2025 situation."
+  }
+}

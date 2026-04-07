@@ -1,0 +1,254 @@
+{
+  "branch_id": "branch_first_home",
+  "branch_label": "First Home Purchase",
+  "branch_order": 10,
+  "always_runs": false,
+  "triggered_by": "life_event_first_home",
+  "intro": "Purchasing your first home in 2025 opens several tax benefits — the First Home Buyers' Amount, the First Home Savings Account, and potentially the Home Buyers' Plan. Let's confirm what applies to your situation.",
+  "screens": [
+    {
+      "screen_id": "first_home_confirmed_buyer",
+      "screen_type": "single_select",
+      "title": "Did you purchase a qualifying home in Canada in 2025?",
+      "question_id": "purchased_home_2025",
+      "instruction": "A qualifying home includes houses, condos, co-operatives, and mobile homes. You must have purchased or built it and it must be your principal place of residence.",
+      "options": [
+        { "value": true,  "label": "Yes — I completed a home purchase in 2025" },
+        { "value": false, "label": "No — the purchase has not yet closed" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Home purchase confirmed. Let's confirm eligibility for available credits and plans.",
+          "activates_flag": "purchased_home_2025"
+        },
+        "false": {
+          "message": "If the purchase closes in 2026 the credits and plans will apply to your 2026 return. For the FHSA, contributions made in 2025 are still deductible on your 2025 return even if the home is purchased in 2026."
+        }
+      }
+    },
+    {
+      "screen_id": "first_home_first_time_buyer",
+      "screen_type": "single_select",
+      "title": "Is this your first home — neither you nor your spouse has owned a principal residence in the current year or any of the previous four calendar years?",
+      "question_id": "confirmed_first_time_buyer",
+      "instruction": "Under ITA s.118.05 and s.146.01, first-time buyer status requires that neither you nor your spouse owned a qualifying home as a principal residence at any point in 2021, 2022, 2023, 2024, or 2025.",
+      "show_if": {
+        "flag": "purchased_home_2025",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — neither I nor my spouse owned a principal residence in 2021–2025" },
+        { "value": false, "label": "No — one of us owned a principal residence during that period" },
+        { "value": "unsure","label": "I am not sure" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "First-time buyer status confirmed. You may be eligible for the First Home Buyers' Amount credit under ITA s.118.05 and the Home Buyers' Plan RRSP withdrawal under ITA s.146.01.",
+          "activates_flag": "confirmed_first_time_buyer",
+          "checklist_update": {
+            "node_id": "credit_first_home_buyers_amount",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "false": {
+          "message": "First-time buyer status does not apply. The First Home Buyers' Amount and Home Buyers' Plan are not available. The FHSA may still be relevant if you opened one before the purchase.",
+          "preparer_flag": {
+            "flag": "Not a first-time buyer — confirm FHSA status and whether HBP applies based on ownership history",
+            "urgency": "standard"
+          }
+        },
+        "unsure": {
+          "message": "Your preparer will confirm eligibility based on your ownership history. Bring details of any property you or your spouse have owned in the past 5 years.",
+          "checklist_update": {
+            "node_id": "credit_first_home_buyers_amount",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "Confirm first-time buyer status — review property ownership history for client and spouse from 2021 to 2025",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "first_home_buyers_amount",
+      "screen_type": "single_select",
+      "title": "Are you aware of the First Home Buyers' Amount credit?",
+      "question_id": "first_home_buyers_amount_aware",
+      "instruction": "The First Home Buyers' Amount under ITA s.118.05 provides a non-refundable federal credit of $10,000 — worth up to $1,500 in federal tax savings. Both spouses may claim it if each qualifies.",
+      "show_if": {
+        "flag": "confirmed_first_time_buyer",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I plan to claim it" },
+        { "value": false, "label": "No — tell me more" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "First Home Buyers' Amount confirmed on your checklist. The $10,000 credit is claimed on Line 31270 of your T1. If you have a spouse you may split the $10,000 claim between your two returns in any way that totals $10,000.",
+          "checklist_update": {
+            "node_id": "credit_first_home_buyers_amount",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "false": {
+          "message": "The First Home Buyers' Amount under ITA s.118.05 gives you a non-refundable $10,000 credit on Line 31270 — worth up to $1,500 in federal tax reduction. It does not need to be repaid and applies to any qualifying home purchase. We have added it to your checklist.",
+          "checklist_update": {
+            "node_id": "credit_first_home_buyers_amount",
+            "confidence_tier": "confirmed"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "first_home_hbp",
+      "screen_type": "single_select",
+      "title": "Did you withdraw funds from your RRSP under the Home Buyers' Plan (HBP) for this purchase?",
+      "question_id": "used_hbp",
+      "instruction": "The Home Buyers' Plan under ITA s.146.01 allows first-time buyers to withdraw up to $35,000 from their RRSP tax-free to purchase a qualifying home. Repayments begin two years after the withdrawal year.",
+      "show_if": {
+        "flag": "confirmed_first_time_buyer",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,       "label": "Yes — I withdrew from my RRSP under the HBP" },
+        { "value": "plan_to",  "label": "I plan to make an HBP withdrawal for this purchase" },
+        { "value": false,      "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "HBP withdrawal confirmed. The withdrawal is tax-free in the year of withdrawal but must be repaid to your RRSP in equal annual instalments beginning in the second calendar year after the year of the first withdrawal. The repayment period is 15 years. Annual repayment amounts are shown on your Notice of Assessment. Missed repayments are added to your income for that year.",
+          "activates_flag": "hbp_active",
+          "checklist_update": {
+            "node_id": "income_hbp_repayment",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "document_checklist_add": {
+            "document": "T4RSP slip showing HBP RRSP withdrawal amount — confirm Home Buyers Plan designation on the withdrawal",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "HBP withdrawal — confirm repayment start year and annual amount. First repayment due in second year following first withdrawal year.",
+            "urgency": "priority"
+          }
+        },
+        "plan_to": {
+          "message": "To use the HBP the withdrawal must occur before the purchase closes or within 30 days after. You must have a written agreement to buy or build a qualifying home. You will receive a T4RSP showing the withdrawal — do not include it in your RRSP deductions.",
+          "activates_flag": "hbp_active",
+          "preparer_flag": {
+            "flag": "HBP withdrawal planned — confirm eligibility, timing relative to purchase date, and that T4RSP shows correct HBP designation",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No HBP withdrawal noted."
+        }
+      }
+    },
+    {
+      "screen_id": "first_home_fhsa",
+      "screen_type": "single_select",
+      "title": "Did you have a First Home Savings Account (FHSA) in 2025?",
+      "question_id": "fhsa_status",
+      "instruction": "The FHSA under ITA s.146.6 allows first-time buyers to contribute up to $8,000 per year (lifetime maximum $40,000) with contributions tax-deductible and qualifying withdrawals tax-free.",
+      "options": [
+        { "value": "contributed",  "label": "Yes — I contributed to an FHSA in 2025" },
+        { "value": "withdrew",     "label": "Yes — I also made a qualifying withdrawal to purchase my home" },
+        { "value": "opened_only",  "label": "I opened an FHSA in 2025 but did not contribute yet" },
+        { "value": false,          "label": "No FHSA" }
+      ],
+      "feedback": {
+        "contributed": {
+          "message": "FHSA contributions are deductible on your 2025 T1 under ITA s.146.6. The annual limit is $8,000 with a $16,000 first-year limit if you opened the account in 2023 or earlier (unused room carries forward by $8,000 per year). You will receive an FHSA contribution receipt from your financial institution.",
+          "activates_flag": "fhsa_active",
+          "checklist_update": {
+            "node_id": "deduction_fhsa_contribution",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "FHSA contribution receipt from financial institution — shows 2025 contributions deductible on T1",
+            "urgency": "priority"
+          }
+        },
+        "withdrew": {
+          "message": "Qualifying FHSA withdrawals to purchase a first home are completely tax-free under ITA s.146.6 — no inclusion in income and no repayment required. You must have been a first-time buyer and the purchase must close by October 1 of the year following the withdrawal. An FHSA T4FHSA slip will be issued showing the withdrawal.",
+          "activates_flag": "fhsa_active",
+          "checklist_update": {
+            "node_id": "deduction_fhsa_contribution",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4FHSA slip — Statement of First Home Savings Account showing contributions and qualifying withdrawal",
+            "urgency": "priority"
+          }
+        },
+        "opened_only": {
+          "message": "Opening an FHSA without contributing still preserves future contribution room. If the account was opened but no contribution made in 2025, no deduction is available for 2025. You can contribute up to $8,000 in 2026 plus carry-forward room.",
+          "activates_flag": "fhsa_active"
+        },
+        "false": {
+          "message": "No FHSA noted. If you are a first-time buyer under 71 and do not yet own a home, you may still be eligible to open and contribute to an FHSA — even if you have already purchased. Your preparer can advise.",
+          "preparer_flag": {
+            "flag": "Assess FHSA eligibility — client may still qualify to open and deduct contributions if first-time buyer under 71",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "first_home_new_construction",
+      "screen_type": "single_select",
+      "title": "Did you purchase a newly built home or substantially renovated home in 2025?",
+      "question_id": "new_construction",
+      "instruction": "Purchasers of newly built or substantially renovated homes may be eligible for the GST/HST New Housing Rebate, which can be worth thousands of dollars.",
+      "show_if": {
+        "flag": "purchased_home_2025",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": true,  "label": "Yes — newly built or substantially renovated" },
+        { "value": false, "label": "No — an existing resale home" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Purchasers of newly built homes priced under $450,000 may claim the GST/HST New Housing Rebate — the federal portion is up to $6,300 and the Ontario provincial portion is up to $24,000 for homes up to $400,000. This rebate is claimed on CRA Form GST190. Bring your purchase agreement and closing documents.",
+          "activates_flag": "new_construction",
+          "checklist_update": {
+            "node_id": "credit_gst_new_housing_rebate",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "document_checklist_add": {
+            "document": "Purchase agreement and Statement of Adjustments for new construction — required for GST/HST New Housing Rebate application (Form GST190)",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "New home construction — assess GST/HST New Housing Rebate eligibility. Federal and Ontario provincial rebates available. Purchase price and occupancy date affect eligibility.",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "Resale home noted. GST/HST New Housing Rebate does not apply to resale purchases."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "First home section complete. Here is what we have identified.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "Purchase agreement and Statement of Adjustments for home purchase",
+      "T4RSP slip if HBP RRSP withdrawal was made",
+      "FHSA contribution receipt or T4FHSA slip",
+      "Form GST190 — New Housing Rebate application if newly built home"
+    ],
+    "transition": "Next: Disability."
+  }
+}

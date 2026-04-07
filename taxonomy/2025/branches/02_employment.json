@@ -1,0 +1,355 @@
+{
+  "branch_id": "branch_employment",
+  "branch_label": "Employment Income",
+  "branch_order": 2,
+  "always_runs": true,
+  "intro": "Let's cover your employment income for 2025. This includes any job where you received a T4 slip.",
+  "screens": [
+    {
+      "screen_id": "employment_t4_count",
+      "screen_type": "single_select",
+      "title": "How many employers did you work for in 2025?",
+      "question_id": "t4_count",
+      "instruction": "Include part-time, casual, and seasonal employment. Each employer issues a separate T4 slip. Employment income is taxable under ITA s.5(1).",
+      "options": [
+        { "value": "none",       "label": "I had no employment income in 2025" },
+        { "value": "one",        "label": "One employer" },
+        { "value": "two",        "label": "Two employers" },
+        { "value": "three_plus", "label": "Three or more employers" }
+      ],
+      "feedback": {
+        "none": {
+          "message": "No T4 employment income noted. We will cover other income sources in the next section.",
+          "suppresses_branch_screens": [
+            "employment_newcomer_partialyr",
+            "employment_income_range",
+            "employment_foreign",
+            "employment_home_office",
+            "employment_t2200",
+            "employment_vehicle",
+            "employment_other_expenses"
+          ]
+        },
+        "one": {
+          "message": "One T4 to report. Employment income reported on Line 10100.",
+          "activates_flag": "has_employment_income",
+          "checklist_update": {
+            "node_id": "income_employment_t4",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "two": {
+          "message": "Two T4s to report. If you changed jobs mid-year and both employers deducted CPP and EI premiums independently, you may have overpaid. Your preparer will reconcile — any overpayment of CPP premiums generates a refund under ITA s.118.7.",
+          "activates_flag": "has_employment_income",
+          "checklist_update": {
+            "node_id": "income_employment_t4",
+            "confidence_tier": "confirmed",
+            "note": "Two T4s — preparer to confirm CPP/EI over-deduction"
+          }
+        },
+        "three_plus": {
+          "message": "Multiple T4s noted. CPP and EI over-deduction is common with three or more employers. Excess CPP premiums are refundable under ITA s.118.7. Excess EI premiums are refunded automatically by CRA.",
+          "activates_flag": "has_employment_income",
+          "checklist_update": {
+            "node_id": "income_employment_t4",
+            "confidence_tier": "confirmed",
+            "note": "Multiple T4s — confirm CPP/EI over-deduction with preparer"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "employment_newcomer_partialyr",
+      "screen_type": "single_select",
+      "title": "Did you work in Canada for the full year in 2025?",
+      "question_id": "employment_full_year",
+      "instruction": "Partial-year employment affects RRSP contribution room, LIFT Credit eligibility, and certain credit calculations that are based on earned income.",
+      "show_if": {
+        "flag": "newcomer_proration",
+        "operator": "equals",
+        "value": true
+      },
+      "skip_if": {
+        "question_id": "t4_count",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": true,  "label": "Yes, I worked in Canada for the full year" },
+        { "value": false, "label": "No, I arrived or started working part-way through 2025" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Full-year Canadian employment confirmed."
+        },
+        "false": {
+          "message": "Partial-year employment noted. RRSP contribution room is based on prior year Canadian earned income. LIFT Credit eligibility is based on Ontario employment income only. We will flag all affected items.",
+          "activates_flag": "partial_year_employment",
+          "preparer_flag": {
+            "flag": "Confirm arrival date and Canadian employment start date — required for RRSP room calculation and pro-rated credit eligibility",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "employment_income_range",
+      "screen_type": "single_select",
+      "title": "Approximately what was your total employment income in 2025?",
+      "question_id": "employment_income_range",
+      "instruction": "An estimate is fine. This helps determine which income-tested credits and deductions apply. This information is not stored or transmitted.",
+      "skip_if": {
+        "question_id": "t4_count",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": "under_20k",         "label": "Under $20,000" },
+        { "value": "20k_to_30k",        "label": "$20,000 to $30,000" },
+        { "value": "30k_to_50k",        "label": "$30,000 to $50,000" },
+        { "value": "50k_to_100k",       "label": "$50,000 to $100,000" },
+        { "value": "over_100k",         "label": "Over $100,000" },
+        { "value": "prefer_not_to_say", "label": "I would prefer not to say" }
+      ],
+      "feedback": {
+        "under_20k": {
+          "message": "At this income level you may qualify for the Canada Workers Benefit under ITA s.122.7, the GST/HST Credit under ITA s.122.5, and the Ontario LIFT Credit under OTA s.103.4. We will confirm eligibility for each.",
+          "activates_flag": "lift_likely"
+        },
+        "20k_to_30k": {
+          "message": "At this income level the Ontario LIFT Credit likely applies under OTA s.103.4 and the Canada Workers Benefit may apply depending on family net income under ITA s.122.7.",
+          "activates_flag": "lift_likely"
+        },
+        "30k_to_50k": {
+          "message": "The LIFT Credit begins to phase out around $38,500 in net income under OTA s.103.4. We will flag it as possible for your preparer to confirm based on your actual net income.",
+          "activates_flag": "lift_possible"
+        },
+        "50k_to_100k": {
+          "message": "Good. This helps calibrate your RRSP deduction benefit and applicable credits."
+        },
+        "over_100k": {
+          "message": "At this income level several phase-out thresholds apply — Age Amount reduction under ITA s.118(2) if 65+, OAS repayment under ITA s.180.2 if applicable, and the basic personal amount enhancement. We will flag each relevant item.",
+          "activates_flag": "high_income_phaseouts"
+        },
+        "prefer_not_to_say": {
+          "message": "Understood. We will flag all income-sensitive credits as possible — your preparer will confirm which apply based on your actual net income.",
+          "activates_flag": "lift_possible"
+        }
+      }
+    },
+    {
+      "screen_id": "employment_foreign",
+      "screen_type": "single_select",
+      "title": "Did you receive employment income from a foreign employer in 2025?",
+      "question_id": "has_foreign_employment",
+      "instruction": "Includes income paid in foreign currency or from a company based outside Canada. Foreign employment income is fully taxable in Canada under ITA s.5(1) even if tax was withheld abroad.",
+      "skip_if": {
+        "question_id": "t4_count",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": true,  "label": "Yes" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Foreign employment income is taxable in Canada under ITA s.5(1) and must be converted to Canadian dollars using the Bank of Canada annual average exchange rate. Tax paid to a foreign government may generate a Foreign Tax Credit under ITA s.126(1) to avoid double taxation.",
+          "activates_flag": "has_foreign_employment",
+          "checklist_update": {
+            "node_id": "income_foreign_employment",
+            "confidence_tier": "confirmed"
+          },
+          "preparer_flag": {
+            "flag": "Obtain foreign employment income statement, confirm currency conversion rate used, and gather proof of foreign tax withheld",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No foreign employment income noted."
+        }
+      }
+    },
+    {
+      "screen_id": "employment_home_office",
+      "screen_type": "single_select",
+      "title": "Did you work from home in 2025?",
+      "question_id": "worked_from_home",
+      "instruction": "Employment home office expenses are deductible under ITA s.8(13) only if your employer required you to work from home and certifies this on Form T2200 under ITA s.8(10). Choosing to work from home does not qualify.",
+      "skip_if": {
+        "question_id": "t4_count",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": "yes_required", "label": "Yes — my employer required me to work from home" },
+        { "value": "yes_choice",   "label": "Yes — by my own choice" },
+        { "value": false,          "label": "No" }
+      ],
+      "feedback": {
+        "yes_required": {
+          "message": "You may deduct a proportionate share of rent, utilities, internet, and maintenance under ITA s.8(13). Your employer must complete Form T2200 under ITA s.8(10) certifying the requirement. The workspace must be where you principally perform your employment duties, or used exclusively for employment and regularly for meeting clients.",
+          "activates_flag": "t2200_required",
+          "checklist_update": {
+            "node_id": "deduction_employment_home_office",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "yes_choice": {
+          "message": "Home office expenses are only deductible if your employer required you to work from home and certifies this on Form T2200. Working from home by personal choice does not qualify under ITA s.8(13)."
+        },
+        "false": {
+          "message": "No home office claim applicable."
+        }
+      }
+    },
+    {
+      "screen_id": "employment_t2200",
+      "screen_type": "single_select",
+      "title": "Has your employer provided or agreed to sign Form T2200?",
+      "question_id": "t2200_obtained",
+      "instruction": "Form T2200 — Declaration of Conditions of Employment — is a mandatory supporting document under ITA s.8(10). Without it CRA will deny employment expense claims on audit.",
+      "show_if": {
+        "flag": "t2200_required",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "yes",   "label": "Yes, I have it or will obtain it before filing" },
+        { "value": "no",    "label": "No, I have not requested it yet" },
+        { "value": "unsure","label": "I am not sure my employer will sign it" }
+      ],
+      "feedback": {
+        "yes": {
+          "message": "Form T2200 confirmed. Home office and vehicle expense claims remain on your checklist.",
+          "document_checklist_add": {
+            "document": "Form T2200 — Declaration of Conditions of Employment, signed by employer",
+            "urgency": "priority"
+          }
+        },
+        "no": {
+          "message": "Request Form T2200 from your employer before filing. Your employer is obligated to complete it if they required you to work from home or use your vehicle. Without it CRA will deny the deduction. We have flagged this as a priority action.",
+          "checklist_update": {
+            "node_id": "deduction_employment_home_office",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "Form T2200 not yet obtained — client must request from employer before filing. Claim will be denied without it under ITA s.8(10).",
+            "urgency": "priority"
+          }
+        },
+        "unsure": {
+          "message": "If your employer required you to work from home, they are legally obligated to sign Form T2200 when requested. We have flagged this for follow-up with your preparer.",
+          "checklist_update": {
+            "node_id": "deduction_employment_home_office",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          },
+          "preparer_flag": {
+            "flag": "T2200 status uncertain — confirm employer obligation with client and obtain before filing",
+            "urgency": "priority"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "employment_vehicle",
+      "screen_type": "single_select",
+      "title": "Did you use your personal vehicle for work purposes in 2025?",
+      "question_id": "used_vehicle_for_work",
+      "instruction": "Eligible use includes driving to client sites, job sites, or between work locations. Commuting from home to your regular workplace is not deductible. A Form T2200 from your employer is required under ITA s.8(10).",
+      "skip_if": {
+        "question_id": "t4_count",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": true,  "label": "Yes — I drove to client sites, job sites, or between work locations" },
+        { "value": false, "label": "No" }
+      ],
+      "feedback": {
+        "true": {
+          "message": "Motor vehicle expenses are deductible under ITA s.8(1)(h.1) in proportion to employment kilometres driven versus total kilometres. Keep a detailed mileage log — CRA routinely audits vehicle claims and a log is essential to support the deduction.",
+          "activates_flag": "t2200_required",
+          "checklist_update": {
+            "node_id": "deduction_employment_vehicle",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Vehicle mileage log for 2025 — date, destination, business purpose, kilometres per trip, total annual kilometres, and total business kilometres",
+            "urgency": "priority"
+          }
+        },
+        "false": {
+          "message": "No vehicle expense claim applicable."
+        }
+      }
+    },
+    {
+      "screen_id": "employment_other_expenses",
+      "screen_type": "multi_select",
+      "title": "Did you pay any of these work-related expenses out of pocket in 2025?",
+      "question_id": "other_employment_expenses",
+      "instruction": "Select all that apply. These must be unreimbursed costs you were required to incur as a condition of employment. Each type has specific rules under ITA s.8(1).",
+      "skip_if": {
+        "question_id": "t4_count",
+        "operator": "equals",
+        "value": "none"
+      },
+      "options": [
+        { "value": "union_dues",   "label": "Union dues or professional association dues" },
+        { "value": "tools",        "label": "Tools or equipment required for work" },
+        { "value": "supplies",     "label": "Office supplies purchased for work" },
+        { "value": "licensing",    "label": "Professional licensing or registration fees" },
+        { "value": "none",         "label": "None of the above", "exclusive": true }
+      ],
+      "feedback": {
+        "union_dues": {
+          "message": "Union dues and professional dues are deductible under ITA s.8(1)(i). They should already appear in Box 44 of your T4. If they are not on your T4 bring your receipts or membership statements.",
+          "checklist_update": {
+            "node_id": "deduction_union_dues",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "tools": {
+          "message": "Employed tradespersons may deduct the cost of eligible tools under ITA s.8(1)(s), subject to the lesser of $500 or the amount by which tool costs exceed the union dues deduction. Apprentice mechanics may deduct up to $4,000 under ITA s.8(1)(r). Limits apply — your preparer will confirm which rule applies.",
+          "checklist_update": {
+            "node_id": "deduction_tradesperson_tools",
+            "confidence_tier": "possible",
+            "reason": "professional_judgment_required"
+          }
+        },
+        "supplies": {
+          "message": "Office supplies are deductible under ITA s.8(1)(i)(iii) if your employer required you to pay for them and your employment contract or Form T2200 confirms this obligation.",
+          "activates_flag": "t2200_required",
+          "checklist_update": {
+            "node_id": "deduction_employment_supplies",
+            "confidence_tier": "possible",
+            "reason": "condition_not_asked"
+          }
+        },
+        "licensing": {
+          "message": "Annual professional licensing fees required to maintain your occupational licence are deductible under ITA s.8(1)(i)(iv). One-time registration or examination fees do not qualify.",
+          "checklist_update": {
+            "node_id": "deduction_professional_dues",
+            "confidence_tier": "confirmed"
+          }
+        },
+        "none": {
+          "message": "No additional employment expenses noted."
+        }
+      }
+    }
+  ],
+  "branch_completion_summary": {
+    "message": "Employment income section complete. Here is what we have identified so far.",
+    "shows": "running_checklist_snapshot",
+    "highlighted_documents": [
+      "All T4 slips from each employer",
+      "Form T2200 signed by employer — if home office or vehicle expenses claimed",
+      "Vehicle mileage log — if vehicle expenses claimed"
+    ],
+    "transition": "Next: Other Income Sources."
+  }
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { InterviewScreen } from "@/types";
 
 interface Props {
@@ -11,6 +12,11 @@ interface Props {
 export default function InterviewScreenComponent({ screen, onAnswer, currentAnswers }: Props) {
   const { screen_type, title, instruction, options, question_id } = screen;
   const currentValue = currentAnswers[question_id];
+
+  // Local pending selection for multi_select — onAnswer is only called when Continue is clicked
+  const [pendingSelection, setPendingSelection] = useState<any[]>(() =>
+    Array.isArray(currentValue) ? currentValue : []
+  );
 
   if (screen_type === "single_select") {
     return (
@@ -33,20 +39,20 @@ export default function InterviewScreenComponent({ screen, onAnswer, currentAnsw
   }
 
   // multi_select
-  const selected: any[] = Array.isArray(currentValue) ? currentValue : [];
   const exclusiveValues = options.filter((o) => o.exclusive).map((o) => o.value);
 
   const toggleOption = (value: any, exclusive?: boolean) => {
-    if (exclusive) {
-      onAnswer([value]);
-      return;
-    }
-    const cleaned = selected.filter((v) => !exclusiveValues.includes(v));
-    if (cleaned.includes(value)) {
-      onAnswer(cleaned.filter((v) => v !== value));
-    } else {
-      onAnswer([...cleaned, value]);
-    }
+    setPendingSelection((prev) => {
+      if (exclusive) {
+        // Exclusive option: select only this one, deselect everything else
+        return prev.length === 1 && prev[0] === value ? [] : [value];
+      }
+      // Non-exclusive: remove any exclusive options, then toggle this one
+      const cleaned = prev.filter((v) => !exclusiveValues.includes(v));
+      return cleaned.includes(value)
+        ? cleaned.filter((v) => v !== value)
+        : [...cleaned, value];
+    });
   };
 
   return (
@@ -56,7 +62,7 @@ export default function InterviewScreenComponent({ screen, onAnswer, currentAnsw
       <p className="text-sm text-gray-500">Select all that apply.</p>
       <div className="flex flex-col gap-3 mt-2">
         {options.map((opt) => {
-          const isSelected = selected.includes(opt.value);
+          const isSelected = pendingSelection.includes(opt.value);
           return (
             <button
               key={String(opt.value)}
@@ -83,14 +89,13 @@ export default function InterviewScreenComponent({ screen, onAnswer, currentAnsw
           );
         })}
       </div>
-      {selected.length > 0 && (
-        <button
-          onClick={() => onAnswer(selected)}
-          className="mt-2 self-start px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          Continue
-        </button>
-      )}
+      <button
+        onClick={() => onAnswer(pendingSelection)}
+        disabled={pendingSelection.length === 0}
+        className="mt-2 self-start px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Continue
+      </button>
     </div>
   );
 }
