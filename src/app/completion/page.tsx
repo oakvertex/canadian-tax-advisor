@@ -119,14 +119,14 @@ export default function CompletionPage() {
             <li key={item.node_id} className="flex items-start gap-3">
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${config.classes}`}>
+                    {config.label}
+                  </span>
                   <span className="text-sm font-medium text-gray-800">
                     {label}
                     {item.count != null && item.count > 1 && (
                       <span className="ml-1 text-gray-500 font-normal">x{item.count}</span>
                     )}
-                  </span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.classes}`}>
-                    {config.label}
                   </span>
                 </div>
                 {itaRef && <p className="text-xs text-gray-400 mt-0.5">{itaRef}</p>}
@@ -145,7 +145,7 @@ export default function CompletionPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Your 2025 Tax Review</h1>
           <p className="text-gray-600">
             We identified{" "}
@@ -153,6 +153,16 @@ export default function CompletionPage() {
             {confirmedCount === 1 ? "item" : "items"} and{" "}
             <span className="font-semibold text-yellow-700">{possibleCount} possible</span>{" "}
             {possibleCount === 1 ? "item" : "items"} for your 2025 return.
+          </p>
+        </div>
+
+        {/* Save reminder banner */}
+        <div className="no-print bg-amber-50 border border-amber-300 rounded-lg px-5 py-4 mb-8 flex items-start gap-3">
+          <span className="text-amber-500 text-lg leading-none mt-0.5">⚠</span>
+          <p className="text-sm text-amber-900 leading-relaxed">
+            <span className="font-semibold">Please save your Checklist before you leave this page.</span>{" "}
+            This review does not store any of your information — once you navigate away, your
+            results will not be recoverable.
           </p>
         </div>
 
@@ -187,7 +197,7 @@ export default function CompletionPage() {
           <section className="bg-white rounded-xl border border-gray-200 p-6">
             <SectionHeader number={generalItems.length > 0 ? 5 : 4} title="Documents to Gather" />
             <p className="text-sm text-gray-600 mb-4">
-              Prepare the following documents before meeting your tax preparer or filing your
+              Gather the following documents before meeting your tax preparer or filing your
               own return.
             </p>
             {sortedDocs.length === 0 ? (
@@ -243,18 +253,29 @@ export default function CompletionPage() {
         {/* Disclaimer */}
         <p className="mt-8 text-xs text-gray-400 leading-relaxed text-center">
           This checklist is for preparation purposes only and does not constitute tax advice.
-          Consult a qualified tax professional before filing. —{" "}
-          <span className="font-medium">Canadian Tax Prep Guide by TaxReady</span>
+          Please consult a qualified tax professional before filing. —{" "}
+          <span className="font-medium">Canadian Tax Prep Navigator by TaxReady</span>
         </p>
 
         {/* Footer actions */}
-        <div className="mt-4 flex gap-4">
+        <div className="no-print mt-4 flex gap-4">
           <Link
             href="/interview"
             className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
           >
             Start Over
           </Link>
+          <button
+            onClick={() => window.print()}
+            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9" />
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+              <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            Print / Save as PDF
+          </button>
         </div>
       </div>
     </div>

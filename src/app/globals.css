@@ -25,3 +25,33 @@ body {
     text-wrap: balance;
   }
 }
+
+@media print {
+  /* Hide interactive elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset backgrounds for clean print */
+  body {
+    background: #ffffff !important;
+  }
+
+  /* Remove card shadows and borders */
+  section {
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* Ensure badges print with background colour */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm 2cm;
+  }
+}
