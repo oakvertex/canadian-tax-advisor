@@ -223,16 +223,16 @@ export default function CompletionPage() {
               <ul className="flex flex-col gap-2">
                 {session.obligations.map((ob, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="text-sm text-gray-800">{ob.action}</span>
                     {ob.urgency && (
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 mt-0.5 ${
                           urgencyConfig[ob.urgency]?.classes ?? urgencyConfig.standard.classes
                         }`}
                       >
                         {urgencyConfig[ob.urgency]?.label ?? ob.urgency}
                       </span>
                     )}
+                    <p className="text-sm text-gray-800">{ob.action}</p>
                   </li>
                 ))}
               </ul>

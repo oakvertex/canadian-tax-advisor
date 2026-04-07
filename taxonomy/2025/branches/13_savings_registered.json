@@ -131,6 +131,14 @@
       "feedback": {
         "true": {
           "message": "RRSP over-contributions above a $2,000 lifetime buffer are penalized at 1% per month under ITA s.204.1. If you have over-contributed you must file Form T1-OVP by March 31, 2026 to self-assess the penalty. Remedies include withdrawing the excess (a Form T3012A can reduce withholding tax on the withdrawal) or using deduction room from 2025 earned income if contribution room increases in 2026.",
+          "document_checklist_add": {
+            "document": "Form T1-OVP (Individual Tax Return for RRSP, PRPP and SPP Excess Contributions) — required if over-contribution above $2,000 lifetime buffer exists",
+            "urgency": "urgent"
+          },
+          "obligations_add": {
+            "action": "File Form T1-OVP by March 31, 2026 to self-assess RRSP over-contribution penalty under ITA s.204.1 — failure to file adds penalties and interest on top of the 1% monthly excess tax",
+            "urgency": "urgent"
+          },
           "preparer_flag": {
             "flag": "RRSP over-contribution concern — verify contribution room immediately via CRA My Account. File T1-OVP by March 31, 2026 if excess exists. Advise on T3012A withdrawal option.",
             "urgency": "urgent"

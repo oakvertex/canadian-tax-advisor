@@ -7,6 +7,7 @@ type FeedbackEntry = {
   activates_flag?: string;
   document_checklist_add?: { document: string; urgency: string } | null;
   preparer_flag?: { flag: string; urgency: string } | null;
+  obligations_add?: { action: string; urgency: string } | null;
   suppresses_branch_screens?: string[];
 };
 
@@ -111,6 +112,17 @@ export function applyFeedback(session: SessionState, feedback: object): SessionS
       documents: [
         ...updated.documents,
         { document: fb.document_checklist_add.document, note: "", urgency, source_node: "" },
+      ],
+    };
+  }
+
+  if (fb.obligations_add) {
+    const urgency = fb.obligations_add.urgency as "standard" | "priority" | "urgent" | "critical";
+    updated = {
+      ...updated,
+      obligations: [
+        ...updated.obligations,
+        { action: fb.obligations_add.action, urgency, source_node: "" },
       ],
     };
   }

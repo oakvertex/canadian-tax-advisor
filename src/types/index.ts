@@ -85,6 +85,7 @@ export interface InterviewScreen {
     activates_flag?: string;
     document_checklist_add?: { document: string; urgency: string } | null;
     preparer_flag?: { flag: string; urgency: string } | null;
+    obligations_add?: { action: string; urgency: string } | null;
     suppresses_branch_screens?: string[];
   }>;
 }
