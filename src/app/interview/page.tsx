@@ -1,20 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import interviewFlowJson from "../../../taxonomy/2025/interview-flow.json";
-import taxonomyItemsJson from "../../../taxonomy/2025/items.json";
 import { createSession, applyScreenFeedback, replaySession } from "@/lib/session";
 import InterviewScreenComponent from "@/components/InterviewScreen";
 import RunningChecklist from "@/components/RunningChecklist";
 import type { SessionState, InterviewBranch, InterviewScreen, TaxonomyNode, AnswerValue } from "@/types";
 
-const branches = interviewFlowJson as unknown as InterviewBranch[];
-const taxonomyNodes = taxonomyItemsJson as TaxonomyNode[];
-
 const SESSION_KEY = "tax-advisor-session";
 
-function getActiveBranches(flags: Record<string, boolean>): InterviewBranch[] {
+function getActiveBranches(
+  branches: InterviewBranch[],
+  flags: Record<string, boolean>
+): InterviewBranch[] {
   return branches
     .filter((branch) => {
       if (branch.always_runs) return true;
@@ -45,53 +43,13 @@ function shouldSkip(screen: InterviewScreen, answers: Record<string, AnswerValue
   }
 }
 
-function shouldShow(
-  screen: InterviewScreen,
-  answers: Record<string, AnswerValue>,
-  flags: Record<string, boolean>
-): boolean {
-  if (!screen.show_if) return true;
-  const si = screen.show_if as {
-    question_id?: string;
-    flag?: string;
-    operator: string;
-    value: unknown;
-  };
-
-  if (si.flag) {
-    const actual = flags[si.flag] ?? false;
-    switch (si.operator) {
-      case "equals": return actual === si.value;
-      case "not_equals": return actual !== si.value;
-      default: return actual === true;
-    }
-  }
-
-  if (si.question_id) {
-    const actual = answers[si.question_id];
-    switch (si.operator) {
-      case "equals": return actual === si.value;
-      case "not_equals": return actual !== si.value;
-      case "in": return Array.isArray(si.value) && si.value.includes(actual as string);
-      case "not_in": return Array.isArray(si.value) && !si.value.includes(actual as string);
-      default: return false;
-    }
-  }
-
-  return true;
-}
-
 function findNextScreenIndex(
   branch: InterviewBranch,
   fromIndex: number,
-  answers: Record<string, AnswerValue>,
-  flags: Record<string, boolean>
+  answers: Record<string, AnswerValue>
 ): number {
   let idx = fromIndex;
-  while (
-    idx < branch.screens.length &&
-    (shouldSkip(branch.screens[idx], answers) || !shouldShow(branch.screens[idx], answers, flags))
-  ) {
+  while (idx < branch.screens.length && shouldSkip(branch.screens[idx], answers)) {
     idx++;
   }
   return idx;
@@ -105,11 +63,63 @@ function saveSession(s: SessionState) {
 
 export default function InterviewPage() {
   const router = useRouter();
+
+  // Data loaded asynchronously — not bundled into the client JS chunk
+  const [branches, setBranches] = useState<InterviewBranch[]>([]);
+  const [taxonomyNodes, setTaxonomyNodes] = useState<TaxonomyNode[]>([]);
+  const [dataReady, setDataReady] = useState(false);
+  const [dataError, setDataError] = useState(false);
+
   const [session, setSession] = useState<SessionState>(() => createSession("2025"));
   const [showingIntro, setShowingIntro] = useState(true);
   const [showingBranchSummary, setShowingBranchSummary] = useState<InterviewBranch | null>(null);
 
-  const activeBranches = getActiveBranches(session.flags);
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/interview-flow").then((r) => {
+        if (!r.ok) throw new Error("Failed to load interview flow");
+        return r.json();
+      }),
+      fetch("/api/taxonomy-items").then((r) => {
+        if (!r.ok) throw new Error("Failed to load taxonomy items");
+        return r.json();
+      }),
+    ])
+      .then(([flow, items]: [InterviewBranch[], TaxonomyNode[]]) => {
+        setBranches(flow);
+        setTaxonomyNodes(items);
+        setDataReady(true);
+      })
+      .catch(() => setDataError(true));
+  }, []);
+
+  // Loading state — page is already interactive, just waiting on data
+  if (!dataReady) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center flex flex-col items-center gap-4">
+          {dataError ? (
+            <>
+              <p className="text-red-600 font-medium">Failed to load interview data.</p>
+              <button
+                onClick={() => { setDataError(false); window.location.reload(); }}
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+              >
+                Retry
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+              <p className="text-gray-500 text-sm">Loading your tax interview…</p>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const activeBranches = getActiveBranches(branches, session.flags);
   const currentBranch = activeBranches[session.current_branch_index];
 
   // Interview complete
@@ -211,8 +221,7 @@ export default function InterviewPage() {
     const nextIdx = findNextScreenIndex(
       currentBranch,
       session.current_screen_index + 1,
-      updated.answers,
-      updated.flags
+      updated.answers
     );
 
     let finalSession: SessionState;
@@ -220,7 +229,7 @@ export default function InterviewPage() {
     if (nextIdx < currentBranch.screens.length) {
       finalSession = { ...updated, current_screen_index: nextIdx };
     } else {
-      const newActiveBranches = getActiveBranches(updated.flags);
+      const newActiveBranches = getActiveBranches(branches, updated.flags);
       const nextBranchIdx = session.current_branch_index + 1;
 
       if (nextBranchIdx >= newActiveBranches.length) {
