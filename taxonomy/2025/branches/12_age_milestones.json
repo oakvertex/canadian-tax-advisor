@@ -3,7 +3,11 @@
   "branch_label": "Age Milestones",
   "branch_order": 12,
   "always_runs": false,
-  "triggered_by": ["life_event_age_milestone", "age_65_plus", "rrsp_conversion_required"],
+  "triggered_by": [
+    "life_event_age_milestone",
+    "age_65_plus",
+    "rrsp_conversion_required"
+  ],
   "intro": "Turning 18, 65, or 71 triggers specific tax obligations and planning opportunities. Let's confirm what your milestone means for your 2025 return.",
   "screens": [
     {
@@ -12,14 +16,26 @@
       "title": "Which age milestone did you reach in 2025?",
       "question_id": "age_milestone_reached",
       "options": [
-        { "value": "turned_18",  "label": "I turned 18 in 2025" },
-        { "value": "turned_65",  "label": "I turned 65 in 2025" },
-        { "value": "turned_71",  "label": "I turned 71 in 2025" },
-        { "value": "over_71",    "label": "I am already past 71 — I need to confirm RRIF obligations" }
+        {
+          "value": "turned_18",
+          "label": "I turned 18 in 2025"
+        },
+        {
+          "value": "turned_65",
+          "label": "I turned 65 in 2025"
+        },
+        {
+          "value": "turned_71",
+          "label": "I turned 71 in 2025"
+        },
+        {
+          "value": "over_71",
+          "label": "I am already past 71 \u2014 I need to confirm RRIF obligations"
+        }
       ],
       "feedback": {
         "turned_18": {
-          "message": "At 18 you become eligible to open a TFSA — you can contribute $7,000 in 2025 plus $7,000 accumulated from 2024. If you worked in prior years your RRSP room (from the prior year's T1) is also available.",
+          "message": "At 18 you become eligible to open a TFSA \u2014 you can contribute $7,000 in 2025 plus $7,000 accumulated from 2024. If you worked in prior years your RRSP room (from the prior year's T1) is also available.",
           "activates_flag": "milestone_18"
         },
         "turned_65": {
@@ -28,12 +44,12 @@
           "activates_flag_note": "milestone_65 also set for planning purposes"
         },
         "turned_71": {
-          "message": "Turning 71 is the RRSP deadline year. Your RRSP must be converted to a RRIF or annuity by December 31, 2025 under ITA s.146(2)(b.4). You may still contribute to your RRSP in 2025 if you have contribution room — in fact making a final contribution before converting can be beneficial. We will confirm the conversion status.",
+          "message": "Turning 71 is the RRSP deadline year. Your RRSP must be converted to a RRIF or annuity by December 31, 2025 under ITA s.146(2)(b.4). You may still contribute to your RRSP in 2025 if you have contribution room \u2014 in fact making a final contribution before converting can be beneficial. We will confirm the conversion status.",
           "activates_flag": "rrsp_conversion_required",
           "activates_flag_note": "milestone_71 also set"
         },
         "over_71": {
-          "message": "Post-71 obligations are ongoing — minimum RRIF withdrawals are required each year. We will confirm your minimum withdrawal was taken.",
+          "message": "Post-71 obligations are ongoing \u2014 minimum RRIF withdrawals are required each year. We will confirm your minimum withdrawal was taken.",
           "activates_flag": "rrsp_conversion_required"
         }
       }
@@ -44,20 +60,29 @@
       "title": "Did you open a TFSA in 2025 now that you are 18?",
       "question_id": "opened_tfsa_at_18",
       "show_if": {
-        "flag": "milestone_18",
+        "question_id": "age_milestone_reached",
         "operator": "equals",
-        "value": true
+        "value": "turned_18"
       },
       "options": [
-        { "value": true,       "label": "Yes — I opened and contributed to a TFSA" },
-        { "value": "opened",   "label": "I opened one but did not contribute yet" },
-        { "value": false,      "label": "Not yet" }
+        {
+          "value": true,
+          "label": "Yes \u2014 I opened and contributed to a TFSA"
+        },
+        {
+          "value": "opened",
+          "label": "I opened one but did not contribute yet"
+        },
+        {
+          "value": false,
+          "label": "Not yet"
+        }
       ],
       "feedback": {
         "true": {
           "message": "TFSA contributions are not deductible but all growth and withdrawals are completely tax-free. Your 2025 limit is $7,000 plus $7,000 accumulated room from 2024 (if you were 17 at any point in 2024). Over-contribution is subject to a 1% monthly penalty. Confirm your exact contribution room through CRA My Account.",
           "document_checklist_add": {
-            "document": "TFSA contribution receipt from financial institution — confirm 2025 amount contributed",
+            "document": "TFSA contribution receipt from financial institution \u2014 confirm 2025 amount contributed",
             "urgency": "standard"
           }
         },
@@ -65,7 +90,7 @@
           "message": "Room is accumulating. You can contribute up to $7,000 per year once you are 18 regardless of income. Your total 2025 limit is $7,000 (2025) plus $7,000 (carried over from 2024 if you were a Canadian resident aged 17 in 2024)."
         },
         "false": {
-          "message": "Consider opening a TFSA — it is one of the best savings vehicles available and you can contribute up to $14,000 immediately ($7,000 for 2024 plus $7,000 for 2025)."
+          "message": "Consider opening a TFSA \u2014 it is one of the best savings vehicles available and you can contribute up to $14,000 immediately ($7,000 for 2024 plus $7,000 for 2025)."
         }
       }
     },
@@ -75,14 +100,23 @@
       "title": "Did you apply for Old Age Security (OAS) when you turned 65?",
       "question_id": "oas_application_status",
       "show_if": {
-        "flag": "age_65_plus",
+        "question_id": "age_milestone_reached",
         "operator": "equals",
-        "value": true
+        "value": "turned_65"
       },
       "options": [
-        { "value": true,     "label": "Yes — I receive or have applied for OAS" },
-        { "value": "defer",  "label": "I am deferring OAS to increase my monthly payments" },
-        { "value": false,    "label": "I have not applied yet" }
+        {
+          "value": true,
+          "label": "Yes \u2014 I receive or have applied for OAS"
+        },
+        {
+          "value": "defer",
+          "label": "I am deferring OAS to increase my monthly payments"
+        },
+        {
+          "value": false,
+          "label": "I have not applied yet"
+        }
       ],
       "feedback": {
         "true": {
@@ -90,16 +124,16 @@
           "activates_flag": "receives_oas"
         },
         "defer": {
-          "message": "Deferring OAS by up to 5 years (to age 70) increases your monthly payment by 0.6% per month of deferral — a maximum increase of 36% at age 70. This is often advantageous if you have other income and expect to live beyond the breakeven age of approximately 75. Your preparer can model the optimal start age.",
+          "message": "Deferring OAS by up to 5 years (to age 70) increases your monthly payment by 0.6% per month of deferral \u2014 a maximum increase of 36% at age 70. This is often advantageous if you have other income and expect to live beyond the breakeven age of approximately 75. Your preparer can model the optimal start age.",
           "preparer_flag": {
-            "flag": "OAS deferral elected — model optimal OAS start age based on current income, expected longevity, and tax bracket",
+            "flag": "OAS deferral elected \u2014 model optimal OAS start age based on current income, expected longevity, and tax bracket",
             "urgency": "standard"
           }
         },
         "false": {
-          "message": "OAS is not automatic — you must apply. If you are 65 or older and have not applied, contact Service Canada. You may also be entitled to retroactive payments up to 11 months.",
+          "message": "OAS is not automatic \u2014 you must apply. If you are 65 or older and have not applied, contact Service Canada. You may also be entitled to retroactive payments up to 11 months.",
           "preparer_flag": {
-            "flag": "OAS not yet applied for — client should contact Service Canada. Retroactive entitlement up to 11 months.",
+            "flag": "OAS not yet applied for \u2014 client should contact Service Canada. Retroactive entitlement up to 11 months.",
             "urgency": "priority"
           }
         }
@@ -110,26 +144,35 @@
       "screen_type": "single_select",
       "title": "Did you make a final RRSP contribution in 2025 before the December 31 deadline?",
       "question_id": "rrsp_final_contribution",
-      "instruction": "The year you turn 71 is your last year to contribute to your own RRSP. The deadline is December 31 of that year — not the usual 60-day window. A final contribution before conversion is often beneficial.",
+      "instruction": "The year you turn 71 is your last year to contribute to your own RRSP. The deadline is December 31 of that year \u2014 not the usual 60-day window. A final contribution before conversion is often beneficial.",
       "show_if": {
-        "flag": "rrsp_conversion_required",
+        "question_id": "age_milestone_reached",
         "operator": "equals",
-        "value": true
+        "value": "turned_71"
       },
       "options": [
-        { "value": true,   "label": "Yes — I made a final RRSP contribution before December 31, 2025" },
-        { "value": false,  "label": "No" },
-        { "value": "unsure","label": "I am not sure" }
+        {
+          "value": true,
+          "label": "Yes \u2014 I made a final RRSP contribution before December 31, 2025"
+        },
+        {
+          "value": false,
+          "label": "No"
+        },
+        {
+          "value": "unsure",
+          "label": "I am not sure"
+        }
       ],
       "feedback": {
         "true": {
           "message": "Final RRSP contribution confirmed. This contribution is deductible on your 2025 T1. Bring your RRSP contribution receipt. Note: if you over-contributed you are subject to a 1% monthly penalty on the excess under ITA s.204.1.",
           "document_checklist_add": {
-            "document": "RRSP contribution receipt for final 2025 contribution — confirm amount does not exceed available deduction room",
+            "document": "RRSP contribution receipt for final 2025 contribution \u2014 confirm amount does not exceed available deduction room",
             "urgency": "priority"
           },
           "preparer_flag": {
-            "flag": "Final RRSP contribution made — confirm contribution room available to avoid over-contribution penalty under ITA s.204.1",
+            "flag": "Final RRSP contribution made \u2014 confirm contribution room available to avoid over-contribution penalty under ITA s.204.1",
             "urgency": "priority"
           }
         },
@@ -152,27 +195,39 @@
       "question_id": "rrif_minimum_taken",
       "instruction": "RRIF minimum withdrawals are mandatory each year under ITA s.146.3. The minimum percentage is based on your age on January 1, 2025. Failure to take the minimum results in penalty tax.",
       "show_if": {
-        "flag": "receives_rrif",
-        "operator": "equals",
-        "value": true
+        "question_id": "age_milestone_reached",
+        "operator": "in",
+        "value": [
+          "turned_71",
+          "over_71"
+        ]
       },
       "options": [
-        { "value": true,   "label": "Yes — I took at least the minimum" },
-        { "value": false,  "label": "No — I did not take a withdrawal" },
-        { "value": "unsure","label": "I am not sure if the amount was the minimum" }
+        {
+          "value": true,
+          "label": "Yes \u2014 I took at least the minimum"
+        },
+        {
+          "value": false,
+          "label": "No \u2014 I did not take a withdrawal"
+        },
+        {
+          "value": "unsure",
+          "label": "I am not sure if the amount was the minimum"
+        }
       ],
       "feedback": {
         "true": {
           "message": "RRIF minimum confirmed. RRIF withdrawals are taxable and reported on a T4RIF slip. Amounts above the minimum may also qualify for the Pension Income Credit under ITA s.118(3) if you are 65 or older.",
           "document_checklist_add": {
-            "document": "T4RIF — Statement of Income from RRIF showing total withdrawal amount in 2025",
+            "document": "T4RIF \u2014 Statement of Income from RRIF showing total withdrawal amount in 2025",
             "urgency": "priority"
           }
         },
         "false": {
           "message": "Missing the RRIF minimum withdrawal results in a 1% monthly penalty tax under ITA s.146.3 on the shortfall. Contact your financial institution immediately to arrange a catch-up withdrawal and speak with your preparer about penalty mitigation.",
           "preparer_flag": {
-            "flag": "RRIF minimum withdrawal not taken in 2025 — penalty tax may apply under ITA s.146.3. Contact financial institution and advise preparer for mitigation options.",
+            "flag": "RRIF minimum withdrawal not taken in 2025 \u2014 penalty tax may apply under ITA s.146.3. Contact financial institution and advise preparer for mitigation options.",
             "urgency": "critical"
           }
         },
@@ -191,7 +246,7 @@
     "shows": "running_checklist_snapshot",
     "highlighted_documents": [
       "RRSP contribution receipt for final 2025 contribution if applicable",
-      "T4RIF — RRIF withdrawal statement",
+      "T4RIF \u2014 RRIF withdrawal statement",
       "TFSA contribution receipts if opened at 18"
     ],
     "transition": "Next: Savings and Registered Plans."

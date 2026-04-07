@@ -4272,9 +4272,9 @@
         "title": "Did you open a TFSA in 2025 now that you are 18?",
         "question_id": "opened_tfsa_at_18",
         "show_if": {
-          "flag": "milestone_18",
+          "question_id": "age_milestone_reached",
           "operator": "equals",
-          "value": true
+          "value": "turned_18"
         },
         "options": [
           {
@@ -4312,9 +4312,9 @@
         "title": "Did you apply for Old Age Security (OAS) when you turned 65?",
         "question_id": "oas_application_status",
         "show_if": {
-          "flag": "age_65_plus",
+          "question_id": "age_milestone_reached",
           "operator": "equals",
-          "value": true
+          "value": "turned_65"
         },
         "options": [
           {
@@ -4358,9 +4358,9 @@
         "question_id": "rrsp_final_contribution",
         "instruction": "The year you turn 71 is your last year to contribute to your own RRSP. The deadline is December 31 of that year — not the usual 60-day window. A final contribution before conversion is often beneficial.",
         "show_if": {
-          "flag": "rrsp_conversion_required",
+          "question_id": "age_milestone_reached",
           "operator": "equals",
-          "value": true
+          "value": "turned_71"
         },
         "options": [
           {
@@ -4407,9 +4407,12 @@
         "question_id": "rrif_minimum_taken",
         "instruction": "RRIF minimum withdrawals are mandatory each year under ITA s.146.3. The minimum percentage is based on your age on January 1, 2025. Failure to take the minimum results in penalty tax.",
         "show_if": {
-          "flag": "receives_rrif",
-          "operator": "equals",
-          "value": true
+          "question_id": "age_milestone_reached",
+          "operator": "in",
+          "value": [
+            "turned_71",
+            "over_71"
+          ]
         },
         "options": [
           {

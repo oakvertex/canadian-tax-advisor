@@ -45,13 +45,53 @@ function shouldSkip(screen: InterviewScreen, answers: Record<string, AnswerValue
   }
 }
 
+function shouldShow(
+  screen: InterviewScreen,
+  answers: Record<string, AnswerValue>,
+  flags: Record<string, boolean>
+): boolean {
+  if (!screen.show_if) return true;
+  const si = screen.show_if as {
+    question_id?: string;
+    flag?: string;
+    operator: string;
+    value: unknown;
+  };
+
+  if (si.flag) {
+    const actual = flags[si.flag] ?? false;
+    switch (si.operator) {
+      case "equals": return actual === si.value;
+      case "not_equals": return actual !== si.value;
+      default: return actual === true;
+    }
+  }
+
+  if (si.question_id) {
+    const actual = answers[si.question_id];
+    switch (si.operator) {
+      case "equals": return actual === si.value;
+      case "not_equals": return actual !== si.value;
+      case "in": return Array.isArray(si.value) && si.value.includes(actual as string);
+      case "not_in": return Array.isArray(si.value) && !si.value.includes(actual as string);
+      default: return false;
+    }
+  }
+
+  return true;
+}
+
 function findNextScreenIndex(
   branch: InterviewBranch,
   fromIndex: number,
-  answers: Record<string, AnswerValue>
+  answers: Record<string, AnswerValue>,
+  flags: Record<string, boolean>
 ): number {
   let idx = fromIndex;
-  while (idx < branch.screens.length && shouldSkip(branch.screens[idx], answers)) {
+  while (
+    idx < branch.screens.length &&
+    (shouldSkip(branch.screens[idx], answers) || !shouldShow(branch.screens[idx], answers, flags))
+  ) {
     idx++;
   }
   return idx;
@@ -171,7 +211,8 @@ export default function InterviewPage() {
     const nextIdx = findNextScreenIndex(
       currentBranch,
       session.current_screen_index + 1,
-      updated.answers
+      updated.answers,
+      updated.flags
     );
 
     let finalSession: SessionState;
