@@ -3,11 +3,7 @@
   "branch_label": "Age Milestones",
   "branch_order": 12,
   "always_runs": false,
-  "triggered_by": [
-    "life_event_age_milestone",
-    "age_65_plus",
-    "rrsp_conversion_required"
-  ],
+  "triggered_by": ["life_event_age_milestone"],
   "intro": "Turning 18, 65, or 71 triggers specific tax obligations and planning opportunities. Let's confirm what your milestone means for your 2025 return.",
   "screens": [
     {

@@ -16,7 +16,7 @@
 | 9  | 09_education.json           | branch_education           | Education                    | life_event_education |
 | 10 | 10_first_home.json          | branch_first_home          | First Home Purchase          | life_event_first_home |
 | 11 | 11_disability.json          | branch_disability          | Disability                   | life_event_disability, has_child_with_disability |
-| 12 | 12_age_milestones.json      | branch_age_milestones      | Age Milestones               | life_event_age_milestone, age_65_plus, rrsp_conversion_required |
+| 12 | 12_age_milestones.json      | branch_age_milestones      | Age Milestones               | life_event_age_milestone |
 | 13 | 13_savings_registered.json  | branch_savings_registered  | Savings and Registered Plans | always |
 | 14 | 14_deductions_review.json   | branch_deductions_review   | Deductions Review            | always |
 | 15 | 15_credits_review.json      | branch_credits_review      | Credits Review               | always |
