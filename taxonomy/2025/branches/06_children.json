@@ -114,6 +114,11 @@
       "title": "Do you have receipts from your child care provider showing their name, address, and SIN or business number?",
       "question_id": "child_care_receipts",
       "instruction": "CRA requires provider identification to support the child care deduction under ITA s.63(1). Without it the claim can be denied on audit.",
+      "skip_if": {
+        "question_id": "paid_child_care",
+        "operator": "equals",
+        "value": false
+      },
       "show_if": {
         "flag": "has_child_care_expenses",
         "operator": "equals",
