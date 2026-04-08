@@ -4216,9 +4216,7 @@
     "branch_order": 12,
     "always_runs": false,
     "triggered_by": [
-      "life_event_age_milestone",
-      "age_65_plus",
-      "rrsp_conversion_required"
+      "life_event_age_milestone"
     ],
     "intro": "Turning 18, 65, or 71 triggers specific tax obligations and planning opportunities. Let's confirm what your milestone means for your 2025 return.",
     "screens": [
@@ -4864,46 +4862,11 @@
     "intro": "Let's check the federal and Ontario credits that apply to your situation. Many of these are easy to miss — especially the Ontario-specific credits that are often overlooked.",
     "screens": [
       {
-        "screen_id": "credits_gst_hst",
-        "screen_type": "single_select",
-        "title": "Are you aware that you may be entitled to the GST/HST Credit?",
-        "question_id": "gst_credit_awareness",
-        "instruction": "The GST/HST Credit under ITA s.122.5 is a quarterly tax-free payment for low and moderate income Canadians. It is applied for automatically when you file your T1 return. No separate application is required.",
-        "options": [
-          {
-            "value": true,
-            "label": "Yes — I already receive it"
-          },
-          {
-            "value": false,
-            "label": "No — tell me about it"
-          }
-        ],
-        "feedback": {
-          "true": {
-            "message": "GST/HST Credit confirmed. It is recalculated each July based on your prior year net income. Filing on time is essential — late filing can delay or interrupt payments."
-          },
-          "false": {
-            "message": "The GST/HST Credit under ITA s.122.5 is a quarterly payment for individuals with low to moderate income. For 2025 single individuals receive up to $519 annually plus $272 per spouse and each child under 19. It is applied for automatically on your T1 — just file your return and CRA will determine eligibility and payment amounts.",
-            "checklist_update": {
-              "node_id": "credit_gst_hst_credit",
-              "confidence_tier": "possible",
-              "reason": "fact_dependent"
-            }
-          }
-        }
-      },
-      {
         "screen_id": "credits_cwb",
         "screen_type": "single_select",
         "title": "Was your employment or self-employment income under approximately $43,000 in 2025?",
         "question_id": "cwb_income_check",
         "instruction": "The Canada Workers Benefit under ITA s.122.7 is a refundable credit for low-income workers. The basic amount phases in above $3,000 of earned income and phases out above approximately $23,000 for singles or $36,000 for families.",
-        "show_if": {
-          "flag": "lift_likely",
-          "operator": "equals",
-          "value": true
-        },
         "options": [
           {
             "value": true,
@@ -5163,7 +5126,7 @@
       }
     ],
     "branch_completion_summary": {
-      "message": "Credits review complete. Your interview is now finished.",
+      "message": "Credits review complete. Your interview is now finished. As a reminder: the GST/HST Credit (ITA s.122.5) is a quarterly tax-free payment for low and moderate-income Canadians — it is assessed automatically when you file your T1. No separate application is required.",
       "shows": "running_checklist_snapshot",
       "highlighted_documents": [
         "ON-BEN form information — rent or property tax amounts, senior homeowner eligibility",
