@@ -3745,9 +3745,9 @@
       {
         "screen_id": "first_home_buyers_amount",
         "screen_type": "single_select",
-        "title": "Are you aware of the First Home Buyers' Amount credit?",
+        "title": "Will you be claiming the First Home Buyers' Amount?",
         "question_id": "first_home_buyers_amount_aware",
-        "instruction": "The First Home Buyers' Amount under ITA s.118.05 provides a non-refundable federal credit of $10,000 — worth up to $1,500 in federal tax savings. Both spouses may claim it if each qualifies.",
+        "instruction": "The First Home Buyers' Amount (ITA s.118.05) is a $10,000 non-refundable federal credit worth up to $1,500 in tax savings, claimed on Line 31270 of your T1. You and a spouse may split the $10,000 claim in any proportion between your two returns.",
         "show_if": {
           "flag": "confirmed_first_time_buyer",
           "operator": "equals",
@@ -3756,26 +3756,31 @@
         "options": [
           {
             "value": true,
-            "label": "Yes — I plan to claim it"
+            "label": "Yes — add it to my checklist"
           },
           {
             "value": false,
-            "label": "No — tell me more"
+            "label": "I'm not sure if I qualify"
           }
         ],
         "feedback": {
           "true": {
-            "message": "First Home Buyers' Amount confirmed on your checklist. The $10,000 credit is claimed on Line 31270 of your T1. If you have a spouse you may split the $10,000 claim between your two returns in any way that totals $10,000.",
+            "message": "First Home Buyers' Amount added. Claim $10,000 on Line 31270 of your T1. If you have a spouse, you may split the $10,000 between your two returns in any proportion — your preparer can optimize the split.",
             "checklist_update": {
               "node_id": "credit_first_home_buyers_amount",
               "confidence_tier": "confirmed"
             }
           },
           "false": {
-            "message": "The First Home Buyers' Amount under ITA s.118.05 gives you a non-refundable $10,000 credit on Line 31270 — worth up to $1,500 in federal tax reduction. It does not need to be repaid and applies to any qualifying home purchase. We have added it to your checklist.",
+            "message": "Your preparer will confirm eligibility. Since you have confirmed first-time buyer status, the credit is very likely available. We have added it as a possible item — bring your purchase agreement and closing documents.",
             "checklist_update": {
               "node_id": "credit_first_home_buyers_amount",
-              "confidence_tier": "confirmed"
+              "confidence_tier": "possible",
+              "reason": "professional_judgment_required"
+            },
+            "preparer_flag": {
+              "flag": "Confirm First Home Buyers' Amount eligibility and optimal spousal split on Line 31270",
+              "urgency": "priority"
             }
           }
         }
