@@ -26,18 +26,11 @@ export default function HomePage() {
             {/* Privacy notice */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-900 leading-relaxed">
-                <span className="font-semibold">Your privacy is protected.</span> This review
-                does not collect or store any of your personal information. Please save or
-                print your Checklist at the end of the review — it will not be retained once
-                you leave the page.
-              </p>
-            </div>
-
-            {/* Mobile tip */}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-700 leading-relaxed">
-                <span className="font-semibold">Using a mobile device?</span> For the best
-                experience, rotate your phone to landscape orientation before you begin.
+                <span className="font-semibold">Your privacy is protected.</span> No
+                identifying information is collected. Your answers are processed only to
+                build your checklist and are never stored on our servers. Please save your
+                checklist at the end of the review — it will not be retained once you leave
+                the page.
               </p>
             </div>
           </div>

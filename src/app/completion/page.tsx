@@ -160,9 +160,11 @@ export default function CompletionPage() {
         <div className="no-print bg-amber-50 border border-amber-300 rounded-lg px-5 py-4 mb-8 flex items-start gap-3">
           <span className="text-amber-500 text-lg leading-none mt-0.5">⚠</span>
           <p className="text-sm text-amber-900 leading-relaxed">
-            <span className="font-semibold">Please save your Checklist before you leave this page.</span>{" "}
-            This review does not store any of your information — once you navigate away, your
-            results will not be recoverable.
+            <span className="font-semibold">Save your checklist before leaving this page.</span>{" "}
+            Your answers are never stored on our servers — once you navigate away, this
+            review cannot be recovered. To save: on desktop use your browser’s{" "}
+            <span className="font-medium">Print → Save as PDF</span>; on mobile use your
+            browser’s Share menu.
           </p>
         </div>
 
@@ -265,17 +267,6 @@ export default function CompletionPage() {
           >
             Start Over
           </Link>
-          <button
-            onClick={() => window.print()}
-            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="6 9 6 2 18 2 18 9" />
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-              <rect x="6" y="14" width="12" height="8" />
-            </svg>
-            Print / Save as PDF
-          </button>
         </div>
       </div>
     </div>
