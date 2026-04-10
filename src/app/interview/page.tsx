@@ -306,7 +306,7 @@ export default function InterviewPage() {
       </header>
 
       {/* Main layout */}
-      <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 flex gap-8">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 flex flex-col lg:flex-row gap-8">
         {/* Interview area */}
         <div className="flex-1 min-w-0">
           {showingBranchSummary !== null ? (
@@ -385,7 +385,7 @@ export default function InterviewPage() {
         </div>
 
         {/* Sidebar checklist */}
-        <aside className="w-72 flex-shrink-0">
+        <aside className="hidden lg:block w-72 flex-shrink-0">
           <RunningChecklist checklist={session.checklist} taxonomyNodes={taxonomyNodes} />
         </aside>
       </main>
