@@ -25,15 +25,30 @@
       ],
       "feedback": {
         "rent": {
-          "message": "",
-          "activates_flag": "otb_detail_needed"
+          "message": "Ontario renters may claim the Ontario Energy and Property Tax Credit component of the Ontario Trillium Benefit under OTA s.103.1. Eligible rent is the amount paid for a principal residence in Ontario. If you lived in subsidized housing, check with your landlord whether property tax was paid on the unit before entering the amount. Bring your landlord's name and address and the total rent paid in 2025.",
+          "activates_flag": "otb_rental",
+          "checklist_update": {
+            "node_id": "credit_ontario_trillium_benefit",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Rent receipts or lease showing total rent paid in 2025 and landlord name and address",
+            "urgency": "standard"
+          }
         },
         "property_tax": {
-          "message": "",
-          "activates_flag": "otb_detail_needed"
+          "message": "Ontario homeowners who paid property tax directly may claim the Ontario Energy and Property Tax Credit under OTA s.103.1. Bring your 2025 property tax assessment notice and payment records.",
+          "checklist_update": {
+            "node_id": "credit_ontario_trillium_benefit",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "2025 Ontario property tax assessment notice showing annual property tax amount",
+            "urgency": "standard"
+          }
         },
         "senior_homeowner": {
-          "message": "The Ontario Senior Homeowners' Property Tax Grant under OTA s.104.1 provides up to $500 annually to homeowners who were 64 or older on December 31, 2025 and paid property tax on their Ontario principal residence. Eligibility is also subject to a net income threshold — the full grant is available below $35,000 (single) or $45,000 (couple) and phases out to nil at $50,000 (single) or $60,000 (couple). It is claimed on Form ON-BEN filed with your T1 return. Your property tax documentation from the OTB section will cover this claim.",
+          "message": "The Ontario Senior Homeowners' Property Tax Grant under OTA s.104.1 provides up to $500 annually to homeowners who were 64 or older on December 31, 2025 and paid property tax on their Ontario principal residence. The full grant is available below $35,000 net income (single) or $45,000 (couple) and phases out to nil at $50,000 (single) or $60,000 (couple). It is claimed on Form ON-BEN filed with your T1 return. Your property tax documentation will cover this claim.",
           "checklist_update": {
             "node_id": "credit_ontario_senior_grant",
             "confidence_tier": "possible",
@@ -61,59 +76,6 @@
         },
         "none": {
           "message": "You may still qualify for the Ontario Sales Tax Credit component of the Ontario Trillium Benefit based on income alone, even without rent or property tax. Your preparer will assess this on Form ON-BEN."
-        }
-      }
-    },
-    {
-      "screen_id": "credits_ontario_trillium",
-      "screen_type": "single_select",
-      "title": "Did you pay rent, property tax, or both in Ontario in 2025?",
-      "question_id": "otb_eligible_expenses",
-      "instruction": "The Ontario Trillium Benefit (OTB) under OTA s.103.1 combines three Ontario credits — the Ontario Energy and Property Tax Credit, the Northern Ontario Energy Credit (if applicable), and the Ontario Sales Tax Credit. Rent and property tax amounts are required inputs for the ON-BEN form.",
-      "show_if": {
-        "flag": "otb_detail_needed",
-        "operator": "equals",
-        "value": true
-      },
-      "options": [
-        { "value": "rent",         "label": "I paid rent in 2025" },
-        { "value": "property_tax", "label": "I paid property tax directly in 2025" },
-        { "value": "both",         "label": "Both — I paid rent for part of the year and property tax for part" }
-      ],
-      "feedback": {
-        "rent": {
-          "message": "Ontario renters may claim the Ontario Energy and Property Tax Credit component of the OTB under OTA s.103.1. Eligible rent is the amount paid for a principal residence in Ontario. If you lived in subsidized housing, check with your landlord whether property tax was paid on the unit before entering the amount. Bring your landlord's name and address and the total rent paid in 2025.",
-          "activates_flag": "otb_rental",
-          "checklist_update": {
-            "node_id": "credit_ontario_trillium_benefit",
-            "confidence_tier": "confirmed"
-          },
-          "document_checklist_add": {
-            "document": "Rent receipts or lease showing total rent paid in 2025 and landlord name and address",
-            "urgency": "standard"
-          }
-        },
-        "property_tax": {
-          "message": "Ontario homeowners who paid property tax directly may claim the Ontario Energy and Property Tax Credit under OTA s.103.1. Bring your 2025 property tax assessment notice and payment records.",
-          "checklist_update": {
-            "node_id": "credit_ontario_trillium_benefit",
-            "confidence_tier": "confirmed"
-          },
-          "document_checklist_add": {
-            "document": "2025 Ontario property tax assessment notice showing annual property tax amount",
-            "urgency": "standard"
-          }
-        },
-        "both": {
-          "message": "For the portion of the year you rented, use your rent amount; for the ownership portion, use your property tax amount. The ON-BEN form accommodates split-year claims. Bring documentation for both periods.",
-          "checklist_update": {
-            "node_id": "credit_ontario_trillium_benefit",
-            "confidence_tier": "confirmed"
-          },
-          "document_checklist_add": {
-            "document": "Rent receipts or lease for rental period and property tax assessment notice for ownership period",
-            "urgency": "standard"
-          }
         }
       }
     },
