@@ -4,7 +4,7 @@
     "branch_label": "Your 2025 Tax Year",
     "branch_order": 0,
     "always_runs": true,
-    "intro": "Let's start by understanding what happened in your 2025 tax year. This helps us focus only on the sections that matter for your situation.",
+    "intro": "Let's start by understanding what happened in your 2025 tax year. This helps us focus only on the sections that matter for your situation. Most users complete this in 8–12 minutes.",
     "screens": [
       {
         "screen_id": "life_events_gate",
@@ -835,11 +835,11 @@
         "screen_type": "single_select",
         "title": "Did you receive CPP or OAS payments in 2025?",
         "question_id": "receives_cpp_oas",
-        "instruction": "CPP and OAS are taxable income under ITA s.56(1)(a). You will receive a T4A(P) for CPP and a T4A(OAS) for OAS. These screens appear for taxpayers 65 and older — if you received CPP disability benefits at any age those are covered here too.",
+        "instruction": "CPP and OAS are taxable income under ITA s.56(1)(a). You will receive a T4A(P) for CPP and a T4A(OAS) for OAS. CPP disability benefits received at any age are included here.",
         "show_if": {
-          "flag": "age_65_plus",
-          "operator": "equals",
-          "value": true
+          "question_id": "other_income_types",
+          "operator": "contains",
+          "value": "cpp_oas"
         },
         "options": [
           {

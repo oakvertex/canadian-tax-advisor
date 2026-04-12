@@ -53,6 +53,7 @@ function shouldShow(screen: InterviewScreen, answers: Record<string, AnswerValue
   switch (si.operator) {
     case "equals":     return actual === si.value;
     case "not_equals": return actual !== si.value;
+    case "contains":   return Array.isArray(actual) && actual.includes(si.value as string);
     case "in":         return Array.isArray(si.value) ? si.value.includes(actual as string) : false;
     case "not_in":     return Array.isArray(si.value) ? !si.value.includes(actual as string) : true;
     default:           return true;
