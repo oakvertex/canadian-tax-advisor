@@ -402,42 +402,10 @@
           "message": "No caregiver support noted."
         }
       }
-    },
-    {
-      "screen_id": "children_attribution_rules",
-      "screen_type": "single_select",
-      "title": "Did you transfer money or property to a child under 18 to invest in their name in 2025?",
-      "question_id": "transferred_to_minor",
-      "instruction": "Attribution rules under ITA s.74.1(2) apply income earned on transferred property back to you until the year the child turns 18. Capital gains are exempt from attribution — only income such as interest and dividends is attributed.",
-      "skip_if": {
-        "question_id": "dependent_profile",
-        "operator": "equals",
-        "value": "none"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
-          "message": "Attribution rules under ITA s.74.1(2) require you to report income (interest, dividends) earned on funds transferred to a minor child on your own return until the year they turn 18. Capital gains earned in the child's hands are not attributed back. Your preparer needs the amount transferred and any income earned on it.",
-          "checklist_update": {
-            "node_id": "special_attribution_minor",
-            "confidence_tier": "confirmed"
-          },
-          "preparer_flag": {
-            "flag": "Income attribution applies — report income earned on funds transferred to minor on your return under ITA s.74.1(2). Capital gains not attributed.",
-            "urgency": "standard"
-          }
-        },
-        "false": {
-          "message": "No transfers to minors noted."
-        }
-      }
     }
   ],
   "branch_completion_summary": {
-    "message": "Children and dependents section complete. Here is what we have identified.",
+    "message": "Children and dependents section complete. Here is what we have identified.\n\nNote for preparer: if the client transferred property or capital to a minor child in 2025, income attribution rules apply under ITA s.74.1(2) — preparer to confirm. Capital gains earned in the child's hands are not attributed; only income such as interest and dividends is affected.",
     "shows": "running_checklist_snapshot",
     "highlighted_documents": [
       "Child care receipts — provider name, SIN or business number, amounts paid per child",

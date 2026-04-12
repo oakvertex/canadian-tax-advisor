@@ -39,9 +39,9 @@
       "question_id": "rrsp_deduct_full",
       "instruction": "You can contribute to an RRSP now but carry the deduction forward to a future year when your income — and marginal tax rate — may be higher. This is a legitimate and often beneficial planning strategy.",
       "show_if": {
-        "flag": "has_employment_income",
+        "question_id": "rrsp_contributed",
         "operator": "equals",
-        "value": false
+        "value": true
       },
       "options": [
         { "value": true,    "label": "Yes — deduct the full contribution on my 2025 return" },

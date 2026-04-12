@@ -6,6 +6,35 @@
   "intro": "Beyond T4 employment income, many other amounts must be reported on your T1. Some arrive as slips, others you must track yourself. Let's make sure nothing is missed.",
   "screens": [
     {
+      "screen_id": "other_income_gate",
+      "screen_type": "multi_select",
+      "title": "Did you receive any of the following types of income in 2025?",
+      "question_id": "other_income_types",
+      "instruction": "Select all that apply. We will only ask for details on what you received. Select \"None of the above\" if none apply.",
+      "options": [
+        { "value": "cpp_oas",          "label": "CPP or OAS benefits" },
+        { "value": "employer_pension", "label": "Pension from a former employer's registered plan" },
+        { "value": "foreign_pension",  "label": "Pension from another country" },
+        { "value": "ei",               "label": "Employment Insurance (EI) benefits" },
+        { "value": "rrsp_withdrawal",  "label": "RRSP withdrawal" },
+        { "value": "support_received", "label": "Spousal or child support payments received" },
+        { "value": "investments",      "label": "Investment income (interest, dividends, capital gains)" },
+        { "value": "rental",           "label": "Rental income" },
+        { "value": "none",             "label": "None of the above", "exclusive": true }
+      ],
+      "feedback": {
+        "cpp_oas":          { "message": "" },
+        "employer_pension": { "message": "" },
+        "foreign_pension":  { "message": "" },
+        "ei":               { "message": "" },
+        "rrsp_withdrawal":  { "message": "" },
+        "support_received": { "message": "" },
+        "investments":      { "message": "" },
+        "rental":           { "message": "" },
+        "none":             { "message": "No other income sources noted. Moving on." }
+      }
+    },
+    {
       "screen_id": "other_income_cpp_oas",
       "screen_type": "single_select",
       "title": "Did you receive CPP or OAS payments in 2025?",
@@ -44,6 +73,11 @@
       "title": "Did you receive pension payments from a former employer's registered pension plan in 2025?",
       "question_id": "receives_employer_pension",
       "instruction": "This includes defined benefit (DB) and defined contribution (DC) pension payments. You will receive a T4A slip. This is considered eligible pension income under ITA s.118(3).",
+      "show_if": {
+        "question_id": "other_income_types",
+        "operator": "contains",
+        "value": "employer_pension"
+      },
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }
@@ -72,6 +106,11 @@
       "title": "Did you receive pension income from another country in 2025?",
       "question_id": "receives_foreign_pension",
       "instruction": "Includes pensions from a former employer abroad, government pensions from another country, or US Social Security. All foreign pension income is taxable in Canada under ITA s.56(1)(a) and must be converted to Canadian dollars.",
+      "show_if": {
+        "question_id": "other_income_types",
+        "operator": "contains",
+        "value": "foreign_pension"
+      },
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }
@@ -100,6 +139,11 @@
       "title": "Did you receive Employment Insurance (EI) benefits in 2025?",
       "question_id": "receives_ei",
       "instruction": "Includes regular EI, maternity, parental, sickness, compassionate care, and fishing benefits. All EI is taxable under ITA s.56(1)(a)(iv). You will receive a T4E slip.",
+      "show_if": {
+        "question_id": "other_income_types",
+        "operator": "contains",
+        "value": "ei"
+      },
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }
@@ -128,6 +172,11 @@
       "title": "Did you withdraw any funds from an RRSP in 2025?",
       "question_id": "rrsp_withdrawal",
       "instruction": "Any RRSP withdrawal — other than under the Home Buyers Plan or Lifelong Learning Plan — is fully taxable as income in the year received under ITA s.56(1)(h). Withholding tax is deducted at source but may not cover your full liability.",
+      "show_if": {
+        "question_id": "other_income_types",
+        "operator": "contains",
+        "value": "rrsp_withdrawal"
+      },
       "options": [
         { "value": "yes_regular", "label": "Yes — a regular withdrawal" },
         { "value": "yes_hbp",     "label": "Yes — under the Home Buyers Plan (HBP)" },
@@ -176,9 +225,9 @@
       "question_id": "support_received",
       "instruction": "Spousal support received is taxable under ITA s.56(1)(b) if paid periodically under a court order or written agreement. Child support received under agreements after May 1, 1997 is not taxable.",
       "show_if": {
-        "question_id": "marital_status",
-        "operator": "in",
-        "value": ["separated", "divorced"]
+        "question_id": "other_income_types",
+        "operator": "contains",
+        "value": "support_received"
       },
       "options": [
         { "value": "spousal_only", "label": "Yes — spousal support only" },
@@ -228,8 +277,13 @@
       "title": "Did you receive any investment income outside a registered account in 2025?",
       "question_id": "investment_income_types",
       "instruction": "Select all that apply. Exclude amounts earned inside a TFSA, RRSP, or RRIF — those are sheltered from current tax. Outside registered accounts, all investment income is reportable.",
+      "show_if": {
+        "question_id": "other_income_types",
+        "operator": "contains",
+        "value": "investments"
+      },
       "options": [
-        { "value": "interest",          "label": "Interest income from bank accounts, GICs, or bonds" },
+        { "value": "interest",           "label": "Interest income from bank accounts, GICs, or bonds" },
         { "value": "canadian_dividends", "label": "Dividends from Canadian corporations" },
         { "value": "foreign_dividends",  "label": "Dividends from foreign corporations" },
         { "value": "capital_gains",      "label": "Sold investments, property, or cryptocurrency at a gain or loss" },
@@ -296,6 +350,11 @@
       "title": "Did you earn rental income in 2025?",
       "question_id": "has_rental_income",
       "instruction": "Includes renting a room, basement suite, or entire property. Short-term rentals such as Airbnb also qualify. Rental income is property income under ITA s.9(1), not employment income.",
+      "show_if": {
+        "question_id": "other_income_types",
+        "operator": "contains",
+        "value": "rental"
+      },
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }

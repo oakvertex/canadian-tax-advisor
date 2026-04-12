@@ -6,11 +6,37 @@
   "intro": "Let's do a final sweep of common deductions that apply to most Canadians — charitable donations, medical expenses, carrying charges, and union dues. These are frequently missed or under-claimed.",
   "screens": [
     {
+      "screen_id": "deductions_gate",
+      "screen_type": "multi_select",
+      "title": "Did any of the following apply to you in 2025?",
+      "question_id": "deductions_applicable",
+      "instruction": "Select all that apply. We will only ask for details on what is relevant to you.",
+      "options": [
+        { "value": "charitable",       "label": "Made donations to registered Canadian charities" },
+        { "value": "medical",          "label": "Paid medical expenses for yourself, spouse, or dependents" },
+        { "value": "carrying_charges", "label": "Paid interest on an investment loan or investment management fees" },
+        { "value": "support_paid",     "label": "Paid spousal support under a court order or written agreement" },
+        { "value": "none",             "label": "None of the above", "exclusive": true }
+      ],
+      "feedback": {
+        "charitable":       { "message": "" },
+        "medical":          { "message": "" },
+        "carrying_charges": { "message": "" },
+        "support_paid":     { "message": "" },
+        "none":             { "message": "No additional deductions to review." }
+      }
+    },
+    {
       "screen_id": "deductions_charitable",
       "screen_type": "single_select",
       "title": "Did you make charitable donations to registered Canadian charities in 2025?",
       "question_id": "has_charitable_donations",
       "instruction": "Donations to registered Canadian charities are eligible for a non-refundable federal credit under ITA s.118.1 — 15% on the first $200 and 29% on amounts above $200 (33% if your income is above the top federal bracket).",
+      "show_if": {
+        "question_id": "deductions_applicable",
+        "operator": "contains",
+        "value": "charitable"
+      },
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }
@@ -39,6 +65,11 @@
       "title": "Did you pay medical expenses for yourself, your spouse, or your dependents in 2025?",
       "question_id": "has_medical_expenses",
       "instruction": "Medical expenses are claimable under ITA s.118.2 as a non-refundable credit on amounts above 3% of net income (or $2,635, whichever is less). The best 12-month period ending in 2025 or 2026 can be used — it does not have to match the calendar year.",
+      "show_if": {
+        "question_id": "deductions_applicable",
+        "operator": "contains",
+        "value": "medical"
+      },
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }
@@ -71,6 +102,11 @@
       "title": "Did you pay interest on money borrowed to earn investment income, or pay investment management fees in 2025?",
       "question_id": "has_carrying_charges",
       "instruction": "Carrying charges and interest on money borrowed to earn income are deductible under ITA s.20(1)(c) and s.20(1)(bb). This includes interest on investment loans and fees paid for investment advice on taxable accounts.",
+      "show_if": {
+        "question_id": "deductions_applicable",
+        "operator": "contains",
+        "value": "carrying_charges"
+      },
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }
@@ -99,9 +135,9 @@
       "question_id": "support_paid_review",
       "instruction": "This is a catch-all for taxpayers who did not go through the Marital Status branch but still make support payments.",
       "show_if": {
-        "flag": "newly_separated",
-        "operator": "not_equals",
-        "value": true
+        "question_id": "deductions_applicable",
+        "operator": "contains",
+        "value": "support_paid"
       },
       "options": [
         { "value": true,  "label": "Yes — I made spousal support payments in 2025" },
