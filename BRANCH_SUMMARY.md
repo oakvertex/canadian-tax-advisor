@@ -16,7 +16,7 @@
 | 9  | 09_education.json           | branch_education           | Education                    | life_event_education |
 | 10 | 10_first_home.json          | branch_first_home          | First Home Purchase          | life_event_first_home |
 | 11 | 11_disability.json          | branch_disability          | Disability                   | life_event_disability, has_child_with_disability |
-| 12 | 12_age_milestones.json      | branch_age_milestones      | Age Milestones               | life_event_age_milestone |
+| 12 | 12_age_milestones.json      | branch_age_milestones      | Age Milestones               | life_event_age_milestone, age_65_plus, rrsp_conversion_required |
 | 13 | 13_savings_registered.json  | branch_savings_registered  | Savings and Registered Plans | always |
 | 14 | 14_deductions_review.json   | branch_deductions_review   | Deductions Review            | always |
 | 15 | 15_credits_review.json      | branch_credits_review      | Credits Review               | always |
@@ -25,6 +25,9 @@
 All 16 branch files complete. interview-flow.json assembled at 239.5 KB, valid JSON.
 Last full rebuild: April 2026.
 To rebuild after any branch edit: npx tsx scripts/buildInterviewFlow.ts
+
+UX improvement sprint: Pass 1 COMPLETE. Pass 2 COMPLETE. Pass 3 (UI layer) PENDING.
+See DECISIONS.md → UX Improvement Sprint for full scope and Pass 3 remaining work.
 
 ## Life Event Options (Screen 0 — Life Events Gate)
 | Value | Activates Flag |
@@ -69,19 +72,19 @@ To rebuild after any branch edit: npx tsx scripts/buildInterviewFlow.ts
 | 0 | life_events_gate |
 | 1 | profile_residency, profile_marital_status, profile_age, profile_dependents |
 | 2 | employment_t4_count, employment_newcomer_partialyr, employment_income_range, employment_foreign, employment_home_office, employment_t2200, employment_vehicle, employment_other_expenses |
-| 3 | other_income_cpp_oas, other_income_employer_pension, other_income_foreign_pension, other_income_ei, other_income_rrsp_withdrawal, other_income_support_received, other_income_investments, other_income_rental |
+| 3 | other_income_gate [GATE — multi_select], other_income_rrsp_withdrawal [show_if: rrsp_withdrawal selected], other_income_support_received [show_if: support_received selected], other_income_investments [show_if: investments selected] — cpp_oas, employer_pension, foreign_pension, ei, and rental handled inline in gate feedback (no separate screens) |
 | 4 | moving_reason, moving_distance, moving_province_change, moving_expenses_types, moving_income_at_new_location, moving_prior_year_carryforward |
 | 5 | marital_change_type, marital_new_spouse_income, marital_separation_date, marital_support_paid, marital_legal_fees, marital_property_transfer, marital_widowed_rrsp, marital_widowed_capital_property |
-| 6 | children_count_ages, children_single_parent, children_care_expenses, children_care_provider, children_lower_income_spouse, children_resp, children_disability_dtc, children_canada_child_benefit, children_caregiver_adult, children_attribution_rules |
+| 6 | children_count_ages, children_single_parent, children_care_expenses, children_care_provider, children_lower_income_spouse, children_resp, children_disability_dtc, children_canada_child_benefit, children_caregiver_adult — ~~children_attribution_rules~~ [REMOVED: converted to standing preparer flag on output brief] |
 | 7 | selfemploy_business_type, selfemploy_revenue_range, selfemploy_books_records, selfemploy_home_office, selfemploy_vehicle, selfemploy_employees, selfemploy_cpp |
 | 8 | retirement_income_sources, retirement_pension_splitting, retirement_age_amount, retirement_oas_clawback, retirement_rrif_conversion |
 | 9 | education_who_is_student, education_tuition_receipts, education_carryforward, education_transfer_decision, education_canada_training_credit, education_student_loan_interest, education_resp_withdrawal |
 | 10 | first_home_confirmed_buyer, first_home_first_time_buyer, first_home_buyers_amount, first_home_hbp, first_home_fhsa, first_home_new_construction |
 | 11 | disability_who_affected, disability_dtc_status, disability_attendant_care, disability_rdsp, disability_medical_expenses |
 | 12 | age_milestone_which, age_milestone_tfsa_18, age_milestone_oas_65, age_milestone_rrsp_final_contribution, age_milestone_rrif_minimum |
-| 13 | savings_rrsp_contributed, savings_rrsp_deduction_timing, savings_spousal_rrsp, savings_tfsa, savings_rrsp_over_contribution |
-| 14 | deductions_charitable, deductions_medical, deductions_carrying_charges, deductions_support_paid, deductions_prior_year_noa |
-| 15 | credits_gst_hst, credits_cwb, credits_ontario_trillium, credits_lift, credits_senior_homeowners, credits_foreign_income_verification, credits_volunteer_firefighter |
+| 13 | savings_rrsp_contributed, savings_rrsp_deduction_timing [show_if: rrsp_contributed=true — FIXED], savings_spousal_rrsp, savings_tfsa |
+| 14 | deductions_gate [GATE — multi_select], deductions_prior_year_noa [always shown] — charitable, medical, carrying_charges, and support_paid handled inline in gate feedback (no separate screens) |
+| 15 | credits_ontario_trillium, credits_senior_homeowners, credits_foreign_income_verification, credits_volunteer_firefighter — ~~credits_cwb~~ [REMOVED: derived from employment_income_range] ~~credits_lift~~ [REMOVED: derived from employment_income_range] |
 
 ## branch_completion_summary.shows Values
 | Value | Meaning |
@@ -101,5 +104,9 @@ tuition_transfer_decision triggers a planning note: transfer vs carryforward mod
 | Screen | Trigger |
 |--------|---------|
 | credits_ontario_trillium | ontario_credits_eligible flag |
-| credits_lift | ontario_credits_eligible flag |
 | credits_senior_homeowners | ontario_credits_eligible flag |
+
+Note: credits_lift and credits_cwb removed as standalone screens (April 2026 UX sprint —
+Pass 1 complete). LIFT eligibility (lift_likely, lift_possible) and CWB eligibility
+(cwb_check) are derived from employment_income_range in Branch 2 by the matching engine.
+See DECISIONS.md → UX Improvement Sprint → Flag Derivation for derivation table.

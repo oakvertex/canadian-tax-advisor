@@ -32,6 +32,7 @@ that could not be reliably detected or repaired.
 /taxonomy/2025/items.json  ← taxonomy nodes
 /taxonomy/2025/interview-flow.json  ← build artifact, do not edit
 /scripts/buildInterviewFlow.ts      ← assembles branches into interview-flow.json
+/docs/taxready-ux-assessment.md     ← UX design review (April 2026)
 /src/app
 /src/components
 /src/engine
@@ -194,9 +195,38 @@ has_capital_assets, has_foreign_employment, receives_foreign_pension
 received_retiring_allowance, received_ei
 otb_rental, northern_ontario_resident
 
+## Flag Derivation — CWB and LIFT (IMPORTANT)
+cwb_check, lift_likely, and lift_possible are NOT set by standalone interview screens.
+They are DERIVED from employment_income_range (set in Branch 2) by the matching engine:
+
+  employment_income_range = under_20k       → cwb_check = true, lift_likely = true
+  employment_income_range = 20k_to_30k      → cwb_check = true, lift_likely = true
+  employment_income_range = 30k_to_50k      → lift_possible = true
+  employment_income_range = 50k_to_100k     → (no CWB/LIFT flags)
+  employment_income_range = over_100k       → high_income_phaseouts = true
+  employment_income_range = prefer_not      → lift_possible = true
+
+There are NO standalone credits_cwb or credits_lift screens in Branch 15.
+These were removed in the April 2026 UX sprint (Pass 1) to eliminate the triple
+income-asking anti-pattern. See DECISIONS.md → UX Improvement Sprint for full rationale.
+
+## Gate Screen Pattern — Branch 3 and Branch 14
+Multi-select gate screens consolidate sequential yes/no questions into a single
+"select all that apply" screen. Detail content is delivered inline as gate feedback
+messages. Downstream screens with genuine follow-up questions carry show_if conditions
+keyed to the gate question_id using the "contains" operator.
+
+Branch 3 (other_income_gate, question_id: other_income_types):
+- CPP/OAS, employer pension, foreign pension, EI, rental → inline gate feedback only
+- RRSP withdrawal, support received, investments → separate screens with show_if
+
+Branch 14 (deductions_gate, question_id: deductions_applicable):
+- Charitable, medical, carrying charges, support paid → inline gate feedback only
+- deductions_prior_year_noa → always shown, no show_if (document collection for all filers)
+
 ## Ontario-Specific Credits (V1 scope)
 - OTB: Ontario Trillium Benefit (OTA s.103.1)
-- LIFT: Low-income Individuals and Families Tax Credit (OTA s.103.4)
+- LIFT: Low-income Individuals and Families Tax Credit (OTA s.103.4) — derived from flag
 - Senior Homeowners Property Tax Grant (OTA s.104.1)
 
 ## AI Clarification Layer

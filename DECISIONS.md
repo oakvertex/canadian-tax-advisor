@@ -102,6 +102,20 @@ This option does not appear anywhere in the interview.
 Partnership income is reported via T2125 or T5013. Partnership is an explicit
 option in Branch 7 alongside sole proprietor, incorporated, and freelance/gig.
 
+## Gate Screen Pattern (UX Sprint — COMPLETE)
+Multi-select gate screens were introduced in Branch 3 and Branch 14 as part of the
+April 2026 UX sprint to eliminate sequential yes/no screens for simple filers.
+
+Pattern: gate screen asks "did any of the following apply?" with exclusive "None of
+the above" option. Detail content is delivered inline as gate feedback. Downstream
+screens (where a follow-up is genuinely required) carry show_if keyed to the gate
+question_id using the "contains" operator.
+
+| Branch | Gate screen_id | question_id | Detail delivery |
+|--------|---------------|-------------|-----------------|
+| 3 — Other Income | other_income_gate | other_income_types | CPP/OAS, employer pension, foreign pension, EI, rental: inline gate feedback. RRSP withdrawal, support received, investments: separate screens with show_if contains gate value. |
+| 14 — Deductions Review | deductions_gate | deductions_applicable | Charitable, medical, carrying charges, support paid: inline gate feedback. No separate detail screens. deductions_prior_year_noa always shown (not gated). |
+
 ## Tech Decisions
 - tsx over ts-node (ESM compatibility)
 - node --import tsx --test for unit tests
@@ -110,6 +124,91 @@ option in Branch 7 alongside sole proprietor, incorporated, and freelance/gig.
 - Dev model: meta-llama/llama-3.3-8b-instruct:free
 - Prod model: to be benchmarked — Claude Sonnet vs Gemini 2.5 Flash
 - No database for MVP — localStorage for session persistence
+
+---
+
+## UX Improvement Sprint — April 2026
+
+Full assessment in: `docs/taxready-ux-assessment.md`
+Inputs: tax preparer structural analysis + senior UI/UX designer review of all 16 branch files.
+Root cause finding: the gap between "intelligent advisor" product promise and "bureaucratic
+survey" delivery is the primary driver of user abandonment. Content is correct; architecture
+that delivers it is not.
+
+### Pass 1 — COMPLETE
+Pure logic changes (no UI, no branch JSON changes):
+- ✅ Derive cwb_check / lift_likely / lift_possible from employment_income_range in matcher
+- ✅ Remove credits_cwb screen from 15_credits_review.json
+- ✅ Remove credits_lift screen from 15_credits_review.json
+- ✅ Build script run, unit tests passing
+
+### Pass 2 — COMPLETE
+Branch JSON edits:
+- ✅ Add other_income_gate (multi_select) as first screen of 03_other_income.json;
+     show_if on other_income_rrsp_withdrawal, other_income_support_received,
+     other_income_investments; CPP/OAS, employer pension, foreign pension, EI, rental
+     collapsed into gate feedback (no separate detail screens required)
+- ✅ Add deductions_gate (multi_select) as first screen of 14_deductions_review.json;
+     charitable, medical, carrying_charges, support_paid collapsed into gate feedback;
+     deductions_prior_year_noa always shown (no show_if)
+- ✅ Remove children_attribution_rules screen from 06_children.json;
+     converted to standing preparer flag on output brief (ITA s.74.1(2))
+- ✅ Fix savings_rrsp_deduction_timing show_if: has_employment_income=false →
+     rrsp_contributed=true in 13_savings_registered.json
+- ⏳ Add time estimate to Branch 0 intro text (deferred to Pass 3 — UI copy pass)
+- ⏳ "No" feedback message audit across branches 3, 6, 7, 8, 9, 13, 14, 15
+     (deferred to Pass 3 — content pass)
+
+### Pass 3 — PENDING
+UI layer changes (components, not branch JSON). No branch files touched in this pass.
+
+1. **Progress indicator** — Phase-based persistent bar showing always-run phases
+   (Profile → Income → [conditional branches] → Savings → Deductions → Credits).
+   Display phase name, not raw screen number. Conditional branches shown as
+   inserted segments when active.
+
+2. **Animated running checklist** — Checklist sidebar promoted from passive end-of-branch
+   summary to active mid-interview motivator. When a checklist item is added
+   (any feedback with checklist_update fires), animate the item into a visible
+   "Found so far" panel. Label: "We've found N items for your preparer."
+
+3. **Branch intro removal for always-run sequential branches** — Remove standalone
+   intro screens for Branches 2, 3, 13, 14, 15. Blend transition into the preceding
+   branch's completion summary message. Retain full intro screens for conditional
+   branches (4–12) where a contextual reframe aids comprehension.
+
+4. **Personalisation cues** — Where session state flags are already set, surface them
+   in branch intro copy. Example: Branch 15 credits_ontario_trillium screen instruction
+   should read "Since you live in Ontario, three provincial credits apply…" using the
+   ontario_credits_eligible flag already on record.
+
+5. **Sample output brief on landing page** — Add a "see what you'll get" preview
+   (mock populated with 2–3 example items) either on the landing page or as a
+   post-gate screen after Branch 0. Addresses cold-start trust problem.
+
+6. **Branch 0 intro time estimate** — Add "Most users complete this in 8–12 minutes.
+   We'll only ask what's relevant to your situation." to the life events gate intro.
+
+7. **"No" feedback message audit** — Apply across branches 3, 6, 7, 8, 9, 13, 14, 15:
+   "No" feedback messages must be blank OR one sentence max. One-sentence "No" feedback
+   is permitted only when it surfaces a genuinely surprising eligibility the user might
+   not know about. Multi-sentence educational content reserved exclusively for "Yes"
+   answers and planning-relevant responses.
+
+### Flag Derivation — CWB and LIFT (COMPLETE — Pass 1)
+When employment_income_range is answered in Branch 2, flags are derived immediately
+in session state without requiring additional screens:
+
+| employment_income_range value | Flags set |
+|-------------------------------|-----------|
+| under_20k                     | cwb_check = true, lift_likely = true |
+| 20k_to_30k                    | cwb_check = true, lift_likely = true |
+| 30k_to_50k                    | lift_possible = true |
+| 50k_to_100k                   | (no CWB/LIFT flags) |
+| over_100k                     | high_income_phaseouts = true |
+| prefer_not_to_say             | lift_possible = true |
+
+---
 
 ## Build Status — Current
 - Types: complete (src/types/index.ts)
@@ -123,13 +222,16 @@ option in Branch 7 alongside sole proprietor, incorporated, and freelance/gig.
 - Build script: COMPLETE (scripts/buildInterviewFlow.ts)
 - Per-branch JSON files: COMPLETE — 16 files in taxonomy/2025/branches/
 - interview-flow.json: COMPLETE — 239.5KB assembled from 16 branch files, valid JSON
+- UX improvement sprint: Pass 1 COMPLETE, Pass 2 COMPLETE, Pass 3 (UI layer) PENDING
 - AI clarification layer (/api/clarify): not yet built
 - PDF export: not yet built
 - Full taxonomy nodes (items.json): 1 node (deduction_moving_expenses) — needs expansion
 
 ## Next Steps
-1. Run app end-to-end in browser and test each branch path
-2. Validate matching engine node IDs against items.json as taxonomy grows
-3. Expand items.json with taxonomy nodes for all node_ids referenced in branches
-4. Build AI clarification layer (/api/clarify route with OpenRouter)
-5. Build PDF export
+1. UX sprint Pass 3: UI layer (progress indicator, checklist animation, branch intros,
+   personalisation cues, sample brief preview, Branch 0 time estimate, "No" message audit)
+2. Run app end-to-end in browser and test each branch path
+3. Validate matching engine node IDs against items.json as taxonomy grows
+4. Expand items.json with taxonomy nodes for all node_ids referenced in branches
+5. Build AI clarification layer (/api/clarify route with OpenRouter)
+6. Build PDF export
