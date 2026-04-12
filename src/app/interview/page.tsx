@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createSession, applyScreenFeedback, replaySession } from "@/lib/session";
 import InterviewScreenComponent from "@/components/InterviewScreen";
@@ -8,6 +8,27 @@ import RunningChecklist from "@/components/RunningChecklist";
 import type { SessionState, InterviewBranch, InterviewScreen, TaxonomyNode, AnswerValue } from "@/types";
 
 const SESSION_KEY = "tax-advisor-session";
+
+// Always-run branches whose intro screens are suppressed in favour of the
+// preceding branch's completion summary acting as the transition cue.
+const SKIP_INTRO_BRANCH_IDS = new Set([
+  "branch_employment",          // Branch 2
+  "branch_other_income",        // Branch 3
+  "branch_savings_registered",  // Branch 13
+  "branch_deductions_review",   // Branch 14
+  "branch_credits_review",      // Branch 15
+]);
+
+// Phase definitions — used by the progress indicator.
+// Each phase covers a range of branch_order values (inclusive).
+const PHASES: { label: string; min: number; max: number }[] = [
+  { label: "Profile",    min: 0,  max: 1  },
+  { label: "Income",     min: 2,  max: 3  },
+  { label: "Life Events",min: 4,  max: 12 },
+  { label: "Savings",   min: 13, max: 13 },
+  { label: "Deductions", min: 14, max: 14 },
+  { label: "Credits",   min: 15, max: 15 },
+];
 
 function getActiveBranches(
   branches: InterviewBranch[],
@@ -43,16 +64,11 @@ function shouldSkip(screen: InterviewScreen, answers: Record<string, AnswerValue
   const { question_id, operator, value } = screen.skip_if;
   const actual = answers[question_id];
   switch (operator) {
-    case "equals":
-      return actual === value;
-    case "not_equals":
-      return actual !== value;
-    case "in":
-      return Array.isArray(value) ? value.includes(actual as string) : false;
-    case "not_in":
-      return Array.isArray(value) ? !value.includes(actual as string) : true;
-    default:
-      return false;
+    case "equals":   return actual === value;
+    case "not_equals": return actual !== value;
+    case "in":       return Array.isArray(value) ? value.includes(actual as string) : false;
+    case "not_in":   return Array.isArray(value) ? !value.includes(actual as string) : true;
+    default:         return false;
   }
 }
 
@@ -78,10 +94,38 @@ function saveSession(s: SessionState) {
   }
 }
 
+// Derive which phases are visible and which is current given active branches + current branch index.
+function getPhaseInfo(
+  activeBranches: InterviewBranch[],
+  currentBranchIndex: number
+) {
+  const currentOrder = activeBranches[currentBranchIndex]?.branch_order ?? 0;
+  const hasLifeEventBranch = activeBranches.some(
+    (b) => b.branch_order >= 4 && b.branch_order <= 12
+  );
+
+  const visiblePhases = PHASES.filter((p) => {
+    if (p.label === "Life Events") return hasLifeEventBranch;
+    return activeBranches.some((b) => b.branch_order >= p.min && b.branch_order <= p.max);
+  });
+
+  const currentPhaseIdx = visiblePhases.findIndex(
+    (p) => currentOrder >= p.min && currentOrder <= p.max
+  );
+
+  // Screen position within the current phase
+  const phaseBranches = activeBranches.filter(
+    (b) => b.branch_order >= (visiblePhases[currentPhaseIdx]?.min ?? 0) &&
+            b.branch_order <= (visiblePhases[currentPhaseIdx]?.max ?? 0)
+  );
+  const phasePosition = phaseBranches.findIndex((b) => b.branch_order === currentOrder) + 1;
+
+  return { visiblePhases, currentPhaseIdx, phasePosition, totalInPhase: phaseBranches.length };
+}
+
 export default function InterviewPage() {
   const router = useRouter();
 
-  // Data loaded asynchronously — not bundled into the client JS chunk
   const [branches, setBranches] = useState<InterviewBranch[]>([]);
   const [taxonomyNodes, setTaxonomyNodes] = useState<TaxonomyNode[]>([]);
   const [dataReady, setDataReady] = useState(false);
@@ -90,6 +134,11 @@ export default function InterviewPage() {
   const [session, setSession] = useState<SessionState>(() => createSession("2025"));
   const [showingIntro, setShowingIntro] = useState(true);
   const [showingBranchSummary, setShowingBranchSummary] = useState<InterviewBranch | null>(null);
+
+  // Track which checklist node_ids were present before the last answer,
+  // so we can animate only the newly added items.
+  const prevChecklistIdsRef = useRef<Set<string>>(new Set());
+  const [newItemIds, setNewItemIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     Promise.all([
@@ -110,7 +159,6 @@ export default function InterviewPage() {
       .catch(() => setDataError(true));
   }, []);
 
-  // Loading state — page is already interactive, just waiting on data
   if (!dataReady) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -139,7 +187,6 @@ export default function InterviewPage() {
   const activeBranches = getActiveBranches(branches, session.flags);
   const currentBranch = activeBranches[session.current_branch_index];
 
-  // Interview complete
   if (session.completed || !currentBranch) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -160,6 +207,9 @@ export default function InterviewPage() {
   }
 
   const currentScreen = currentBranch.screens[session.current_screen_index];
+  const { visiblePhases, currentPhaseIdx, phasePosition, totalInPhase } =
+    getPhaseInfo(activeBranches, session.current_branch_index);
+  const currentPhaseName = visiblePhases[currentPhaseIdx]?.label ?? "";
 
   const canGoBack = showingBranchSummary !== null
     ? (session.answerHistory ?? []).length > 0
@@ -183,6 +233,7 @@ export default function InterviewPage() {
       };
       saveSession(finalSession);
       setSession(finalSession);
+      setNewItemIds(new Set());
       setShowingBranchSummary(null);
       setShowingIntro(false);
       return;
@@ -201,6 +252,7 @@ export default function InterviewPage() {
       };
       saveSession(finalSession);
       setSession(finalSession);
+      setNewItemIds(new Set());
       setShowingIntro(false);
       return;
     }
@@ -217,9 +269,14 @@ export default function InterviewPage() {
     };
     saveSession(finalSession);
     setSession(finalSession);
+    setNewItemIds(new Set());
   };
 
   const handleAnswer = (screen: InterviewScreen, value: AnswerValue | AnswerValue[]) => {
+    // Snapshot checklist IDs before applying feedback
+    const prevIds = new Set(session.checklist.map((i) => i.node_id));
+    prevChecklistIdsRef.current = prevIds;
+
     const historyEntry = {
       question_id: screen.question_id,
       value: value as AnswerValue,
@@ -234,6 +291,15 @@ export default function InterviewPage() {
     };
 
     updated = applyScreenFeedback(updated, screen, value);
+
+    // Derive newly added checklist items and schedule their animation
+    const nextIds = new Set(updated.checklist.map((i) => i.node_id));
+    const added = new Set([...nextIds].filter((id) => !prevIds.has(id)));
+    setNewItemIds(added);
+    // Clear new-item highlights after animation completes (400ms + buffer)
+    if (added.size > 0) {
+      setTimeout(() => setNewItemIds(new Set()), 800);
+    }
 
     const nextIdx = findNextScreenIndex(
       currentBranch,
@@ -263,8 +329,12 @@ export default function InterviewPage() {
           current_branch_index: nextBranchIdx,
           current_screen_index: 0,
         };
+        const nextBranch = newActiveBranches[nextBranchIdx];
         if (currentBranch.branch_completion_summary.shows === "active_branches_preview") {
           setShowingBranchSummary(currentBranch);
+        } else if (SKIP_INTRO_BRANCH_IDS.has(nextBranch?.branch_id)) {
+          // Skip intro for always-run sequential branches — go straight to questions
+          setShowingIntro(false);
         } else {
           setShowingIntro(true);
         }
@@ -275,32 +345,55 @@ export default function InterviewPage() {
     setSession(finalSession);
   };
 
+  const checklistCount = session.checklist.length;
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header with branch progress */}
+      {/* Header with phase-based progress indicator */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <h1 className="text-lg font-semibold text-gray-900">2025 Tax Interview</h1>
           <span className="text-sm text-gray-500">
-            Branch {session.current_branch_index + 1} of {activeBranches.length} —{" "}
-            <span className="font-medium text-gray-700">{currentBranch.branch_label}</span>
+            <span className="font-medium text-gray-700">{currentPhaseName}</span>
+            {totalInPhase > 1 && (
+              <span className="ml-1 text-gray-400">
+                {phasePosition} of {totalInPhase}
+              </span>
+            )}
           </span>
         </div>
-        {/* Branch progress bar */}
+
+        {/* Phase progress bar */}
         <div className="max-w-5xl mx-auto mt-3">
-          <div className="flex gap-1.5">
-            {activeBranches.map((branch, idx) => (
-              <div
-                key={branch.branch_id}
-                className={`h-1 flex-1 rounded-full transition-colors ${
-                  idx < session.current_branch_index
-                    ? "bg-blue-500"
-                    : idx === session.current_branch_index
-                    ? "bg-blue-300"
-                    : "bg-gray-200"
-                }`}
-              />
-            ))}
+          <div className="flex gap-1.5 items-end">
+            {visiblePhases.map((phase, idx) => {
+              const isCompleted = idx < currentPhaseIdx;
+              const isCurrent   = idx === currentPhaseIdx;
+              return (
+                <div key={phase.label} className="flex flex-col items-center gap-1 flex-1">
+                  <div
+                    className={`h-1 w-full rounded-full transition-colors duration-300 ${
+                      isCompleted
+                        ? "bg-blue-500"
+                        : isCurrent
+                        ? "bg-blue-300"
+                        : "bg-gray-200"
+                    }`}
+                  />
+                  <span
+                    className={`text-[10px] leading-tight font-medium transition-colors hidden sm:block ${
+                      isCompleted
+                        ? "text-blue-500"
+                        : isCurrent
+                        ? "text-blue-400"
+                        : "text-gray-300"
+                    }`}
+                  >
+                    {phase.label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </header>
@@ -384,11 +477,32 @@ export default function InterviewPage() {
           ) : null}
         </div>
 
-        {/* Sidebar checklist */}
+        {/* Desktop sidebar checklist */}
         <aside className="hidden lg:block w-72 flex-shrink-0">
-          <RunningChecklist checklist={session.checklist} taxonomyNodes={taxonomyNodes} />
+          <RunningChecklist
+            checklist={session.checklist}
+            taxonomyNodes={taxonomyNodes}
+            newItemIds={newItemIds}
+          />
         </aside>
       </main>
+
+      {/* Mobile floating checklist badge — visible below lg breakpoint, only when items exist */}
+      {checklistCount > 0 && (
+        <div className="fixed bottom-5 right-5 lg:hidden z-50">
+          <div
+            key={checklistCount}
+            className="flex items-center gap-2 bg-blue-600 text-white pl-3 pr-4 py-2.5 rounded-full shadow-lg animate-badge-pop"
+          >
+            <span className="w-5 h-5 flex items-center justify-center bg-white text-blue-600 rounded-full text-xs font-bold flex-shrink-0">
+              {checklistCount}
+            </span>
+            <span className="text-sm font-medium">
+              item{checklistCount !== 1 ? "s" : ""} found
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

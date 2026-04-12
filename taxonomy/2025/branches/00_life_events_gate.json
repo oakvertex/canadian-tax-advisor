@@ -3,7 +3,7 @@
   "branch_label": "Your 2025 Tax Year",
   "branch_order": 0,
   "always_runs": true,
-  "intro": "Let's start by understanding what happened in your 2025 tax year. This helps us focus only on the sections that matter for your situation.",
+  "intro": "Let's start by understanding what happened in your 2025 tax year. This helps us focus only on the sections that matter for your situation. Most users complete this in 8–12 minutes.",
   "screens": [
     {
       "screen_id": "life_events_gate",
