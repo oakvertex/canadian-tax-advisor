@@ -3,7 +3,7 @@
   "branch_label": "Deductions Review",
   "branch_order": 14,
   "always_runs": true,
-  "intro": "Let's do a final sweep of common deductions that apply to most Canadians — charitable donations, medical expenses, carrying charges, and union dues. These are frequently missed or under-claimed.",
+  "intro": "Let's do a final sweep of common deductions that apply to most Canadians — charitable donations, medical expenses, carrying charges, and spousal support. These are frequently missed or under-claimed.",
   "screens": [
     {
       "screen_id": "deductions_gate",
@@ -19,30 +19,7 @@
         { "value": "none",             "label": "None of the above", "exclusive": true }
       ],
       "feedback": {
-        "charitable":       { "message": "" },
-        "medical":          { "message": "" },
-        "carrying_charges": { "message": "" },
-        "support_paid":     { "message": "" },
-        "none":             { "message": "No additional deductions to review." }
-      }
-    },
-    {
-      "screen_id": "deductions_charitable",
-      "screen_type": "single_select",
-      "title": "Did you make charitable donations to registered Canadian charities in 2025?",
-      "question_id": "has_charitable_donations",
-      "instruction": "Donations to registered Canadian charities are eligible for a non-refundable federal credit under ITA s.118.1 — 15% on the first $200 and 29% on amounts above $200 (33% if your income is above the top federal bracket).",
-      "show_if": {
-        "question_id": "deductions_applicable",
-        "operator": "contains",
-        "value": "charitable"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
+        "charitable": {
           "message": "Charitable donation receipts must be from registered Canadian charities. The federal credit is 15% on the first $200 and 29% on amounts above $200 under ITA s.118.1. Spouses can combine donations on one return to maximize the above-$200 rate. Unused donations can be carried forward up to 5 years. First-time donors (no donation claimed in the prior 5 years) qualify for a 25% First-Time Donor Super Credit on up to $1,000 in cash donations.",
           "activates_flag": "has_charitable_donations",
           "checklist_update": {
@@ -54,29 +31,8 @@
             "urgency": "standard"
           }
         },
-        "false": {
-          "message": "No charitable donations noted."
-        }
-      }
-    },
-    {
-      "screen_id": "deductions_medical",
-      "screen_type": "single_select",
-      "title": "Did you pay medical expenses for yourself, your spouse, or your dependents in 2025?",
-      "question_id": "has_medical_expenses",
-      "instruction": "Medical expenses are claimable under ITA s.118.2 as a non-refundable credit on amounts above 3% of net income (or $2,635, whichever is less). The best 12-month period ending in 2025 or 2026 can be used — it does not have to match the calendar year.",
-      "show_if": {
-        "question_id": "deductions_applicable",
-        "operator": "contains",
-        "value": "medical"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
-          "message": "Medical expenses under ITA s.118.2(2) cover a wide range — prescriptions, dental, vision, physiotherapy, ambulance, home modifications for disability, private health insurance premiums, and many other items. The eligible list is extensive. Only amounts above 3% of your net income (minimum $2,635 in 2025) generate a credit. Pooling all family medical expenses on the lower-income spouse's return often maximizes the claim.",
+        "medical": {
+          "message": "Medical expenses under ITA s.118.2(2) cover a wide range — prescriptions, dental, vision, physiotherapy, ambulance, home modifications for disability, private health insurance premiums, and many other items. Only amounts above 3% of your net income (minimum $2,635 in 2025) generate a credit. Pooling all family medical expenses on the lower-income spouse's return often maximizes the claim.",
           "activates_flag": "has_medical_expenses",
           "checklist_update": {
             "node_id": "credit_medical_expenses",
@@ -91,28 +47,7 @@
             "urgency": "standard"
           }
         },
-        "false": {
-          "message": "No medical expenses noted."
-        }
-      }
-    },
-    {
-      "screen_id": "deductions_carrying_charges",
-      "screen_type": "single_select",
-      "title": "Did you pay interest on money borrowed to earn investment income, or pay investment management fees in 2025?",
-      "question_id": "has_carrying_charges",
-      "instruction": "Carrying charges and interest on money borrowed to earn income are deductible under ITA s.20(1)(c) and s.20(1)(bb). This includes interest on investment loans and fees paid for investment advice on taxable accounts.",
-      "show_if": {
-        "question_id": "deductions_applicable",
-        "operator": "contains",
-        "value": "carrying_charges"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
+        "carrying_charges": {
           "message": "Interest on money borrowed to earn investment income is deductible under ITA s.20(1)(c) — for example, a loan used to purchase stocks, bonds, or a rental property. Investment management fees on taxable accounts (not RRSPs, TFSAs, or RRIFs) are deductible under ITA s.20(1)(bb). Fees on registered accounts are not deductible.",
           "checklist_update": {
             "node_id": "deduction_carrying_charges",
@@ -123,29 +58,8 @@
             "urgency": "standard"
           }
         },
-        "false": {
-          "message": "No carrying charges noted."
-        }
-      }
-    },
-    {
-      "screen_id": "deductions_support_paid",
-      "screen_type": "single_select",
-      "title": "Did you pay spousal support under a court order or written agreement in 2025 that has not already been captured?",
-      "question_id": "support_paid_review",
-      "instruction": "This is a catch-all for taxpayers who did not go through the Marital Status branch but still make support payments.",
-      "show_if": {
-        "question_id": "deductions_applicable",
-        "operator": "contains",
-        "value": "support_paid"
-      },
-      "options": [
-        { "value": true,  "label": "Yes — I made spousal support payments in 2025" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
-          "message": "Spousal support paid periodically pursuant to a court order or written agreement is deductible under ITA s.60(b). Lump sum payments are generally not deductible. Bring your agreement and proof of payments made.",
+        "support_paid": {
+          "message": "Spousal support paid periodically pursuant to a court order or written agreement is deductible under ITA s.60(b). Lump sum payments are generally not deductible. Bring your agreement and proof of all payments made in 2025.",
           "checklist_update": {
             "node_id": "deduction_spousal_support_paid",
             "confidence_tier": "confirmed"
@@ -155,9 +69,7 @@
             "urgency": "priority"
           }
         },
-        "false": {
-          "message": "No support payments noted."
-        }
+        "none": { "message": "No additional deductions to review." }
       }
     },
     {
