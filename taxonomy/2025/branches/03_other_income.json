@@ -23,34 +23,7 @@
         { "value": "none",             "label": "None of the above", "exclusive": true }
       ],
       "feedback": {
-        "cpp_oas":          { "message": "" },
-        "employer_pension": { "message": "" },
-        "foreign_pension":  { "message": "" },
-        "ei":               { "message": "" },
-        "rrsp_withdrawal":  { "message": "" },
-        "support_received": { "message": "" },
-        "investments":      { "message": "" },
-        "rental":           { "message": "" },
-        "none":             { "message": "No other income sources noted. Moving on." }
-      }
-    },
-    {
-      "screen_id": "other_income_cpp_oas",
-      "screen_type": "single_select",
-      "title": "Did you receive CPP or OAS payments in 2025?",
-      "question_id": "receives_cpp_oas",
-      "instruction": "CPP and OAS are taxable income under ITA s.56(1)(a). You will receive a T4A(P) for CPP and a T4A(OAS) for OAS. CPP disability benefits received at any age are included here.",
-      "show_if": {
-        "question_id": "other_income_types",
-        "operator": "contains",
-        "value": "cpp_oas"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
+        "cpp_oas": {
           "message": "CPP and OAS are taxable under ITA s.56(1)(a). T4A(P) and T4A(OAS) slips are issued by Service Canada by late February. Up to 50% of CPP income may be assigned to a spouse for tax purposes under ITA s.60.03 — your preparer can model whether splitting is beneficial.",
           "activates_flag": "receives_cpp",
           "checklist_update": {
@@ -62,29 +35,8 @@
             "urgency": "priority"
           }
         },
-        "false": {
-          "message": "No CPP or OAS income noted."
-        }
-      }
-    },
-    {
-      "screen_id": "other_income_employer_pension",
-      "screen_type": "single_select",
-      "title": "Did you receive pension payments from a former employer's registered pension plan in 2025?",
-      "question_id": "receives_employer_pension",
-      "instruction": "This includes defined benefit (DB) and defined contribution (DC) pension payments. You will receive a T4A slip. This is considered eligible pension income under ITA s.118(3).",
-      "show_if": {
-        "question_id": "other_income_types",
-        "operator": "contains",
-        "value": "employer_pension"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
-          "message": "Employer registered pension income is taxable under ITA s.56(1)(a) and reported on a T4A slip. It qualifies as eligible pension income for the Pension Income Credit under ITA s.118(3) — worth up to $2,000 federally. Up to 50% may be allocated to a spouse under ITA s.60.03 if both are 65 or older, or if you are receiving pension payments from a registered pension plan at any age.",
+        "employer_pension": {
+          "message": "Employer registered pension income is taxable under ITA s.56(1)(a) and reported on a T4A slip. It qualifies as eligible pension income for the Pension Income Credit under ITA s.118(3) — worth up to $2,000 federally. Up to 50% may be allocated to a spouse under ITA s.60.03 if both are 65 or older, or if you are receiving payments from a registered pension plan at any age.",
           "activates_flag": "receives_eligible_pension",
           "checklist_update": {
             "node_id": "income_employer_pension",
@@ -95,28 +47,7 @@
             "urgency": "priority"
           }
         },
-        "false": {
-          "message": "No employer pension income noted."
-        }
-      }
-    },
-    {
-      "screen_id": "other_income_foreign_pension",
-      "screen_type": "single_select",
-      "title": "Did you receive pension income from another country in 2025?",
-      "question_id": "receives_foreign_pension",
-      "instruction": "Includes pensions from a former employer abroad, government pensions from another country, or US Social Security. All foreign pension income is taxable in Canada under ITA s.56(1)(a) and must be converted to Canadian dollars.",
-      "show_if": {
-        "question_id": "other_income_types",
-        "operator": "contains",
-        "value": "foreign_pension"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
+        "foreign_pension": {
           "message": "Foreign pension income is taxable in Canada under ITA s.56(1)(a) at the Bank of Canada annual average exchange rate. Tax treaties with the source country may reduce foreign withholding tax, and a Foreign Tax Credit under ITA s.126(1) offsets taxes paid abroad to avoid double taxation. US Social Security is taxable at 85% of benefits received under the Canada-US Tax Treaty.",
           "activates_flag": "receives_foreign_pension",
           "checklist_update": {
@@ -128,29 +59,8 @@
             "urgency": "priority"
           }
         },
-        "false": {
-          "message": "No foreign pension income noted."
-        }
-      }
-    },
-    {
-      "screen_id": "other_income_ei",
-      "screen_type": "single_select",
-      "title": "Did you receive Employment Insurance (EI) benefits in 2025?",
-      "question_id": "receives_ei",
-      "instruction": "Includes regular EI, maternity, parental, sickness, compassionate care, and fishing benefits. All EI is taxable under ITA s.56(1)(a)(iv). You will receive a T4E slip.",
-      "show_if": {
-        "question_id": "other_income_types",
-        "operator": "contains",
-        "value": "ei"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
-          "message": "EI benefits are taxable under ITA s.56(1)(a)(iv) and reported on a T4E slip. If your net income exceeds $79,000 in 2025 you may be required to repay a portion under ITA s.145 — this is called the EI social benefits repayment and appears on Schedule 1. If you collected EI in any of the prior 10 years your preparer should verify whether the repayment rule applies.",
+        "ei": {
+          "message": "EI benefits are taxable under ITA s.56(1)(a)(iv) and reported on a T4E slip. If your net income exceeds $79,000 in 2025 you may be required to repay a portion under ITA s.145 — this is the EI social benefits repayment and appears on Schedule 1.",
           "activates_flag": "received_ei",
           "checklist_update": {
             "node_id": "income_ei_benefits",
@@ -161,27 +71,43 @@
             "urgency": "priority"
           }
         },
-        "false": {
-          "message": "No EI benefits noted."
-        }
+        "rrsp_withdrawal": { "message": "" },
+        "support_received": { "message": "" },
+        "investments":      { "message": "" },
+        "rental": {
+          "message": "Rental income is taxable as property income under ITA s.9(1). Eligible expenses deductible under ITA s.18(1)(a) include mortgage interest (not principal), property tax, insurance, repairs and maintenance, and utilities you paid. If you rent part of your principal residence, the change-in-use rules under ITA s.45(1) may affect your future principal residence exemption — discuss with your preparer before filing.",
+          "activates_flag": "has_rental_income",
+          "checklist_update": {
+            "node_id": "income_rental",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "Rental income and expense records for 2025 — mortgage statement, property tax bill, insurance, receipts for all repairs and eligible expenses",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "Confirm if rental property is part of principal residence — partial rental may affect principal residence exemption under ITA s.45(1) on future sale",
+            "urgency": "priority"
+          }
+        },
+        "none": { "message": "No other income sources noted. Moving on." }
       }
     },
     {
       "screen_id": "other_income_rrsp_withdrawal",
       "screen_type": "single_select",
-      "title": "Did you withdraw any funds from an RRSP in 2025?",
+      "title": "What type of RRSP withdrawal did you make in 2025?",
       "question_id": "rrsp_withdrawal",
-      "instruction": "Any RRSP withdrawal — other than under the Home Buyers Plan or Lifelong Learning Plan — is fully taxable as income in the year received under ITA s.56(1)(h). Withholding tax is deducted at source but may not cover your full liability.",
+      "instruction": "Regular withdrawals are fully taxable as income in the year received under ITA s.56(1)(h). Withdrawals under the Home Buyers Plan or Lifelong Learning Plan follow different rules.",
       "show_if": {
         "question_id": "other_income_types",
         "operator": "contains",
         "value": "rrsp_withdrawal"
       },
       "options": [
-        { "value": "yes_regular", "label": "Yes — a regular withdrawal" },
-        { "value": "yes_hbp",     "label": "Yes — under the Home Buyers Plan (HBP)" },
-        { "value": "yes_llp",     "label": "Yes — under the Lifelong Learning Plan (LLP)" },
-        { "value": false,         "label": "No withdrawals in 2025" }
+        { "value": "yes_regular", "label": "A regular withdrawal" },
+        { "value": "yes_hbp",     "label": "Under the Home Buyers Plan (HBP)" },
+        { "value": "yes_llp",     "label": "Under the Lifelong Learning Plan (LLP)" }
       ],
       "feedback": {
         "yes_regular": {
@@ -196,7 +122,7 @@
           }
         },
         "yes_hbp": {
-          "message": "HBP withdrawals up to $35,000 are not taxable when used to purchase a qualifying first home under ITA s.146.01. However, annual repayments to your RRSP are required starting the second calendar year after the first withdrawal year. Missed repayments are added to your income for that year. We will cover this in the First Home Purchase section.",
+          "message": "HBP withdrawals up to $35,000 are not taxable when used to purchase a qualifying first home under ITA s.146.01. Annual repayments to your RRSP are required starting the second calendar year after the first withdrawal year. Missed repayments are added to your income for that year. We will cover this in the First Home Purchase section.",
           "activates_flag": "hbp_active",
           "checklist_update": {
             "node_id": "income_hbp_repayment",
@@ -212,16 +138,13 @@
             "confidence_tier": "possible",
             "reason": "fact_dependent"
           }
-        },
-        "false": {
-          "message": "No RRSP withdrawals noted."
         }
       }
     },
     {
       "screen_id": "other_income_support_received",
       "screen_type": "single_select",
-      "title": "Did you receive spousal or child support payments in 2025?",
+      "title": "What type of support payments did you receive in 2025?",
       "question_id": "support_received",
       "instruction": "Spousal support received is taxable under ITA s.56(1)(b) if paid periodically under a court order or written agreement. Child support received under agreements after May 1, 1997 is not taxable.",
       "show_if": {
@@ -230,10 +153,9 @@
         "value": "support_received"
       },
       "options": [
-        { "value": "spousal_only", "label": "Yes — spousal support only" },
-        { "value": "child_only",   "label": "Yes — child support only" },
-        { "value": "both",         "label": "Yes — both spousal and child support" },
-        { "value": false,          "label": "No" }
+        { "value": "spousal_only", "label": "Spousal support only" },
+        { "value": "child_only",   "label": "Child support only" },
+        { "value": "both",         "label": "Both spousal and child support" }
       ],
       "feedback": {
         "spousal_only": {
@@ -265,16 +187,13 @@
             "document": "Separation agreement or court order clearly showing spousal vs child support breakdown and proof of all payments received",
             "urgency": "priority"
           }
-        },
-        "false": {
-          "message": "No support payments received noted."
         }
       }
     },
     {
       "screen_id": "other_income_investments",
       "screen_type": "multi_select",
-      "title": "Did you receive any investment income outside a registered account in 2025?",
+      "title": "Which types of investment income did you receive outside a registered account in 2025?",
       "question_id": "investment_income_types",
       "instruction": "Select all that apply. Exclude amounts earned inside a TFSA, RRSP, or RRIF — those are sheltered from current tax. Outside registered accounts, all investment income is reportable.",
       "show_if": {
@@ -341,43 +260,6 @@
         },
         "none": {
           "message": "No investment income outside registered accounts noted."
-        }
-      }
-    },
-    {
-      "screen_id": "other_income_rental",
-      "screen_type": "single_select",
-      "title": "Did you earn rental income in 2025?",
-      "question_id": "has_rental_income",
-      "instruction": "Includes renting a room, basement suite, or entire property. Short-term rentals such as Airbnb also qualify. Rental income is property income under ITA s.9(1), not employment income.",
-      "show_if": {
-        "question_id": "other_income_types",
-        "operator": "contains",
-        "value": "rental"
-      },
-      "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
-      ],
-      "feedback": {
-        "true": {
-          "message": "Rental income is taxable as property income under ITA s.9(1). Eligible rental expenses deductible under ITA s.18(1)(a) include: mortgage interest (not principal), property tax, insurance, repairs and maintenance, utilities paid by you, and a portion of your own home expenses if renting a portion of your principal residence. Note: if you rent part of your principal residence, the change-in-use rules under ITA s.45(1) may affect your future principal residence exemption — discuss with your preparer before filing.",
-          "activates_flag": "has_rental_income",
-          "checklist_update": {
-            "node_id": "income_rental",
-            "confidence_tier": "confirmed"
-          },
-          "document_checklist_add": {
-            "document": "Rental income and expense records for 2025 — mortgage statement, property tax bill, insurance, receipts for all repairs and eligible expenses",
-            "urgency": "priority"
-          },
-          "preparer_flag": {
-            "flag": "Confirm if rental property is part of principal residence — partial rental may affect principal residence exemption under ITA s.45(1) on future sale",
-            "urgency": "priority"
-          }
-        },
-        "false": {
-          "message": "No rental income noted."
         }
       }
     }
