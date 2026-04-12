@@ -294,7 +294,7 @@ export default function InterviewPage() {
 
     // Derive newly added checklist items and schedule their animation
     const nextIds = new Set(updated.checklist.map((i) => i.node_id));
-    const added = new Set([...nextIds].filter((id) => !prevIds.has(id)));
+    const added = new Set(Array.from(nextIds).filter((id) => !prevIds.has(id)));
     setNewItemIds(added);
     // Clear new-item highlights after animation completes (400ms + buffer)
     if (added.size > 0) {
