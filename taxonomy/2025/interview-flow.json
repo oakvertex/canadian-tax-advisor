@@ -11,7 +11,7 @@
         "screen_type": "multi_select",
         "title": "Which of the following happened in 2025?",
         "question_id": "life_events",
-        "instruction": "Select all that apply. Don't worry if you are unsure — we'll ask follow-up questions for each. We'll cover standard items like RRSP, TFSA, and common credits regardless of your selections.",
+        "instruction": "Don't worry if you are unsure — we'll ask follow-up questions for each. We'll cover standard items like RRSP, TFSA, and common credits regardless of your selections.",
         "options": [
           {
             "value": "life_event_moved",
@@ -670,7 +670,7 @@
         "screen_type": "multi_select",
         "title": "Did you pay any of these work-related expenses out of pocket in 2025?",
         "question_id": "other_employment_expenses",
-        "instruction": "Select all that apply. These must be unreimbursed costs you were required to incur as a condition of employment. Each type has specific rules under ITA s.8(1).",
+        "instruction": "These must be unreimbursed costs you were required to incur as a condition of employment. Each type has specific rules under ITA s.8(1).",
         "skip_if": {
           "question_id": "t4_count",
           "operator": "equals",
@@ -760,7 +760,7 @@
         "screen_type": "multi_select",
         "title": "Did you receive any of the following types of income in 2025?",
         "question_id": "other_income_types",
-        "instruction": "Select all that apply. We will only ask for details on what you received. Select \"None of the above\" if none apply.",
+        "instruction": "We will only ask for details on what you received. Select \"None of the above\" if none apply.",
         "options": [
           {
             "value": "cpp_oas",
@@ -999,7 +999,7 @@
         "screen_type": "multi_select",
         "title": "Which types of investment income did you receive outside a registered account in 2025?",
         "question_id": "investment_income_types",
-        "instruction": "Select all that apply. Exclude amounts earned inside a TFSA, RRSP, or RRIF — those are sheltered from current tax. Outside registered accounts, all investment income is reportable.",
+        "instruction": "Exclude amounts earned inside a TFSA, RRSP, or RRIF — those are sheltered from current tax. Outside registered accounts, all investment income is reportable.",
         "show_if": {
           "question_id": "other_income_types",
           "operator": "contains",
@@ -1925,7 +1925,7 @@
         "screen_type": "multi_select",
         "title": "Which of the following describes your children or dependents in 2025?",
         "question_id": "dependent_profile",
-        "instruction": "Select all that apply. This determines which deductions and credits are available to you.",
+        "instruction": "This determines which deductions and credits are available to you.",
         "options": [
           {
             "value": "child_under_7",
@@ -2434,7 +2434,7 @@
         "screen_type": "multi_select",
         "title": "Which of the following describes your self-employment in 2025?",
         "question_id": "business_type",
-        "instruction": "Select all that apply. Different business structures have different reporting requirements on your T1.",
+        "instruction": "Different business structures have different reporting requirements on your T1.",
         "options": [
           {
             "value": "sole_proprietor",
@@ -2907,7 +2907,7 @@
         "screen_type": "multi_select",
         "title": "Which retirement income sources did you receive in 2025?",
         "question_id": "retirement_income_types",
-        "instruction": "Select all that apply. Each source has specific reporting requirements and potential planning opportunities.",
+        "instruction": "Each source has specific reporting requirements and potential planning opportunities.",
         "options": [
           {
             "value": "cpp",
@@ -3223,7 +3223,7 @@
         "screen_type": "multi_select",
         "title": "Who attended post-secondary education in 2025?",
         "question_id": "student_profile",
-        "instruction": "Select all that apply. Tuition credits can be used by the student, transferred to a supporting parent or grandparent, or carried forward.",
+        "instruction": "Tuition credits can be used by the student, transferred to a supporting parent or grandparent, or carried forward.",
         "options": [
           {
             "value": "self",
@@ -3876,7 +3876,7 @@
         "screen_type": "multi_select",
         "title": "Who has the disability?",
         "question_id": "disability_who",
-        "instruction": "Select all that apply. Different rules apply depending on whether it is you, your spouse, or a dependent.",
+        "instruction": "Different rules apply depending on whether it is you, your spouse, or a dependent.",
         "options": [
           {
             "value": "self",
@@ -4543,7 +4543,7 @@
         "screen_type": "multi_select",
         "title": "Did any of the following apply to you in 2025?",
         "question_id": "deductions_applicable",
-        "instruction": "Select all that apply. We will only ask for details on what is relevant to you.",
+        "instruction": "We will only ask for details on what is relevant to you.",
         "options": [
           {
             "value": "charitable",
@@ -4681,7 +4681,7 @@
         "screen_type": "multi_select",
         "title": "Which of the following applied to you in 2025?",
         "question_id": "ontario_credits_gate",
-        "instruction": "Select all that apply. We'll collect the details we need based on your selections.",
+        "instruction": "We'll collect the details we need based on your selections.",
         "show_if": {
           "flag": "ontario_credits_eligible",
           "operator": "equals",

@@ -10,7 +10,7 @@
       "screen_type": "multi_select",
       "title": "Did any of the following apply to you in 2025?",
       "question_id": "deductions_applicable",
-      "instruction": "Select all that apply. We will only ask for details on what is relevant to you.",
+      "instruction": "We will only ask for details on what is relevant to you.",
       "options": [
         { "value": "charitable",       "label": "Made donations to registered Canadian charities" },
         { "value": "medical",          "label": "Paid medical expenses for yourself, spouse, or dependents" },

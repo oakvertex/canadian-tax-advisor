@@ -11,7 +11,7 @@
       "screen_type": "multi_select",
       "title": "Which of the following describes your self-employment in 2025?",
       "question_id": "business_type",
-      "instruction": "Select all that apply. Different business structures have different reporting requirements on your T1.",
+      "instruction": "Different business structures have different reporting requirements on your T1.",
       "options": [
         { "value": "sole_proprietor", "label": "Sole proprietor — operating under my own name or a business name" },
         { "value": "partnership",     "label": "Partnership — sharing the business with one or more partners" },

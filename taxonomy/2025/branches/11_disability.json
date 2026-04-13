@@ -11,7 +11,7 @@
       "screen_type": "multi_select",
       "title": "Who has the disability?",
       "question_id": "disability_who",
-      "instruction": "Select all that apply. Different rules apply depending on whether it is you, your spouse, or a dependent.",
+      "instruction": "Different rules apply depending on whether it is you, your spouse, or a dependent.",
       "options": [
         { "value": "self",             "label": "I have a disability" },
         { "value": "spouse",           "label": "My spouse or common-law partner has a disability" },

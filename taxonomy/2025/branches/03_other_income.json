@@ -10,7 +10,7 @@
       "screen_type": "multi_select",
       "title": "Did you receive any of the following types of income in 2025?",
       "question_id": "other_income_types",
-      "instruction": "Select all that apply. We will only ask for details on what you received. Select \"None of the above\" if none apply.",
+      "instruction": "We will only ask for details on what you received. Select \"None of the above\" if none apply.",
       "options": [
         { "value": "cpp_oas",          "label": "CPP or OAS benefits" },
         { "value": "employer_pension", "label": "Pension from a former employer's registered plan" },
@@ -195,7 +195,7 @@
       "screen_type": "multi_select",
       "title": "Which types of investment income did you receive outside a registered account in 2025?",
       "question_id": "investment_income_types",
-      "instruction": "Select all that apply. Exclude amounts earned inside a TFSA, RRSP, or RRIF — those are sheltered from current tax. Outside registered accounts, all investment income is reportable.",
+      "instruction": "Exclude amounts earned inside a TFSA, RRSP, or RRIF — those are sheltered from current tax. Outside registered accounts, all investment income is reportable.",
       "show_if": {
         "question_id": "other_income_types",
         "operator": "contains",

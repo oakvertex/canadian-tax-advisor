@@ -10,7 +10,7 @@
       "screen_type": "multi_select",
       "title": "Which of the following applied to you in 2025?",
       "question_id": "ontario_credits_gate",
-      "instruction": "Select all that apply. We'll collect the details we need based on your selections.",
+      "instruction": "We'll collect the details we need based on your selections.",
       "show_if": {
         "flag": "ontario_credits_eligible",
         "operator": "equals",

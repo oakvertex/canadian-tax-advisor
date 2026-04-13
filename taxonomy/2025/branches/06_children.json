@@ -11,7 +11,7 @@
       "screen_type": "multi_select",
       "title": "Which of the following describes your children or dependents in 2025?",
       "question_id": "dependent_profile",
-      "instruction": "Select all that apply. This determines which deductions and credits are available to you.",
+      "instruction": "This determines which deductions and credits are available to you.",
       "options": [
         { "value": "child_under_7",    "label": "Child under 7 years old at December 31, 2025" },
         { "value": "child_7_to_16",    "label": "Child aged 7 to 16 at December 31, 2025" },

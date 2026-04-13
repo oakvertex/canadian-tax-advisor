@@ -10,7 +10,7 @@
       "screen_type": "multi_select",
       "title": "Which of the following happened in 2025?",
       "question_id": "life_events",
-      "instruction": "Select all that apply. Don't worry if you are unsure — we'll ask follow-up questions for each. We'll cover standard items like RRSP, TFSA, and common credits regardless of your selections.",
+      "instruction": "Don't worry if you are unsure — we'll ask follow-up questions for each. We'll cover standard items like RRSP, TFSA, and common credits regardless of your selections.",
       "options": [
         { "value": "life_event_moved",            "label": "I moved to a new city or province",             "exclusive": false },
         { "value": "life_event_changed_job",       "label": "I changed jobs or started a new job",          "exclusive": false },

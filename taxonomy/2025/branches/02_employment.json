@@ -291,7 +291,7 @@
       "screen_type": "multi_select",
       "title": "Did you pay any of these work-related expenses out of pocket in 2025?",
       "question_id": "other_employment_expenses",
-      "instruction": "Select all that apply. These must be unreimbursed costs you were required to incur as a condition of employment. Each type has specific rules under ITA s.8(1).",
+      "instruction": "These must be unreimbursed costs you were required to incur as a condition of employment. Each type has specific rules under ITA s.8(1).",
       "skip_if": {
         "question_id": "t4_count",
         "operator": "equals",

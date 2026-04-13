@@ -11,7 +11,7 @@
       "screen_type": "multi_select",
       "title": "Who attended post-secondary education in 2025?",
       "question_id": "student_profile",
-      "instruction": "Select all that apply. Tuition credits can be used by the student, transferred to a supporting parent or grandparent, or carried forward.",
+      "instruction": "Tuition credits can be used by the student, transferred to a supporting parent or grandparent, or carried forward.",
       "options": [
         { "value": "self",        "label": "I attended a qualifying post-secondary program" },
         { "value": "spouse",      "label": "My spouse or common-law partner attended" },

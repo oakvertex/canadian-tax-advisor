@@ -11,7 +11,7 @@
       "screen_type": "multi_select",
       "title": "Which retirement income sources did you receive in 2025?",
       "question_id": "retirement_income_types",
-      "instruction": "Select all that apply. Each source has specific reporting requirements and potential planning opportunities.",
+      "instruction": "Each source has specific reporting requirements and potential planning opportunities.",
       "options": [
         { "value": "cpp",              "label": "Canada Pension Plan (CPP) or CPP2 benefits" },
         { "value": "oas",              "label": "Old Age Security (OAS)" },
