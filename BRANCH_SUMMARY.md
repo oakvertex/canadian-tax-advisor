@@ -27,6 +27,7 @@ Last full rebuild: April 2026.
 To rebuild after any branch edit: npx tsx scripts/buildInterviewFlow.ts
 
 UX improvement sprint: Pass 1 COMPLETE. Pass 2 COMPLETE. Pass 3 (UI layer) PENDING.
+Registered plan coverage audit: COMPLETE (April 2026) — see DECISIONS.md.
 See DECISIONS.md → UX Improvement Sprint for full scope and Pass 3 remaining work.
 
 ## Life Event Options (Screen 0 — Life Events Gate)
@@ -61,7 +62,7 @@ See DECISIONS.md → UX Improvement Sprint for full scope and Pass 3 remaining w
 | 10 — First Home | ITA s.118.05, s.146.01, s.146.6 |
 | 11 — Disability | ITA s.64, s.118.2(2), s.118.3, s.118.3(2), s.146.4 |
 | 12 — Age Milestones | ITA s.118(2), s.146(2)(b.4), s.146.3, s.207.02 |
-| 13 — Savings & Registered Plans | ITA s.146(1), s.146(8.3), s.146.6, s.204.1 |
+| 13 — Savings & Registered Plans | ITA s.146(1), s.146(8.3), s.146.01, s.146.02, s.146.1(7), s.146.6, s.204.1 |
 | 14 — Deductions Review | ITA s.20(1)(c), s.20(1)(bb), s.60(b), s.118.1, s.118.2 |
 | 15 — Credits Review | ITA s.118.06, s.118.07, s.122.5, s.122.7, s.180.2, s.233.3; OTA s.103.1, s.103.4, s.104.1 |
 
@@ -79,10 +80,10 @@ See DECISIONS.md → UX Improvement Sprint for full scope and Pass 3 remaining w
 | 7 | selfemploy_business_type, selfemploy_revenue_range, selfemploy_books_records, selfemploy_home_office, selfemploy_vehicle, selfemploy_employees, selfemploy_cpp |
 | 8 | retirement_income_sources, retirement_pension_splitting, retirement_age_amount, retirement_oas_clawback, retirement_rrif_conversion |
 | 9 | education_who_is_student, education_tuition_receipts, education_carryforward, education_transfer_decision, education_canada_training_credit, education_student_loan_interest, education_resp_withdrawal |
-| 10 | first_home_confirmed_buyer, first_home_first_time_buyer, first_home_buyers_amount, first_home_hbp, first_home_fhsa, first_home_new_construction |
+| 10 | first_home_confirmed_buyer, first_home_first_time_buyer, first_home_buyers_amount, first_home_hbp, first_home_fhsa [SIMPLIFIED: withdrawal-only, question_id: fhsa_withdrawal_used, show_if: purchased_home_2025=true — contribution deduction ownership moved to Branch 13 savings_fhsa], first_home_new_construction |
 | 11 | disability_who_affected, disability_dtc_status, disability_attendant_care, disability_rdsp, disability_medical_expenses |
 | 12 | age_milestone_which, age_milestone_tfsa_18, age_milestone_oas_65, age_milestone_rrsp_final_contribution, age_milestone_rrif_minimum |
-| 13 | savings_rrsp_contributed, savings_rrsp_deduction_timing [show_if: rrsp_contributed=true — FIXED], savings_spousal_rrsp, savings_tfsa |
+| 13 | savings_rrsp_contributed, savings_rrsp_deduction_timing [show_if: rrsp_contributed=true], savings_spousal_rrsp, savings_fhsa [question_id: fhsa_savings_status — always shown], savings_resp [skip_if: taxpayer_is_student=true — student path: income_resp_eap confirmed + taxpayer_is_student flag set; subscriber path: preparer coordination flag only], savings_prior_obligations [multi_select: hbp_repayment, llp_repayment — no skip condition] — ~~savings_tfsa~~ [REMOVED: no T1 output; over-contribution warning retained in completion summary] |
 | 14 | deductions_gate [GATE — multi_select], deductions_prior_year_noa [always shown] — charitable, medical, carrying_charges, and support_paid handled inline in gate feedback (no separate screens) |
 | 15 | credits_ontario_trillium, credits_senior_homeowners, credits_foreign_income_verification, credits_volunteer_firefighter — ~~credits_cwb~~ [REMOVED: derived from employment_income_range] ~~credits_lift~~ [REMOVED: derived from employment_income_range] |
 
@@ -99,6 +100,9 @@ Screen education_who_is_student (multi_select):
 - "child"  → dependent_is_student + tuition_transfer_decision
 Downstream screens gated by show_if on individual student flags.
 tuition_transfer_decision triggers a planning note: transfer vs carryforward modelling.
+
+Note: taxpayer_is_student can also be set by savings_resp in Branch 13 (student path)
+for mature students who receive RESP EAPs without having flagged life_event_education.
 
 ## Ontario Credits — Trigger Conditions (Branch 15)
 | Screen | Trigger |

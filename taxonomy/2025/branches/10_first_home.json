@@ -38,8 +38,8 @@
         "value": true
       },
       "options": [
-        { "value": true,  "label": "Yes — neither I nor my spouse owned a principal residence in 2021–2025" },
-        { "value": false, "label": "No — one of us owned a principal residence during that period" },
+        { "value": true,    "label": "Yes — neither I nor my spouse owned a principal residence in 2021–2025" },
+        { "value": false,   "label": "No — one of us owned a principal residence during that period" },
         { "value": "unsure","label": "I am not sure" }
       ],
       "feedback": {
@@ -89,7 +89,7 @@
       ],
       "feedback": {
         "true": {
-          "message": "First Home Buyers' Amount added. Claim $10,000 on Line 31270 of your T1. If you have a spouse, you may split the $10,000 between your two returns in any proportion \u2014 your preparer can optimize the split.",
+          "message": "First Home Buyers' Amount added. Claim $10,000 on Line 31270 of your T1. If you have a spouse, you may split the $10,000 between your two returns in any proportion \u2014 your preparer can optimise the split.",
           "checklist_update": {
             "node_id": "credit_first_home_buyers_amount",
             "confidence_tier": "confirmed"
@@ -121,9 +121,9 @@
         "value": true
       },
       "options": [
-        { "value": true,       "label": "Yes — I withdrew from my RRSP under the HBP" },
-        { "value": "plan_to",  "label": "I plan to make an HBP withdrawal for this purchase" },
-        { "value": false,      "label": "No" }
+        { "value": true,      "label": "Yes — I withdrew from my RRSP under the HBP" },
+        { "value": "plan_to", "label": "I plan to make an HBP withdrawal for this purchase" },
+        { "value": false,     "label": "No" }
       ],
       "feedback": {
         "true": {
@@ -135,7 +135,7 @@
             "reason": "fact_dependent"
           },
           "document_checklist_add": {
-            "document": "T4RSP slip showing HBP RRSP withdrawal amount — confirm Home Buyers Plan designation on the withdrawal",
+            "document": "T4RSP slip showing HBP RRSP withdrawal amount — confirm Home Buyers' Plan designation on the withdrawal",
             "urgency": "priority"
           },
           "preparer_flag": {
@@ -159,50 +159,33 @@
     {
       "screen_id": "first_home_fhsa",
       "screen_type": "single_select",
-      "title": "Did you have a First Home Savings Account (FHSA) in 2025?",
-      "question_id": "fhsa_status",
-      "instruction": "The FHSA under ITA s.146.6 allows first-time buyers to contribute up to $8,000 per year (lifetime maximum $40,000) with contributions tax-deductible and qualifying withdrawals tax-free.",
+      "title": "Did you make a qualifying FHSA withdrawal to fund this home purchase?",
+      "question_id": "fhsa_withdrawal_used",
+      "instruction": "A qualifying withdrawal under ITA s.146.6 is completely tax-free — no income inclusion and no repayment required. Any FHSA contribution deduction is captured separately in the Savings section.",
+      "show_if": {
+        "flag": "purchased_home_2025",
+        "operator": "equals",
+        "value": true
+      },
       "options": [
-        { "value": "contributed",  "label": "Yes — I contributed to an FHSA in 2025" },
-        { "value": "withdrew",     "label": "Yes — I also made a qualifying withdrawal to purchase my home" },
-        { "value": "opened_only",  "label": "I opened an FHSA in 2025 but did not contribute yet" },
-        { "value": false,          "label": "No FHSA" }
+        { "value": true,  "label": "Yes — I withdrew from my FHSA to purchase this home" },
+        { "value": false, "label": "No" }
       ],
       "feedback": {
-        "contributed": {
-          "message": "FHSA contributions are deductible on your 2025 T1 under ITA s.146.6. The annual limit is $8,000 with a $16,000 first-year limit if you opened the account in 2023 or earlier (unused room carries forward by $8,000 per year). You will receive an FHSA contribution receipt from your financial institution.",
+        "true": {
+          "message": "Qualifying FHSA withdrawal confirmed. The withdrawal is tax-free under ITA s.146.6 — no repayment required and no income to report. You must have been a first-time buyer and the home must close by October 1 of the year following the withdrawal. A T4FHSA slip will be issued confirming the withdrawal amount.",
           "activates_flag": "fhsa_active",
-          "checklist_update": {
-            "node_id": "deduction_fhsa_contribution",
-            "confidence_tier": "confirmed"
-          },
           "document_checklist_add": {
-            "document": "FHSA contribution receipt from financial institution — shows 2025 contributions deductible on T1",
+            "document": "T4FHSA — Statement of First Home Savings Account confirming qualifying withdrawal for home purchase",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "FHSA qualifying withdrawal used for home purchase — confirm first-time buyer status and closing date within required window under ITA s.146.6",
             "urgency": "priority"
           }
-        },
-        "withdrew": {
-          "message": "Qualifying FHSA withdrawals to purchase a first home are completely tax-free under ITA s.146.6 — no inclusion in income and no repayment required. You must have been a first-time buyer and the purchase must close by October 1 of the year following the withdrawal. An FHSA T4FHSA slip will be issued showing the withdrawal.",
-          "activates_flag": "fhsa_active",
-          "checklist_update": {
-            "node_id": "deduction_fhsa_contribution",
-            "confidence_tier": "confirmed"
-          },
-          "document_checklist_add": {
-            "document": "T4FHSA slip — Statement of First Home Savings Account showing contributions and qualifying withdrawal",
-            "urgency": "priority"
-          }
-        },
-        "opened_only": {
-          "message": "Opening an FHSA without contributing still preserves future contribution room. If the account was opened but no contribution made in 2025, no deduction is available for 2025. You can contribute up to $8,000 in 2026 plus carry-forward room.",
-          "activates_flag": "fhsa_active"
         },
         "false": {
-          "message": "No FHSA noted. If you are a first-time buyer under 71 and do not yet own a home, you may still be eligible to open and contribute to an FHSA — even if you have already purchased. Your preparer can advise.",
-          "preparer_flag": {
-            "flag": "Assess FHSA eligibility — client may still qualify to open and deduct contributions if first-time buyer under 71",
-            "urgency": "standard"
-          }
+          "message": "No FHSA withdrawal used for this purchase noted."
         }
       }
     },
@@ -251,7 +234,7 @@
     "highlighted_documents": [
       "Purchase agreement and Statement of Adjustments for home purchase",
       "T4RSP slip if HBP RRSP withdrawal was made",
-      "FHSA contribution receipt or T4FHSA slip",
+      "T4FHSA slip if FHSA qualifying withdrawal was made",
       "Form GST190 — New Housing Rebate application if newly built home"
     ],
     "transition": "Next: Disability."

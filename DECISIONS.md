@@ -210,6 +210,45 @@ in session state without requiring additional screens:
 
 ---
 
+## Registered Plan Coverage Audit — April 2026
+
+Full-branch audit of registered plan screens identified four gaps where T1-relevant
+items were buried in conditional branches that not all filers reach.
+
+### Gaps identified and resolved
+
+| Gap | Root cause | Fix |
+|-----|------------|-----|
+| FHSA contribution deduction (ITA s.146.6) | Only in Branch 10 (triggered by life_event_first_home) — non-purchasing contributors missed $8,000 deduction | Added savings_fhsa to Branch 13 (always_runs) |
+| HBP repayment obligation (ITA s.146.01) | Branch 3 covers current-year withdrawal; no always-run screen for prior-year repayment schedule | Added savings_prior_obligations to Branch 13 |
+| LLP repayment obligation (ITA s.146.02) | Same gap as HBP | Added savings_prior_obligations to Branch 13 |
+| RESP EAP withdrawal | Only in Branch 9 (triggered by life_event_education) — subscribing parents who didn't flag education missed coordination flag | Added savings_resp to Branch 13 |
+| TFSA screen | No T1 output — violated T1 scope discipline | Removed savings_tfsa; over-contribution warning retained in completion summary |
+
+### Key design decisions
+
+- **question_id collision avoided:** Branch 13 savings_fhsa uses question_id
+  `fhsa_savings_status`; Branch 10 first_home_fhsa uses `fhsa_withdrawal_used`.
+  Both coexist in session state without conflict.
+- **Branch 10 first_home_fhsa simplified** to withdrawal-only path (show_if:
+  purchased_home_2025=true). Contribution deduction ownership is now exclusively
+  Branch 13.
+- **savings_prior_obligations has no skip condition** — hbp_active / llp_active
+  flags are idempotent; minor double-confirmation is preferable to a silent gap.
+- **savings_resp is role-aware** — student path sets taxpayer_is_student flag and
+  adds income_resp_eap confirmed to checklist; subscriber path adds preparer
+  coordination flag only. skip_if taxpayer_is_student=true prevents double-ask
+  when Branch 9 also runs for the same filer.
+
+### Deferred — Branch 9 trigger gap
+Branch 9 (Education) has no secondary trigger from Branch 1 or Branch 13.
+A returning student who does not flag life_event_education misses all education
+credits — tuition, Canada Training Credit, student loan interest. The savings_resp
+student path partially mitigates this for RESP income only. Full fix tracked as a
+separate GitHub issue for V2 consideration.
+
+---
+
 ## Build Status — Current
 - Types: complete (src/types/index.ts)
 - Taxonomy validation: complete (src/lib/validateTaxonomy.ts)
@@ -221,17 +260,21 @@ in session state without requiring additional screens:
 - Session replay (Back button): complete
 - Build script: COMPLETE (scripts/buildInterviewFlow.ts)
 - Per-branch JSON files: COMPLETE — 16 files in taxonomy/2025/branches/
-- interview-flow.json: COMPLETE — 239.5KB assembled from 16 branch files, valid JSON
+- interview-flow.json: rebuild required after registered plan coverage audit changes
 - UX improvement sprint: Pass 1 COMPLETE, Pass 2 COMPLETE, Pass 3 (UI layer) PENDING
+- Registered plan coverage audit: COMPLETE (April 2026)
 - AI clarification layer (/api/clarify): not yet built
 - PDF export: not yet built
 - Full taxonomy nodes (items.json): 1 node (deduction_moving_expenses) — needs expansion
 
 ## Next Steps
-1. UX sprint Pass 3: UI layer (progress indicator, checklist animation, branch intros,
+1. Run build: npx tsx scripts/buildInterviewFlow.ts (required after registered plan audit changes)
+2. UX sprint Pass 3: UI layer (progress indicator, checklist animation, branch intros,
    personalisation cues, sample brief preview, Branch 0 time estimate, "No" message audit)
-2. Run app end-to-end in browser and test each branch path
-3. Validate matching engine node IDs against items.json as taxonomy grows
-4. Expand items.json with taxonomy nodes for all node_ids referenced in branches
-5. Build AI clarification layer (/api/clarify route with OpenRouter)
-6. Build PDF export
+3. Run app end-to-end in browser and test each branch path — clear localStorage first
+4. Validate matching engine node IDs against items.json as taxonomy grows
+5. Expand items.json with taxonomy nodes for all node_ids referenced in branches
+6. Build AI clarification layer (/api/clarify route with OpenRouter)
+7. Build PDF export
+8. V2 consideration: add secondary trigger to Branch 9 for returning students who
+   do not flag life_event_education (GitHub issue filed)

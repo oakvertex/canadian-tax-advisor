@@ -3,7 +3,7 @@
   "branch_label": "Savings and Registered Plans",
   "branch_order": 13,
   "always_runs": true,
-  "intro": "RRSP, TFSA, FHSA, and other registered plans affect nearly every Canadian's T1 return. Let's make sure your contributions and deductions are properly addressed.",
+  "intro": "RRSP, TFSA, FHSA, and other registered plans affect nearly every Canadian's T1 return. Let's make sure your contributions, deductions, and repayment obligations are all captured.",
   "screens": [
     {
       "screen_id": "savings_rrsp_contributed",
@@ -44,8 +44,8 @@
         "value": true
       },
       "options": [
-        { "value": true,    "label": "Yes — deduct the full contribution on my 2025 return" },
-        { "value": false,   "label": "No — I want to carry forward some or all of the deduction" },
+        { "value": true,     "label": "Yes — deduct the full contribution on my 2025 return" },
+        { "value": false,    "label": "No — I want to carry forward some or all of the deduction" },
         { "value": "discuss","label": "I want my preparer to advise on the optimal timing" }
       ],
       "feedback": {
@@ -60,7 +60,7 @@
           }
         },
         "discuss": {
-          "message": "Your preparer will model the deduction timing based on your current and projected future income to maximize tax savings.",
+          "message": "Your preparer will model the deduction timing based on your current and projected future income to maximise tax savings.",
           "preparer_flag": {
             "flag": "Model RRSP deduction timing — compare current year vs future year tax saving based on marginal rates",
             "urgency": "standard"
@@ -73,14 +73,14 @@
       "screen_type": "single_select",
       "title": "Did you contribute to a spousal RRSP in 2025?",
       "question_id": "spousal_rrsp_contributed",
-      "instruction": "A spousal RRSP contribution uses your own deduction room but builds retirement savings in your spouse's name — useful for equalizing retirement income and reducing total tax through pension splitting.",
+      "instruction": "A spousal RRSP contribution uses your own deduction room but builds retirement savings in your spouse's name — useful for equalising retirement income and reducing total tax through pension splitting.",
       "options": [
         { "value": true,  "label": "Yes" },
         { "value": false, "label": "No" }
       ],
       "feedback": {
         "true": {
-          "message": "Spousal RRSP contributions are deductible on your return using your own RRSP room. However if your spouse withdraws from the spousal RRSP within 3 calendar years of any spousal contribution, the withdrawal is attributed back to you as income under ITA s.146(8.3) — the attribution rule. Your preparer must track the last spousal contribution date.",
+          "message": "Spousal RRSP contributions are deductible on your return using your own RRSP room. However, if your spouse withdraws from the spousal RRSP within 3 calendar years of any spousal contribution, the withdrawal is attributed back to you as income under ITA s.146(8.3) — the attribution rule. Your preparer must track the last spousal contribution date.",
           "document_checklist_add": {
             "document": "Spousal RRSP contribution receipt and record of last spousal contribution date — required to assess 3-year attribution rule under ITA s.146(8.3)",
             "urgency": "priority"
@@ -96,36 +96,157 @@
       }
     },
     {
-      "screen_id": "savings_tfsa",
+      "screen_id": "savings_fhsa",
       "screen_type": "single_select",
-      "title": "Did you contribute to a TFSA in 2025?",
-      "question_id": "tfsa_contributed",
-      "instruction": "TFSA contributions are not deductible but all growth and withdrawals are tax-free. Over-contributions are subject to a 1% monthly penalty tax on the excess amount under ITA s.207.02.",
+      "title": "Do you have a First Home Savings Account (FHSA)?",
+      "question_id": "fhsa_savings_status",
+      "instruction": "FHSA contributions under ITA s.146.6 are tax-deductible regardless of whether you purchased a home in 2025. The annual limit is $8,000 with a lifetime maximum of $40,000. Unused room carries forward by $8,000 per year.",
       "options": [
-        { "value": true,  "label": "Yes" },
-        { "value": false, "label": "No" }
+        { "value": "contributed",  "label": "Yes — I contributed to an FHSA in 2025" },
+        { "value": "withdrew",     "label": "Yes — I made a qualifying withdrawal to purchase my first home" },
+        { "value": "opened_only",  "label": "I opened an FHSA in 2025 but did not contribute yet" },
+        { "value": false,          "label": "No FHSA" }
       ],
       "feedback": {
-        "true": {
-          "message": "TFSA contributions are not tax-deductible and do not appear on your T1. However the 2025 annual contribution limit is $7,000. If you have withdrawn funds from a TFSA in prior years those amounts are added back to your room on January 1 of the following year. Confirm your exact room through CRA My Account to avoid over-contribution penalties.",
+        "contributed": {
+          "message": "FHSA contributions are deductible on your 2025 T1 under ITA s.146.6. The annual limit is $8,000 — if you opened your FHSA in 2023 or earlier and did not use your full room, you may have up to $16,000 available in 2025. Your financial institution will issue an FHSA contribution receipt.",
+          "activates_flag": "fhsa_active",
+          "checklist_update": {
+            "node_id": "deduction_fhsa_contribution",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "FHSA contribution receipt from financial institution — shows 2025 contributions deductible on T1",
+            "urgency": "priority"
+          }
+        },
+        "withdrew": {
+          "message": "A qualifying FHSA withdrawal to purchase a first home is completely tax-free under ITA s.146.6 — no income inclusion and no repayment required. You must have been a first-time buyer and the home must close by October 1 of the year following the withdrawal. A T4FHSA slip will be issued. We will cover the full purchase detail in the First Home section.",
+          "activates_flag": "fhsa_active",
+          "checklist_update": {
+            "node_id": "deduction_fhsa_contribution",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4FHSA — Statement of First Home Savings Account showing contributions and qualifying withdrawal amount",
+            "urgency": "priority"
+          }
+        },
+        "opened_only": {
+          "message": "Opening an FHSA without contributing preserves future room. No deduction is available for 2025, but you can contribute up to $8,000 in 2026 plus any carry-forward room accumulated since opening.",
+          "activates_flag": "fhsa_active"
+        },
+        "false": {
+          "message": "No FHSA noted. If you are a first-time buyer under 71, you may still be eligible to open one — contributions are deductible and qualifying withdrawals are tax-free. Your preparer can advise on eligibility.",
           "preparer_flag": {
-            "flag": "Confirm TFSA contribution room through CRA My Account — over-contribution penalty is 1% per month on excess under ITA s.207.02",
+            "flag": "Assess FHSA eligibility — client may qualify to open and deduct contributions if a first-time buyer under 71",
+            "urgency": "standard"
+          }
+        }
+      }
+    },
+    {
+      "screen_id": "savings_resp",
+      "screen_type": "single_select",
+      "title": "Did you have any involvement with an RESP withdrawal in 2025?",
+      "question_id": "resp_involvement",
+      "instruction": "RESP Educational Assistance Payments (EAPs) — which include accumulated income and government grants — are taxable in the student's hands under ITA s.146.1(7). The tax treatment depends on whether you are the student beneficiary or the subscriber who opened the plan.",
+      "skip_if": {
+        "flag": "taxpayer_is_student",
+        "operator": "equals",
+        "value": true
+      },
+      "options": [
+        { "value": "student",    "label": "I am the student — I received Educational Assistance Payments from an RESP" },
+        { "value": "subscriber", "label": "I am the subscriber — my child or grandchild received EAP payments" },
+        { "value": false,        "label": "No RESP withdrawal in 2025" }
+      ],
+      "feedback": {
+        "student": {
+          "message": "EAPs are taxable in your hands as the student beneficiary under ITA s.146.1(7). You will receive a T4A slip showing the EAP amount — this must be reported on your T1. Since most students have low income, tax on EAPs is often nil or minimal. The return of original RESP contributions to the subscriber is always tax-free and does not affect your return.",
+          "activates_flag": "taxpayer_is_student",
+          "checklist_update": {
+            "node_id": "income_resp_eap",
+            "confidence_tier": "confirmed"
+          },
+          "document_checklist_add": {
+            "document": "T4A slip — Statement of RESP Educational Assistance Payment issued to you as the student beneficiary",
+            "urgency": "priority"
+          }
+        },
+        "subscriber": {
+          "message": "As the subscriber, the EAP income belongs to the student — there is nothing to report on your T1 from the withdrawal itself. Confirm that the student beneficiary has received their T4A and will report the EAP on their own return.",
+          "preparer_flag": {
+            "flag": "RESP EAP withdrawal made by subscriber — confirm student beneficiary has T4A and will report EAP income on their own T1 under ITA s.146.1(7)",
             "urgency": "standard"
           }
         },
         "false": {
-          "message": "No TFSA contributions noted."
+          "message": "No RESP withdrawal in 2025 noted."
+        }
+      }
+    },
+    {
+      "screen_id": "savings_prior_obligations",
+      "screen_type": "multi_select",
+      "title": "Do any of the following registered plan repayment obligations apply to you?",
+      "question_id": "prior_plan_obligations",
+      "instruction": "These obligations arise from RRSP withdrawals made in prior years. Missed annual repayments are added to your income for that year — they are not optional.",
+      "options": [
+        { "value": "hbp_repayment", "label": "I am repaying a Home Buyers' Plan (HBP) withdrawal from a prior year" },
+        { "value": "llp_repayment", "label": "I am repaying a Lifelong Learning Plan (LLP) withdrawal from a prior year" },
+        { "value": "none",          "label": "Neither applies", "exclusive": true }
+      ],
+      "feedback": {
+        "hbp_repayment": {
+          "message": "HBP repayments are made by contributing to your own RRSP and designating the amount on Schedule 7 — they are not separate payments to CRA. Your annual required repayment amount is shown on your Notice of Assessment. If you do not make the required repayment, that year's shortfall is added to your income under ITA s.146.01. Bring your NOA and confirm your repayment amount with your preparer.",
+          "activates_flag": "hbp_active",
+          "checklist_update": {
+            "node_id": "income_hbp_repayment",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "document_checklist_add": {
+            "document": "Notice of Assessment — confirms annual HBP repayment amount required for 2025. Schedule 7 must be filed to designate RRSP contributions as HBP repayments.",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "HBP repayment obligation — confirm annual required amount from NOA and whether repayment was made via RRSP contribution designated on Schedule 7",
+            "urgency": "priority"
+          }
+        },
+        "llp_repayment": {
+          "message": "LLP repayments work the same way as HBP — contribute to your RRSP and designate the amount on Schedule 7. Your annual required repayment is shown on your Notice of Assessment. Missed repayments are added to your income under ITA s.146.02. Repayments must begin no later than 10 years after the first LLP withdrawal, or the year after you cease to be a full-time student — whichever is earlier.",
+          "activates_flag": "llp_active",
+          "checklist_update": {
+            "node_id": "income_llp_repayment",
+            "confidence_tier": "possible",
+            "reason": "fact_dependent"
+          },
+          "document_checklist_add": {
+            "document": "Notice of Assessment — confirms annual LLP repayment amount required for 2025. Schedule 7 must be filed to designate RRSP contributions as LLP repayments.",
+            "urgency": "priority"
+          },
+          "preparer_flag": {
+            "flag": "LLP repayment obligation — confirm annual required amount from NOA and whether repayment was made via RRSP contribution designated on Schedule 7",
+            "urgency": "priority"
+          }
+        },
+        "none": {
+          "message": "No prior registered plan repayment obligations noted."
         }
       }
     }
   ],
   "branch_completion_summary": {
-    "message": "Savings and registered plans section complete.\n\nReminder: Over-contributions to registered accounts are not resolved through your T1 — they require separate CRA filings. If you have any concern, raise it with your preparer: RRSP excess above $2,000 buffer → Form T1-OVP by March 31, 2026 (ITA s.204.1); TFSA excess → Form RC243 by June 30, 2026 (ITA s.207.02); FHSA excess → Form RC243-SCH-A by June 30, 2026 (ITA s.207.021); RESP excess above $50,000/beneficiary → Form T1E-OVP by June 30, 2026 (ITA s.204.9). Verify all contribution room via CRA My Account.",
+    "message": "Savings and registered plans section complete.\n\nReminder: Over-contributions to registered accounts are not resolved through your T1 — they require separate CRA filings. Raise any concerns with your preparer: RRSP excess above $2,000 buffer → Form T1-OVP by March 31, 2026 (ITA s.204.1); TFSA excess → Form RC243 by June 30, 2026 (ITA s.207.02); FHSA excess → Form RC243-SCH-A by June 30, 2026 (ITA s.207.021); RESP excess above $50,000 per beneficiary → Form T1E-OVP by June 30, 2026 (ITA s.204.9). Verify all contribution room via CRA My Account.",
     "shows": "running_checklist_snapshot",
     "highlighted_documents": [
       "RRSP contribution receipts for March 2025 to March 2026 period",
-      "Notice of Assessment — confirms RRSP deduction limit and TFSA room",
-      "Spousal RRSP receipt and last contribution date record"
+      "Notice of Assessment — confirms RRSP deduction limit, HBP/LLP repayment amounts, and TFSA room",
+      "Spousal RRSP receipt and last contribution date record",
+      "FHSA contribution receipt or T4FHSA slip",
+      "T4A slip — RESP Educational Assistance Payment (issued to student beneficiary)"
     ],
     "transition": "Next: Deductions Review."
   }
