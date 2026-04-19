@@ -101,6 +101,10 @@
             "node_id": "deduction_child_care",
             "confidence_tier": "confirmed"
           },
+          "document_checklist_add": {
+            "document": "Form T778 — Child Care Expenses Deduction (completed by lower-income spouse's preparer and filed with T1)",
+            "urgency": "priority"
+          },
           "activates_flag": "has_child_care_expenses"
         },
         "false": {
